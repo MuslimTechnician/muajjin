@@ -65,30 +65,6 @@ export function AboutSection() {
               </ul>
             </AccordionContent>
           </AccordionItem>
-          
-          <AccordionItem value="offline-usage">
-            <AccordionTrigger>Offline Usage</AccordionTrigger>
-            <AccordionContent>
-              <p className="text-sm mb-2">Muajjin works offline after your first visit:</p>
-              <ul className="list-disc list-inside text-sm space-y-1">
-                <li>Prayer times are cached for offline use</li>
-                <li>Use the refresh option in settings to update the data</li>
-                <li>Regular usage doesn't require an internet connection</li>
-              </ul>
-            </AccordionContent>
-          </AccordionItem>
-          
-          <AccordionItem value="data-refresh">
-            <AccordionTrigger>Data Refresh</AccordionTrigger>
-            <AccordionContent>
-              <p className="text-sm mb-2">You can refresh the app data in two ways:</p>
-              <ul className="list-disc list-inside text-sm space-y-1">
-                <li>Soft refresh: Updates data without clearing cache</li>
-                <li>Hard refresh: Clears all cached data and fetches fresh data from the server</li>
-                <li>Use hard refresh if you notice any inconsistencies in prayer times</li>
-              </ul>
-            </AccordionContent>
-          </AccordionItem>
         </Accordion>
       </CardContent>
     </Card>
