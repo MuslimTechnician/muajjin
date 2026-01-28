@@ -1,0 +1,75 @@
+name: Build Release APK
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build web assets
+        run: npm run build
+
+      - name: Sync to Android (Capacitor)
+        run: npx cap sync android
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Create local.properties
+        run: |
+          echo "keystore.file=/tmp/keystore.jks" > android/local.properties
+          echo "keystore.password=${{ secrets.KEYSTORE_PASSWORD }}" >> android/local.properties
+          echo "keystore.key.alias=${{ secrets.KEY_ALIAS }}" >> android/local.properties
+          echo "keystore.key.password=${{ secrets.KEY_PASSWORD }}" >> android/local.properties
+
+      - name: Decode keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > /tmp/keystore.jks
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x android/gradlew
+
+      - name: Build Release APK
+        run: |
+          cd android
+          ./gradlew clean assembleRelease --stacktrace
+
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Rename APK
+        run: |
+          cd android/app/build/outputs/apk/release
+          mv app-release.apk muajjin-${{ steps.get_version.outputs.VERSION }}.apk
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./android/app/build/outputs/apk/release/muajjin-${{ steps.get_version.outputs.VERSION }}.apk
+          asset_name: muajjin-${{ steps.get_version.outputs.VERSION }}.apk
+          asset_content_type: application/vnd.android.package-archive
