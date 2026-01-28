@@ -10,7 +10,7 @@ import { FastingTimesContainer } from '@/components/FastingTimesContainer';
 import { calculatePrayerTimesLocally } from '@/services/prayerTimesLocal';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { PrayerTime, ProhibitedTime, UserSettings } from '@/types';
-import { adjustTime, getProhibitedTimes } from '@/utils/timeUtils';
+import { adjustTime, getProhibitedTimes, setTranslationFunction } from '@/utils/timeUtils';
 import { DEFAULT_SETTINGS, DEFAULT_CONTAINER_ORDER } from '@/constants/defaultSettings';
 import { useTranslation } from '@/contexts/TranslationContext';
 
@@ -36,7 +36,7 @@ export enum ContainerType {
 
 const Index = () => {
   const navigate = useNavigate();
-  const { getPrayerName } = useTranslation();
+  const { t, getPrayerName, mounted } = useTranslation();
   const [userSettings, setUserSettings] = useLocalStorage<UserSettings>('muajjin-settings', DEFAULT_SETTINGS);
   const [containerOrder, setContainerOrder] = useLocalStorage<string[]>('muajjin-container-order', DEFAULT_CONTAINER_ORDER);
   const [visibleContainers] = useLocalStorage<Record<string, boolean>>('muajjin-visible-containers', defaultVisibleContainers);
@@ -45,6 +45,7 @@ const Index = () => {
   const [sehriTime, setSehriTime] = useState<string>('');
   const [iftarTime, setIftarTime] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [loadedWithTranslation, setLoadedWithTranslation] = useState(false);
 
   // Check if onboarding is completed
   useEffect(() => {
@@ -54,10 +55,23 @@ const Index = () => {
     }
   }, [navigate]);
 
-  // Load prayer times on component mount
+  // Load prayer times on component mount and when translation changes
   useEffect(() => {
+    // Only load after translations are mounted
+    if (!mounted) return;
+
+    // Initialize the translation function for timeUtils (use general 't', not 'getPrayerName')
+    setTranslationFunction(t);
+
+    // If already loaded with this translation, don't reload
+    if (loadedWithTranslation) return;
+
     loadPrayerTimes(userSettings);
-  }, []);
+    // Also reload prohibited times to ensure they're translated
+    const timings = calculatePrayerTimesLocally(new Date(), userSettings);
+    setProhibitedTimes(getProhibitedTimes(timings));
+    setLoadedWithTranslation(true);
+  }, [mounted, t]); // Reload when translation function changes or first mounted
 
   const loadPrayerTimes = (settings: UserSettings) => {
     setIsLoading(true);
@@ -67,11 +81,11 @@ const Index = () => {
 
     // Create prayer times array with jamaah times from settings
     const prayers: PrayerTime[] = [
-      { name: getPrayerName('Fajr'), start: timings.Fajr, end: timings.Sunrise, jamaah: settings.jamaahTimes.Fajr },
-      { name: getPrayerName('Dhuhr'), start: timings.Dhuhr, end: timings.Asr, jamaah: settings.jamaahTimes.Dhuhr },
-      { name: getPrayerName('Asr'), start: timings.Asr, end: timings.Maghrib, jamaah: settings.jamaahTimes.Asr },
-      { name: getPrayerName('Maghrib'), start: timings.Maghrib, end: timings.Isha, jamaah: settings.jamaahTimes.Maghrib },
-      { name: getPrayerName('Isha'), start: timings.Isha, end: timings.Fajr, jamaah: settings.jamaahTimes.Isha }
+      { id: 'fajr', name: getPrayerName('Fajr'), start: timings.Fajr, end: timings.Sunrise, jamaah: settings.jamaahTimes.Fajr },
+      { id: 'dhuhr', name: getPrayerName('Dhuhr'), start: timings.Dhuhr, end: timings.Asr, jamaah: settings.jamaahTimes.Dhuhr },
+      { id: 'asr', name: getPrayerName('Asr'), start: timings.Asr, end: timings.Maghrib, jamaah: settings.jamaahTimes.Asr },
+      { id: 'maghrib', name: getPrayerName('Maghrib'), start: timings.Maghrib, end: timings.Isha, jamaah: settings.jamaahTimes.Maghrib },
+      { id: 'isha', name: getPrayerName('Isha'), start: timings.Isha, end: timings.Fajr, jamaah: settings.jamaahTimes.Isha }
     ];
 
     setPrayerTimes(prayers);
@@ -146,7 +160,7 @@ const Index = () => {
   
   return (
     <div className="min-h-screen p-4 max-w-md mx-auto">
-      {isLoading ? (
+      {isLoading || !mounted ? (
         <div className="flex flex-col items-center justify-center h-[60vh]">
           <div className="animate-pulse flex flex-col items-center gap-4">
             <div className="h-12 w-12 rounded-full bg-secondary"></div>

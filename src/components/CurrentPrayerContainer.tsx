@@ -51,7 +51,7 @@ export function CurrentPrayerContainer({ allPrayers, timeFormat = 'system' }: Cu
         endTime.setHours(endHours, endMinutes, 0, 0);
 
         // Handle day wraparound for Isha
-        if (currentPrayer.name === 'Isha') {
+        if (currentPrayer.id === 'isha') {
           if (now.getHours() >= startHours) {
             // Before midnight (e.g., 9:00 PM)
             // Check if Jama'ah time is after midnight (hour less than start hour)

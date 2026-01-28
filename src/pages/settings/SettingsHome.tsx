@@ -13,7 +13,7 @@ export default function SettingsHome() {
     { id: 'fasting', label: t('settings.fastingSettings'), route: '/settings/fasting' },
     { id: 'hijri', label: t('settings.hijriSettings'), route: '/settings/hijri' },
     { id: 'time-location', label: t('settings.timeLocationSettings'), route: '/settings/time-location' },
-    { id: 'display', label: t('settings.displayAndLanguage'), route: '/settings/display' },
+    { id: 'display', label: t('settings.displaySettings'), route: '/settings/display' },
     { id: 'translations', label: t('settings.translations'), route: '/settings/translations' },
     { id: 'about', label: t('settings.aboutSettings'), route: '/settings/about' },
   ];

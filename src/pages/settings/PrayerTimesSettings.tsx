@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { CALCULATION_METHODS, MADHABS } from '@/services/prayerTimesService';
+import { CALCULATION_METHODS, CALCULATION_METHOD_KEYS, MADHABS } from '@/services/prayerTimesService';
 import { UserSettings } from '@/types';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { Separator } from '@/components/ui/separator';
@@ -73,7 +73,7 @@ export default function PrayerTimesSettings() {
             <SelectContent>
               {CALCULATION_METHODS.map((method) => (
                 <SelectItem key={method.id} value={method.id.toString()}>
-                  {method.name}
+                  {t(CALCULATION_METHOD_KEYS[method.id] || 'calculationMethods.other')}
                 </SelectItem>
               ))}
             </SelectContent>

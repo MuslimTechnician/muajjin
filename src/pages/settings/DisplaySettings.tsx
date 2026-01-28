@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Upload, Trash2, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -84,10 +84,12 @@ function SortableContainer({
 export default function DisplaySettings() {
   const navigate = useNavigate();
   const { theme, setTheme, resolvedTheme } = useTheme();
-  const { t } = useTranslation();
+  const { t, uploadFont, removeFont, customFont } = useTranslation();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [userSettings] = useLocalStorage<UserSettings>('muajjin-settings', DEFAULT_SETTINGS);
   const [containerOrder, setContainerOrder] = useLocalStorage<string[]>('muajjin-container-order', DEFAULT_CONTAINER_ORDER);
   const [mounted, setMounted] = useState(false);
+  const hasCustomFont = !!customFont;
 
   // Default visible containers - all visible by default
   const defaultVisibleContainers: Record<string, boolean> = {
@@ -145,6 +147,18 @@ export default function DisplaySettings() {
     }));
   };
 
+  const handleFontUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    await uploadFont(file);
+
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -158,7 +172,7 @@ export default function DisplaySettings() {
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h1 className="text-lg font-semibold">{t('settings.displayAndLanguage')}</h1>
+          <h1 className="text-lg font-semibold">{t('settings.displaySettings')}</h1>
         </div>
       </div>
 
@@ -199,6 +213,54 @@ export default function DisplaySettings() {
               {t('settings.system')}
             </Button>
           </div>
+        </div>
+
+        <Separator />
+
+        {/* Custom Font */}
+        <div className="space-y-3">
+          <Label>{t('settings.customFont')}</Label>
+          <p className="text-sm text-muted-foreground">{t('settings.uploadFontDesc')}</p>
+
+          {hasCustomFont ? (
+            <div className="flex items-center justify-between p-3 border rounded-sm bg-muted/30">
+              <div className="flex items-center gap-2">
+                <Check className="h-4 w-4 text-green-600" />
+                <span className="text-sm font-medium">{t('settings.currentFont')}: customfont.woff2</span>
+              </div>
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={removeFont}
+                className="gap-1"
+              >
+                <Trash2 className="h-4 w-4" />
+                {t('settings.removeFont')}
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".woff2"
+                onChange={handleFontUpload}
+                className="hidden"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full gap-2"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <Upload className="h-4 w-4" />
+                {t('settings.uploadFont')}
+              </Button>
+              <p className="text-xs text-muted-foreground text-center">
+                {t('settings.fontFileName')}
+              </p>
+            </div>
+          )}
         </div>
 
         <Separator />

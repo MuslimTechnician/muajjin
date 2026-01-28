@@ -145,7 +145,7 @@ export function getCurrentPrayer(prayerTimes: PrayerTime[]): PrayerTime | null {
     const currentTotalMinutes = currentHours * 60 + currentMinutes;
     
     // Handle day wraparound for Isha
-    if (currentPrayer.name === 'Isha' && endTotalMinutes < startTotalMinutes) {
+    if (currentPrayer.id === 'isha' && endTotalMinutes < startTotalMinutes) {
       if (currentTotalMinutes >= startTotalMinutes || currentTotalMinutes < endTotalMinutes) {
         return currentPrayer;
       }

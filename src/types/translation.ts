@@ -2,17 +2,11 @@
  * Translation file structure
  */
 
-export interface TranslationFont {
-  name: string;
-  url: string;
-}
-
 export interface TranslationMeta {
   languageName: string;
   languageCode: string;
   direction: 'ltr' | 'rtl';
   version: string;
-  font?: TranslationFont; // Optional custom font
 }
 
 export interface TranslationStrings {

@@ -116,6 +116,21 @@ export const CALCULATION_METHODS = [
   { id: 1, name: "University of Islamic Sciences, Karachi" }
 ];
 
+// Map calculation method IDs to translation keys
+export const CALCULATION_METHOD_KEYS: Record<number, string> = {
+  5: 'calculationMethods.egyptian',
+  8: 'calculationMethods.other',
+  7: 'calculationMethods.tehran',
+  2: 'calculationMethods.northAmerica',
+  9: 'calculationMethods.kuwait',
+  11: 'calculationMethods.singapore',
+  3: 'calculationMethods.muslimWorldLeague',
+  12: 'calculationMethods.moonsightingCommittee',
+  10: 'calculationMethods.qatar',
+  4: 'calculationMethods.ummAlQura',
+  1: 'calculationMethods.karachi'
+};
+
 /**
  * Madhabs (schools of jurisprudence)
  */

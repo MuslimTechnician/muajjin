@@ -1,11 +1,19 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { TranslationState, TranslationStrings, StoredTranslation } from '@/types/translation';
 import enTemplate from '@/i18n/template-en.json';
 import { setTranslationFunction } from '@/utils/timeUtils';
-import { fontService } from '@/services/fontService';
+import { toast } from '@/components/ui/use-toast';
 
 const TRANSLATION_STORAGE_KEY = 'muajjin-translations';
 const ACTIVE_TRANSLATION_KEY = 'muajjin-active-translation';
+const CUSTOM_FONT_KEY = 'muajjin-custom-font';
+const FONT_FAMILY_NAME = 'MuajjinCustomFont';
+
+interface StoredFont {
+  name: string;
+  data: string; // base64
+  timestamp: number;
+}
 
 interface TranslationContextType {
   t: (key: string, params?: Record<string, string | number>) => string;
@@ -16,12 +24,13 @@ interface TranslationContextType {
   importTranslation: (translation: any) => { success: boolean; error?: string; id?: string };
   deleteTranslation: (id: string) => void;
   direction: 'ltr' | 'rtl';
+  mounted: boolean;
+  uploadFont: (file: File) => Promise<boolean>;
+  removeFont: () => void;
+  customFont: StoredFont | null;
 }
 
 const TranslationContext = createContext<TranslationContextType | undefined>(undefined);
-
-// Track current applied font
-let currentFont: string | null = null;
 
 // Helper function to get nested value from object using dot notation
 function getNestedValue(obj: any, key: string): string | undefined {
@@ -48,17 +57,25 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
     translations: {}
   });
   const [mounted, setMounted] = useState(false);
+  const [customFont, setCustomFont] = useState<StoredFont | null>(null);
 
-  // Load translations from localStorage on mount
+  // Load translations and font from localStorage on mount
   useEffect(() => {
     try {
       const storedTranslations = localStorage.getItem(TRANSLATION_STORAGE_KEY);
       const activeId = localStorage.getItem(ACTIVE_TRANSLATION_KEY);
+      const storedFont = localStorage.getItem(CUSTOM_FONT_KEY);
 
       setState({
         activeTranslationId: activeId || null,
         translations: storedTranslations ? JSON.parse(storedTranslations) : {}
       });
+
+      if (storedFont) {
+        const fontData = JSON.parse(storedFont) as StoredFont;
+        setCustomFont(fontData);
+        // Font will be applied after mounted is true (see useEffect below)
+      }
     } catch (error) {
       console.error('Failed to load translations:', error);
     } finally {
@@ -88,35 +105,6 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
     : null;
 
   const direction = activeTranslation?.meta.direction || 'ltr';
-
-  // Load font when translation changes
-  useEffect(() => {
-    const loadFontForTranslation = async () => {
-      // Remove previous font
-      if (currentFont) {
-        fontService.removeFont(currentFont);
-        currentFont = null;
-      }
-
-      // Load new font if available
-      if (activeTranslation?.meta.font && state.activeTranslationId) {
-        try {
-          const fontName = await fontService.loadFont(
-            activeTranslation.meta.font.url,
-            state.activeTranslationId
-          );
-          fontService.applyFont(fontName);
-          currentFont = fontName;
-          console.log('Custom font applied:', fontName);
-        } catch (error) {
-          console.error('Failed to load custom font:', error);
-          // Continue without custom font - translation still works
-        }
-      }
-    };
-
-    loadFontForTranslation();
-  }, [activeTranslation]);
 
   // Translation function
   const t = (key: string, params?: Record<string, string | number>): string => {
@@ -195,15 +183,6 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
   const deleteTranslation = (id: string) => {
     setState(prev => {
       const newTranslations = { ...prev.translations };
-      const translationToDelete = newTranslations[id];
-
-      // Clear font cache if exists
-      if (translationToDelete?.meta.font) {
-        fontService.clearFontCache(translationToDelete.meta.font.url).catch(err => {
-          console.error('Failed to clear font cache:', err);
-        });
-      }
-
       delete newTranslations[id];
 
       return {
@@ -213,6 +192,120 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
       };
     });
   };
+
+  // Apply font to document
+  const applyFont = useCallback(async (font: StoredFont) => {
+    try {
+      const fontFace = new FontFace(FONT_FAMILY_NAME, `url(${font.data})`);
+      const loadedFont = await fontFace.load();
+
+      // Add to document fonts
+      document.fonts.add(loadedFont);
+
+      // Apply to root element
+      document.documentElement.style.fontFamily = `'${FONT_FAMILY_NAME}', system-ui, -apple-system, sans-serif`;
+
+      console.log('Custom font applied:', font.name);
+    } catch (error) {
+      console.error('Failed to apply font:', error);
+      throw error;
+    }
+  }, []);
+
+  // Apply font after mounted and when customFont changes
+  useEffect(() => {
+    if (mounted && customFont) {
+      applyFont(customFont);
+    }
+  }, [mounted, customFont, applyFont]);
+
+  // Remove custom font
+  const removeFont = useCallback(() => {
+    try {
+      // Remove all font faces with our custom font family from document
+      for (const fontFace of document.fonts) {
+        if (fontFace.family === FONT_FAMILY_NAME) {
+          document.fonts.delete(fontFace);
+        }
+      }
+
+      // Reset document font family to default
+      document.documentElement.style.fontFamily = '';
+
+      // Clear from localStorage
+      localStorage.removeItem(CUSTOM_FONT_KEY);
+
+      // Update state
+      setCustomFont(null);
+
+      toast({
+        title: "Font removed",
+        description: "Custom font has been removed. Using default font.",
+      });
+    } catch (error) {
+      console.error('Failed to remove font:', error);
+    }
+  }, []);
+
+  // Upload and set custom font
+  const uploadFont = useCallback(async (file: File): Promise<boolean> => {
+    try {
+      // Validate file name must be exactly "customfont.woff2"
+      if (file.name !== 'customfont.woff2') {
+        throw new Error('Font file must be named exactly "customfont.woff2"');
+      }
+
+      // Validate file type
+      if (!file.name.endsWith('.woff2')) {
+        throw new Error('Invalid font file. Only .woff2 files are supported.');
+      }
+
+      // Check file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        throw new Error('Font file too large. Maximum size is 5MB.');
+      }
+
+      // Convert to base64
+      const reader = new FileReader();
+      const base64Promise = new Promise<string>((resolve, reject) => {
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = () => reject(reader.error);
+        reader.readAsDataURL(file);
+      });
+
+      const base64 = await base64Promise;
+
+      // Remove previous font
+      removeFont();
+
+      // Create new font data
+      const fontData: StoredFont = {
+        name: file.name,
+        data: base64,
+        timestamp: Date.now()
+      };
+
+      // Store in localStorage
+      localStorage.setItem(CUSTOM_FONT_KEY, JSON.stringify(fontData));
+
+      setCustomFont(fontData);
+
+      toast({
+        title: "Font uploaded successfully",
+        description: "Custom font is now active.",
+      });
+
+      return true;
+    } catch (error) {
+      console.error('Failed to upload font:', error);
+      toast({
+        title: "Failed to upload font",
+        description: error instanceof Error ? error.message : "Unknown error",
+        variant: "destructive",
+      });
+      return false;
+    }
+  }, [removeFont]);
 
   return (
     <TranslationContext.Provider
@@ -224,12 +317,22 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
         importedTranslations: state.translations,
         importTranslation,
         deleteTranslation,
-        direction
+        direction,
+        mounted,
+        uploadFont,
+        removeFont,
+        customFont
       }}
     >
-      <div dir={direction}>
-        {children}
-      </div>
+      {!mounted ? (
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="animate-pulse">Loading...</div>
+        </div>
+      ) : (
+        <div dir={direction}>
+          {children}
+        </div>
+      )}
     </TranslationContext.Provider>
   );
 }
