@@ -2,53 +2,51 @@
 import { PrayerTime } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatTime } from '@/utils/timeUtils';
-import { Bell } from 'lucide-react';
+import { useTranslation } from '@/contexts/TranslationContext';
 
 interface PrayerTimesContainerProps {
   prayers: PrayerTime[];
+  timeFormat?: 'system' | '12h' | '24h';
 }
 
-export function PrayerTimesContainer({ prayers }: PrayerTimesContainerProps) {
+// Helper to get Jama'ah time with fallback to start time
+const getJamaahTime = (prayer: PrayerTime): string => {
+  return prayer.jamaah || prayer.start;
+};
+
+export function PrayerTimesContainer({ prayers, timeFormat = 'system' }: PrayerTimesContainerProps) {
+  const { t } = useTranslation();
+
   return (
-    <div className="prayer-container">
-      <Card className="bg-transparent shadow-none border-none">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-xl flex items-center justify-center gap-2">
-            <Bell size={18} />
-            Prayer Times
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-4">
-          {prayers.map((prayer) => (
-            <div key={prayer.name} className="prayer-time border-b border-secondary last:border-0">
-              <div className="text-left">
-                <p className="font-semibold">{prayer.name}</p>
-              </div>
-              
-              <div className="flex gap-3 text-right">
-                <div className="text-xs lg:text-sm">
-                  <p className="text-muted-foreground">Start</p>
-                  <p>{formatTime(prayer.start)}</p>
-                </div>
-                
-                {prayer.end && (
-                  <div className="text-xs lg:text-sm">
-                    <p className="text-muted-foreground">End</p>
-                    <p>{formatTime(prayer.end)}</p>
-                  </div>
-                )}
-                
-                {prayer.jamaah && (
-                  <div className="text-xs lg:text-sm">
-                    <p className="text-muted-foreground">Jama'ah</p>
-                    <p className="text-primary font-medium">{formatTime(prayer.jamaah)}</p>
-                  </div>
-                )}
-              </div>
+    <Card className="bg-muted/30 border shadow-sm mb-4 rounded-sm">
+      <CardHeader className="pb-2 pt-3">
+        <CardTitle className="text-2xl font-bold">
+          {t('prayerTimes.title')}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="p-4">
+        {/* Table Header */}
+        <div className="grid grid-cols-4 gap-2 pb-2 mb-2 border-b border-secondary">
+          <div className="text-sm font-semibold">{t('prayerTimes.prayer')}</div>
+          <div className="text-sm font-semibold text-center">{t('prayerTimes.start')}</div>
+          <div className="text-sm font-semibold text-center">{t('prayerTimes.jamaah')}</div>
+          <div className="text-sm font-semibold text-center">{t('prayerTimes.end')}</div>
+        </div>
+
+        {/* Table Rows */}
+        {prayers.map((prayer) => (
+          <div key={prayer.name} className="grid grid-cols-4 gap-2 py-3 border-b border-secondary last:border-0 items-center">
+            <div className="font-medium">{prayer.name}</div>
+            <div className="text-center text-sm">{formatTime(prayer.start, timeFormat)}</div>
+            <div className="text-center text-sm text-primary font-medium">
+              {formatTime(getJamaahTime(prayer), timeFormat)}
             </div>
-          ))}
-        </CardContent>
-      </Card>
-    </div>
+            <div className="text-center text-sm text-muted-foreground">
+              {prayer.end ? formatTime(prayer.end, timeFormat) : '—'}
+            </div>
+          </div>
+        ))}
+      </CardContent>
+    </Card>
   );
 }

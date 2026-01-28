@@ -85,6 +85,108 @@
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
+
+  /* Safe area support for notched devices (iPhone, Android) */
+  html {
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+
+  /* Hide scrollbar globally while keeping scrolling functionality */
+  * {
+    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none;  /* IE and Edge */
+  }
+
+  /* Chrome, Safari, Opera */
+  ::-webkit-scrollbar {
+    width: 0px;
+    height: 0px;
+    background: transparent;
+  }
+
+  /* RTL Support */
+  [dir="rtl"] {
+    direction: rtl;
+  }
+
+  [dir="rtl"] .flex {
+    text-align: right;
+  }
+
+  [dir="rtl"] .text-left {
+    text-align: right;
+  }
+
+  [dir="rtl"] .text-right {
+    text-align: left;
+  }
+
+  [dir="rtl"] .mr-2 {
+    margin-right: 0;
+    margin-left: 0.5rem;
+  }
+
+  [dir="rtl"] .ml-2 {
+    margin-left: 0;
+    margin-right: 0.5rem;
+  }
+
+  [dir="rtl"] .mr-3 {
+    margin-right: 0;
+    margin-left: 0.75rem;
+  }
+
+  [dir="rtl"] .ml-3 {
+    margin-left: 0;
+    margin-right: 0.75rem;
+  }
+
+  [dir="rtl"] .mr-4 {
+    margin-right: 0;
+    margin-left: 1rem;
+  }
+
+  [dir="rtl"] .ml-4 {
+    margin-left: 0;
+    margin-right: 1rem;
+  }
+
+  [dir="rtl"] .mr-auto {
+    margin-right: 0;
+    margin-left: auto;
+  }
+
+  [dir="rtl"] .ml-auto {
+    margin-left: 0;
+    margin-right: auto;
+  }
+
+  /* Flip directional icons in RTL */
+  [dir="rtl"] .fa-arrow-left,
+  [dir="rtl"] .lucide-arrow-left {
+    transform: scaleX(-1);
+  }
+
+  [dir="rtl"] .fa-arrow-right,
+  [dir="rtl"] .lucide-arrow-right {
+    transform: scaleX(-1);
+  }
+
+  /* Ensure proper spacing in RTL for flex containers */
+  [dir="rtl"] .gap-2 > * + * {
+    margin-right: 0;
+    margin-left: 0.5rem;
+  }
+
+  [dir="rtl"] .gap-3 > * + * {
+    margin-right: 0;
+    margin-left: 0.75rem;
+  }
+
+  [dir="rtl"] .gap-4 > * + * {
+    margin-right: 0;
+    margin-left: 1rem;
+  }
 }
 
 @layer components {

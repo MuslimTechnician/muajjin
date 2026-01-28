@@ -1,139 +1,81 @@
 
 import { useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { formatGregorianDate, formatHijriDate, getCurrentTimeFormatted } from '@/utils/timeUtils';
-import { fetchHijriDate } from '@/services/prayerTimesService';
-import { PrayerTime } from '@/types';
-import { getCurrentPrayer, getNextPrayer, formatTime } from '@/utils/timeUtils';
-import { Separator } from '@/components/ui/separator';
+import { formatGregorianDateShort, getCurrentTimeFormatted, getDayName, resolveTimeFormat } from '@/utils/timeUtils';
+import { calculateHijriDate, formatHijriDateLocal, HijriDateResult } from '@/utils/hijriUtils';
 import { MapPin } from 'lucide-react';
 
 interface DateTimeContainerProps {
   hijriAdjustment: number;
-  allPrayers: PrayerTime[];
   location?: {
     city: string;
     country: string;
   };
+  timeFormat?: 'system' | '12h' | '24h';
 }
 
-export function DateTimeContainer({ hijriAdjustment, allPrayers, location }: DateTimeContainerProps) {
-  const [currentTime, setCurrentTime] = useState(getCurrentTimeFormatted(true)); // Pass true to get 12-hour format
-  const [hijriDate, setHijriDate] = useState<any>(null);
-  const [currentPrayer, setCurrentPrayer] = useState<PrayerTime | null>(null);
-  const [nextPrayer, setNextPrayer] = useState<PrayerTime | null>(null);
-  
+export function DateTimeContainer({ hijriAdjustment, location, timeFormat = 'system' }: DateTimeContainerProps) {
+  const [currentTime, setCurrentTime] = useState(getCurrentTimeFormatted(timeFormat));
+  const [hijriDate, setHijriDate] = useState<HijriDateResult | null>(null);
+
   // Update current time every second
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentTime(getCurrentTimeFormatted(true)); // Pass true to get 12-hour format
-      
-      // Update current and next prayer
-      if (allPrayers.length > 0) {
-        setCurrentPrayer(getCurrentPrayer(allPrayers));
-        setNextPrayer(getNextPrayer(allPrayers));
-      }
+      setCurrentTime(getCurrentTimeFormatted(timeFormat));
     }, 1000);
-    
+
     return () => clearInterval(timer);
-  }, [allPrayers]);
-  
-  // Fetch Hijri date on component mount
+  }, [timeFormat]);
+
+  // Calculate Hijri date locally on component mount and adjustment change
   useEffect(() => {
-    const fetchHijri = async () => {
-      try {
-        const hijriData = await fetchHijriDate(new Date(), hijriAdjustment);
-        setHijriDate(hijriData);
-      } catch (error) {
-        console.error('Error fetching Hijri date:', error);
-      }
-    };
-    
-    fetchHijri();
+    // Calculate Hijri date locally using Umm al-Qura calendar (no API call needed!)
+    const hijri = calculateHijriDate(new Date(), hijriAdjustment);
+    setHijriDate(hijri);
   }, [hijriAdjustment]);
   
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 prayer-container">
-      <Card className="bg-secondary/50 shadow-none border-none">
-        <CardContent className="p-4 text-left">
-          {location && (
-            <div className="mb-2 flex items-center">
-              <MapPin size={14} className="mr-1 text-muted-foreground" />
-              <p className="text-xs text-muted-foreground">{location.city}, {location.country}</p>
+    <Card className="bg-muted/30 border shadow-sm mb-4 rounded-sm">
+      <CardContent className="p-4">
+          <div className="space-y-3">
+            {/* Row 1: Time + Day Name | Location */}
+            <div className="grid grid-cols-2 gap-4">
+              {/* Left Column: Time + Day Name (same row) */}
+              <div className="text-left flex items-baseline gap-2">
+                <span className="text-base">
+                  {resolveTimeFormat(timeFormat) === '24h'
+                    ? currentTime.split(':').slice(0, 2).join(':')
+                    : currentTime.split(':').slice(0, 2).join(':') + ' ' + currentTime.split(' ').slice(-1)[0]
+                  }
+                </span>
+                <span className="text-base">{getDayName(new Date())}</span>
+              </div>
+
+              {/* Right Column: Location */}
+              <div className="text-right flex items-center justify-end gap-2">
+                {location && (
+                  <>
+                    <span className="text-base">{location.city}</span>
+                    <MapPin size={14} className="text-muted-foreground" />
+                  </>
+                )}
+              </div>
             </div>
-          )}
-          <div className="mb-2">
-            <p className="text-xs text-muted-foreground">Hijri Date</p>
-            <p className="text-xl font-semibold">{formatHijriDate(hijriDate)}</p>
-          </div>
-          <div className="mb-2">
-            <p className="text-xs text-muted-foreground">Gregorian Date</p>
-            <p className="text-base">{formatGregorianDate(new Date())}</p>
-          </div>
-          <div>
-            <p className="text-xs text-muted-foreground">Current Time</p>
-            <p className="text-2xl font-bold text-primary">{currentTime}</p>
+
+            {/* Row 2: Hijri Date | Gregorian Date */}
+            <div className="grid grid-cols-2 gap-4">
+              {/* Left Column: Hijri Date */}
+              <div className="text-left">
+                <p className="text-base">{formatHijriDateLocal(hijriDate)}</p>
+              </div>
+
+              {/* Right Column: Gregorian Date */}
+              <div className="text-right">
+                <p className="text-base text-muted-foreground">{formatGregorianDateShort(new Date())}</p>
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>
-      
-      <Card className="bg-secondary/50 shadow-none border-none">
-        <CardContent className="p-4 text-left">
-          {currentPrayer ? (
-            <div className="mb-2">
-              <p className="text-xs text-muted-foreground">Current Prayer</p>
-              <p className="text-xl font-bold text-primary">{currentPrayer.name}</p>
-              <p className="text-sm">
-                Ends at{' '}
-                <span className="font-medium">
-                  {currentPrayer.end ? formatTime(currentPrayer.end) : 'N/A'}
-                </span>
-              </p>
-              {currentPrayer.jamaah && (
-                <p className="text-sm">
-                  Jama'ah at{' '}
-                  <span className="font-medium text-primary">
-                    {formatTime(currentPrayer.jamaah)}
-                  </span>
-                </p>
-              )}
-            </div>
-          ) : (
-            <div className="mb-2">
-              <p className="text-xs text-muted-foreground">Current Prayer</p>
-              <p className="text-lg">Loading...</p>
-            </div>
-          )}
-          
-          <Separator className="my-2" />
-          
-          {nextPrayer ? (
-            <div>
-              <p className="text-xs text-muted-foreground">Next Prayer</p>
-              <p className="text-xl font-bold">{nextPrayer.name}</p>
-              <p className="text-sm">
-                Starts at{' '}
-                <span className="font-medium">
-                  {formatTime(nextPrayer.start)}
-                </span>
-              </p>
-              {nextPrayer.jamaah && (
-                <p className="text-sm">
-                  Jama'ah at{' '}
-                  <span className="font-medium text-primary">
-                    {formatTime(nextPrayer.jamaah)}
-                  </span>
-                </p>
-              )}
-            </div>
-          ) : (
-            <div>
-              <p className="text-xs text-muted-foreground">Next Prayer</p>
-              <p className="text-lg">Loading...</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </div>
   );
 }
