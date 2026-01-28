@@ -4,6 +4,9 @@ on:
   release:
     types: [published]
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -36,6 +39,16 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
       - name: Create local.properties
         run: |
           echo "keystore.file=/tmp/keystore.jks" > android/local.properties
@@ -65,11 +78,6 @@ jobs:
           mv app-release.apk muajjin-${{ steps.get_version.outputs.VERSION }}.apk
 
       - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v2
         with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./android/app/build/outputs/apk/release/muajjin-${{ steps.get_version.outputs.VERSION }}.apk
-          asset_name: muajjin-${{ steps.get_version.outputs.VERSION }}.apk
-          asset_content_type: application/vnd.android.package-archive
+          files: ./android/app/build/outputs/apk/release/muajjin-${{ steps.get_version.outputs.VERSION }}.apk
