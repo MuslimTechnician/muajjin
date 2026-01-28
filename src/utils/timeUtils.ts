@@ -1,11 +1,105 @@
 
 import { PrayerTime, ProhibitedTime } from "@/types";
 
-// Format time from 24h format to 12h format with AM/PM
-export function formatTime(time: string): string {
+// Cache for translation function to avoid circular imports
+let translationFunction: ((key: string) => string) | null = null;
+
+export function setTranslationFunction(fn: (key: string) => string) {
+  translationFunction = fn;
+}
+
+function t(key: string): string {
+  return translationFunction ? translationFunction(key) : key;
+}
+
+/**
+ * Detect if the user's system uses 12-hour or 24-hour time format
+ * Uses Intl.DateTimeFormat to check the system preference
+ */
+export function getSystemTimeFormat(): '12h' | '24h' {
+  try {
+    // Use a test time (13:00 = 1 PM) to check if system shows 12h or 24h
+    const formatter = new Intl.DateTimeFormat(undefined, {
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: false // Let the system decide
+    });
+
+    const parts = formatter.formatToParts(new Date(2021, 0, 1, 13));
+    const hasDayPeriod = parts.some(part => part.type === 'dayPeriod');
+
+    // If the formatter doesn't use dayPeriod for 13:00, it's 24h format
+    // But we need to check if hour12 is actually being used
+    const formatterWith12h = new Intl.DateTimeFormat(undefined, {
+      hour: 'numeric',
+      hour12: true
+    });
+    const formattedWith12h = formatterWith12h.format(new Date(2021, 0, 1, 13));
+
+    // If system shows "1 PM" or similar, it's 12h format
+    // If system shows "13", it's 24h format
+    const formatterAuto = new Intl.DateTimeFormat(undefined, {
+      hour: 'numeric',
+      hour12: true
+    });
+    const formattedAuto = formatterAuto.format(new Date(2021, 0, 1, 13));
+
+    // Check if the result contains PM/AM indicator
+    if (formattedAuto.includes('PM') || formattedAuto.includes('AM')) {
+      return '12h';
+    }
+
+    // Check if the hour is shown as 13 (24h) or 1 (12h)
+    const hourPart = parts.find(p => p.type === 'hour');
+    if (hourPart && hourPart.value === '13') {
+      return '24h';
+    }
+
+    // Fallback: try formatting and check for day period
+    const testFormatter = new Intl.DateTimeFormat(undefined, {
+      hour: 'numeric',
+      minute: 'numeric'
+    });
+    const testFormatted = testFormatter.format(new Date(2021, 0, 1, 13));
+
+    // If it contains AM/PM, it's 12h
+    if (testFormatted.includes('AM') || testFormatted.includes('PM')) {
+      return '12h';
+    }
+
+    // Default to 24h if unable to detect
+    return '24h';
+  } catch {
+    // If detection fails, default to 24h
+    return '24h';
+  }
+}
+
+/**
+ * Resolve the actual time format ('12h' or '24h') from user preference
+ * If user selected 'system', detect system preference
+ */
+export function resolveTimeFormat(format: 'system' | '12h' | '24h'): '12h' | '24h' {
+  if (format === 'system') {
+    return getSystemTimeFormat();
+  }
+  return format;
+}
+
+// Format time from 24h format to 12h or 24h format based on preference
+export function formatTime(time: string, format: 'system' | '12h' | '24h' = 'system'): string {
   const [hours, minutes] = time.split(':');
   const hoursNum = parseInt(hours, 10);
-  const ampm = hoursNum >= 12 ? 'PM' : 'AM';
+
+  // Resolve the actual format (handle 'system' option)
+  const actualFormat = resolveTimeFormat(format);
+
+  if (actualFormat === '24h') {
+    return `${String(hoursNum).padStart(2, '0')}:${minutes}`;
+  }
+
+  // 12h format with AM/PM
+  const ampm = hoursNum >= 12 ? t('common.pm') : t('common.am');
   const hours12 = hoursNum % 12 || 12;
   return `${hours12}:${minutes} ${ampm}`;
 }
@@ -51,7 +145,7 @@ export function getCurrentPrayer(prayerTimes: PrayerTime[]): PrayerTime | null {
     const currentTotalMinutes = currentHours * 60 + currentMinutes;
     
     // Handle day wraparound for Isha
-    if (currentPrayer.name === 'Isha' && endTotalMinutes < startTotalMinutes) {
+    if (currentPrayer.id === 'isha' && endTotalMinutes < startTotalMinutes) {
       if (currentTotalMinutes >= startTotalMinutes || currentTotalMinutes < endTotalMinutes) {
         return currentPrayer;
       }
@@ -95,49 +189,52 @@ export function getNextPrayer(prayerTimes: PrayerTime[]): PrayerTime | null {
   return sortedPrayers[0];
 }
 
-// Get prohibited prayer times
+// Get prohibited prayer times with start and end ranges
 export function getProhibitedTimes(prayerTimes: { [key: string]: string }): ProhibitedTime[] {
   const prohibitedTimes: ProhibitedTime[] = [
     {
-      name: 'Sunrise',
-      time: prayerTimes['Sunrise'],
-      description: 'From dawn until the sun has risen'
+      name: t('prohibited.sunrise'),
+      start: prayerTimes['Sunrise'], // When Fajr ends
+      end: adjustTime(prayerTimes['Sunrise'], 15) // 15 minutes after sunrise
     },
     {
-      name: 'Zenith',
-      time: adjustTime(prayerTimes['Dhuhr'], -5),
-      description: 'When the sun is at its highest point (5 minutes before Dhuhr)'
+      name: t('prohibited.zenith'),
+      start: adjustTime(prayerTimes['Dhuhr'], -3), // 3 minutes before Dhuhr
+      end: prayerTimes['Dhuhr'] // Until Dhuhr starts
     },
     {
-      name: 'Sunset',
-      time: adjustTime(prayerTimes['Maghrib'], -5),
-      description: 'When the sun is about to set (5 minutes before Maghrib)'
+      name: t('prohibited.sunset'),
+      start: adjustTime(prayerTimes['Maghrib'], -15), // 15 minutes before Maghrib
+      end: prayerTimes['Maghrib'] // Until Maghrib starts
     }
   ];
-  
+
   return prohibitedTimes;
 }
 
 // Format current time
-export function getCurrentTimeFormatted(use12Hour: boolean = false): string {
+export function getCurrentTimeFormatted(format: 'system' | '12h' | '24h' = 'system'): string {
   const now = new Date();
-  
-  if (use12Hour) {
+
+  // Resolve the actual format (handle 'system' option)
+  const actualFormat = resolveTimeFormat(format);
+
+  if (actualFormat === '12h') {
     let hours = now.getHours();
     const minutes = String(now.getMinutes()).padStart(2, '0');
     const seconds = String(now.getSeconds()).padStart(2, '0');
-    const ampm = hours >= 12 ? 'PM' : 'AM';
-    
+    const ampm = hours >= 12 ? t('common.pm') : t('common.am');
+
     hours = hours % 12;
     hours = hours ? hours : 12; // the hour '0' should be '12'
     const hoursStr = String(hours).padStart(2, '0');
-    
+
     return `${hoursStr}:${minutes}:${seconds} ${ampm}`;
   } else {
     const hours = String(now.getHours()).padStart(2, '0');
     const minutes = String(now.getMinutes()).padStart(2, '0');
     const seconds = String(now.getSeconds()).padStart(2, '0');
-    
+
     return `${hours}:${minutes}:${seconds}`;
   }
 }
@@ -152,12 +249,19 @@ export function formatGregorianDate(date: Date): string {
   }).format(date);
 }
 
-// Format Hijri date
-export function formatHijriDate(hijriData: any): string {
-  if (!hijriData || !hijriData.data || !hijriData.data.hijri) {
-    return 'Loading Hijri date...';
-  }
-  
-  const hijri = hijriData.data.hijri;
-  return `${hijri.day} ${hijri.month.en} ${hijri.year} AH`;
+// Get day name only (e.g., "Mon")
+export function getDayName(date: Date, short: boolean = true): string {
+  const weekday = new Intl.DateTimeFormat('en-US', {
+    weekday: short ? 'short' : 'long'
+  }).format(date);
+  return weekday;
+}
+
+// Format Gregorian date without day name (e.g., "12 Aug 2026")
+export function formatGregorianDateShort(date: Date): string {
+  return new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  }).format(date);
 }

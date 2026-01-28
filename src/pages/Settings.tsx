@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
-import { CALCULATION_METHODS, MADHABS } from '@/services/prayerTimesService';
+import { CALCULATION_METHODS, CALCULATION_METHOD_KEYS, MADHABS } from '@/services/prayerTimesService';
 import { UserSettings } from '@/types';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { toast } from '@/components/ui/use-toast';

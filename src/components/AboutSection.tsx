@@ -3,65 +3,67 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Separator } from '@/components/ui/separator';
+import { useTranslation } from '@/contexts/TranslationContext';
 
 export function AboutSection() {
+  const { t } = useTranslation();
+
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>About Muajjin</CardTitle>
-        <CardDescription>Information and usage instructions</CardDescription>
+        <CardTitle>{t('about.title')}</CardTitle>
+        <CardDescription>{t('about.information')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-sm text-muted-foreground">
-          Muajjin is your comprehensive Islamic prayer times application that provides accurate prayer times,
-          Hijri calendar information, and Ramadan timings.
+          {t('about.appDescription')}
         </p>
-        
+
         <Separator className="my-2" />
-        
+
         <Accordion type="single" collapsible className="w-full">
           <AccordionItem value="prayer-times">
-            <AccordionTrigger>Prayer Times</AccordionTrigger>
+            <AccordionTrigger>{t('about.sections.prayerTimes')}</AccordionTrigger>
             <AccordionContent>
-              <p className="text-sm mb-2">The main screen displays the daily prayer times based on your location and calculation method settings.</p>
+              <p className="text-sm mb-2">{t('about.sections.prayerTimesDesc')}</p>
               <ul className="list-disc list-inside text-sm space-y-1">
-                <li>Prayer times are calculated based on your location and preferred calculation method</li>
-                <li>Jama'ah times can be customized in the settings</li>
-                <li>Time adjustments for Sehri and Iftar can be set in the prayer times tab</li>
+                <li>{t('about.sections.prayerTimesList1')}</li>
+                <li>{t('about.sections.prayerTimesList2')}</li>
+                <li>{t('about.sections.prayerTimesList3')}</li>
               </ul>
             </AccordionContent>
           </AccordionItem>
-          
+
           <AccordionItem value="location">
-            <AccordionTrigger>Location Settings</AccordionTrigger>
+            <AccordionTrigger>{t('about.sections.location')}</AccordionTrigger>
             <AccordionContent>
-              <p className="text-sm mb-2">You can set your location in two ways:</p>
+              <p className="text-sm mb-2">{t('about.sections.locationDesc')}</p>
               <ul className="list-disc list-inside text-sm space-y-1">
-                <li>Manual coordinates: Enter latitude and longitude directly</li>
-                <li>City and country: Select your city and country from the dropdown</li>
+                <li>{t('about.sections.locationList1')}</li>
+                <li>{t('about.sections.locationList2')}</li>
               </ul>
             </AccordionContent>
           </AccordionItem>
-          
+
           <AccordionItem value="calculation-methods">
-            <AccordionTrigger>Calculation Methods</AccordionTrigger>
+            <AccordionTrigger>{t('about.sections.calculationMethods')}</AccordionTrigger>
             <AccordionContent>
-              <p className="text-sm mb-2">Different regions follow different calculation methods:</p>
+              <p className="text-sm mb-2">{t('about.sections.calculationMethodsDesc')}</p>
               <ul className="list-disc list-inside text-sm space-y-1">
-                <li>Select the calculation method that is followed in your region</li>
-                <li>Choose the appropriate Madhab for Asr prayer time calculation</li>
-                <li>Adjust the Hijri date if needed to match local moon sighting</li>
+                <li>{t('about.sections.calculationMethodsList1')}</li>
+                <li>{t('about.sections.calculationMethodsList2')}</li>
+                <li>{t('about.sections.calculationMethodsList3')}</li>
               </ul>
             </AccordionContent>
           </AccordionItem>
-          
+
           <AccordionItem value="jamaah-times">
-            <AccordionTrigger>Jama'ah Times</AccordionTrigger>
+            <AccordionTrigger>{t('about.sections.jamaahTimes')}</AccordionTrigger>
             <AccordionContent>
-              <p className="text-sm mb-2">Set the congregation prayer times for your local mosque:</p>
+              <p className="text-sm mb-2">{t('about.sections.jamaahTimesDesc')}</p>
               <ul className="list-disc list-inside text-sm space-y-1">
-                <li>Enter the exact time for each prayer's congregation</li>
-                <li>These times will be displayed alongside the calculated prayer times</li>
+                <li>{t('about.sections.jamaahTimesList1')}</li>
+                <li>{t('about.sections.jamaahTimesList2')}</li>
               </ul>
             </AccordionContent>
           </AccordionItem>

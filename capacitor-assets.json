@@ -1,0 +1,8 @@
+{
+  "iconSize": 1024,
+  "splashSize": 2732,
+  "iconBackgroundColor": "#4f46e5",
+  "splashBackgroundColor": "#4f46e5",
+  "android": true,
+  "ios": false
+}

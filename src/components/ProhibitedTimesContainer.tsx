@@ -2,45 +2,35 @@
 import { ProhibitedTime } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatTime } from '@/utils/timeUtils';
-import { Ban } from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useTranslation } from '@/contexts/TranslationContext';
 
 interface ProhibitedTimesContainerProps {
   prohibitedTimes: ProhibitedTime[];
+  timeFormat?: 'system' | '12h' | '24h';
 }
 
-export function ProhibitedTimesContainer({ prohibitedTimes }: ProhibitedTimesContainerProps) {
+export function ProhibitedTimesContainer({ prohibitedTimes, timeFormat = 'system' }: ProhibitedTimesContainerProps) {
+  const { t } = useTranslation();
+
   return (
-    <div className="prayer-container">
-      <Card className="bg-transparent shadow-none border-none">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-xl flex items-center justify-center gap-2">
-            <Ban size={18} className="text-destructive" />
-            Prohibited Prayer Times
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-4">
+    <Card className="bg-muted/30 border shadow-sm mb-4 rounded-sm">
+      <CardHeader className="pb-2 pt-3">
+        <CardTitle className="text-2xl font-bold">
+          {t('prohibited.title')}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="p-4">
           <div className="grid gap-3">
             {prohibitedTimes.map((time) => (
-              <TooltipProvider key={time.name}>
-                <div className="flex justify-between items-center border-b border-secondary pb-2 last:border-0 last:pb-0">
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div className="flex items-center gap-2 cursor-help">
-                        <p className="font-medium">{time.name}</p>
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent side="top">
-                      <p className="max-w-[200px] text-sm">{time.description}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                  <p>{formatTime(time.time)}</p>
-                </div>
-              </TooltipProvider>
+              <div key={time.name} className="flex justify-between items-center border-b border-secondary pb-2 last:border-0 last:pb-0">
+                <p className="font-medium">{time.name}</p>
+                <p className="text-sm text-muted-foreground">
+                  {formatTime(time.start, timeFormat)} → {formatTime(time.end, timeFormat)}
+                </p>
+              </div>
             ))}
           </div>
         </CardContent>
       </Card>
-    </div>
   );
 }

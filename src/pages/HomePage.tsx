@@ -1,23 +1,15 @@
 
-import { useState } from 'react';
-import Index from './Index';
-import SettingsPage from './Settings';
-import { BottomNavBar } from '@/components/BottomNavBar';
-
-// Define the available sections
-export type Section = 'home' | 'settings';
+import { Outlet } from 'react-router-dom';
+import { AppHeader } from '@/components/AppHeader';
 
 const HomePage = () => {
-  const [activeSection, setActiveSection] = useState<Section>('home');
-
   return (
     <div className="min-h-screen">
-      {/* Show components based on active section */}
-      {activeSection === 'home' && <Index />}
-      {activeSection === 'settings' && <SettingsPage />}
+      {/* App Header - Always visible */}
+      <AppHeader />
 
-      {/* Bottom navigation bar that updates the active section */}
-      <BottomNavBar activeSection={activeSection} onSectionChange={setActiveSection} />
+      {/* Main Content - Outlet renders child routes */}
+      <Outlet />
     </div>
   );
 };
