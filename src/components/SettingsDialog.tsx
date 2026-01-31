@@ -50,14 +50,14 @@ export function SettingsDialog({ settings, onUpdateSettings }: SettingsDialogPro
           <DialogTitle>Settings</DialogTitle>
         </DialogHeader>
         
-        <Tabs defaultValue="prayer-times">
+        <Tabs defaultValue="salat-times">
           <TabsList className="grid grid-cols-3 mb-4">
-            <TabsTrigger value="prayer-times">Prayer Times</TabsTrigger>
+            <TabsTrigger value="salat-times">Salat Times</TabsTrigger>
             <TabsTrigger value="location">Location</TabsTrigger>
             <TabsTrigger value="jamaah">Jama'ah Times</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="prayer-times">
+          <TabsContent value="salat-times">
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="calculation-method">Calculation Method</Label>
@@ -110,13 +110,13 @@ export function SettingsDialog({ settings, onUpdateSettings }: SettingsDialogPro
               
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Sehri Adjustment ({localSettings.sehriAdjustment} min)</Label>
-                  <Slider 
-                    min={-3} 
-                    max={3} 
-                    step={1} 
-                    value={[localSettings.sehriAdjustment]} 
-                    onValueChange={(value) => updateSetting('sehriAdjustment', value[0])}
+                  <Label>Suhoor Adjustment ({localSettings.suhoorAdjustment} min)</Label>
+                  <Slider
+                    min={-3}
+                    max={3}
+                    step={1}
+                    value={[localSettings.suhoorAdjustment]}
+                    onValueChange={(value) => updateSetting('suhoorAdjustment', value[0])}
                   />
                 </div>
                 

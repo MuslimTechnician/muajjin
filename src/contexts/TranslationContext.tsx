@@ -17,7 +17,7 @@ interface StoredFont {
 
 interface TranslationContextType {
   t: (key: string, params?: Record<string, string | number>) => string;
-  getPrayerName: (prayer: string) => string;
+  getSalatName: (salat: string) => string;
   activeTranslation: StoredTranslation | null;
   setActiveTranslation: (id: string | null) => void;
   importedTranslations: Record<string, StoredTranslation>;
@@ -46,8 +46,13 @@ function getNestedValue(obj: any, key: string): string | undefined {
 // Replace {{placeholder}} with actual values
 function interpolate(template: string, params?: Record<string, string | number>): string {
   if (!params) return template;
+
   return template.replace(/\{\{(\w+)\}\}/g, (match, key) => {
-    return params[key]?.toString() || match;
+    const value = params[key];
+    if (value === undefined || value === null) {
+      return match;
+    }
+    return String(value);
   });
 }
 
@@ -126,10 +131,10 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
     return key;
   };
 
-  // Helper to get translated prayer name
-  const getPrayerName = (prayer: string): string => {
-    const prayerKey = prayer.toLowerCase();
-    return t(`prayers.${prayerKey}`);
+  // Helper to get translated salat name
+  const getSalatName = (salat: string): string => {
+    const salatKey = salat.toLowerCase();
+    return t(`salats.${salatKey}`);
   };
 
   // Initialize translation function for timeUtils
@@ -311,7 +316,7 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
     <TranslationContext.Provider
       value={{
         t,
-        getPrayerName,
+        getSalatName,
         activeTranslation,
         setActiveTranslation,
         importedTranslations: state.translations,

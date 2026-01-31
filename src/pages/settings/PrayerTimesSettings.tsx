@@ -14,7 +14,7 @@ import { useTranslation } from '@/contexts/TranslationContext';
 
 export default function PrayerTimesSettings() {
   const navigate = useNavigate();
-  const { t, getPrayerName } = useTranslation();
+  const { t, getSalatName } = useTranslation();
   const [userSettings, setUserSettings] = useLocalStorage<UserSettings>('muajjin-settings', DEFAULT_SETTINGS);
   const [localSettings, setLocalSettings] = useState<UserSettings>({ ...userSettings });
 
@@ -54,7 +54,7 @@ export default function PrayerTimesSettings() {
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h1 className="text-lg font-semibold">{t('settings.prayerTimesSettings')}</h1>
+          <h1 className="text-lg font-semibold">{t('settings.salatTimesSettings')}</h1>
         </div>
       </div>
 
@@ -108,15 +108,15 @@ export default function PrayerTimesSettings() {
         {/* Jama'ah Times */}
         <div className="space-y-4">
           <Label className="text-base">{t('settings.jamaahTimes')}</Label>
-          {(['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'] as const).map((prayer) => (
-            <div key={prayer} className="space-y-2">
-              <Label htmlFor={`jamaah-${prayer}`}>{getPrayerName(prayer)}</Label>
+          {(['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'] as const).map((salat) => (
+            <div key={salat} className="space-y-2">
+              <Label htmlFor={`jamaah-${salat}`}>{getSalatName(salat)}</Label>
               <Input
-                id={`jamaah-${prayer}`}
+                id={`jamaah-${salat}`}
                 type="time"
-                value={localSettings.jamaahTimes[prayer] || ''}
+                value={localSettings.jamaahTimes[salat] || ''}
                 onChange={(e) => handleJamaahTimeChange(
-                  prayer,
+                  salat,
                   e.target.value
                 )}
               />

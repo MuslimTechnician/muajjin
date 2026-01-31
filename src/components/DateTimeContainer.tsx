@@ -7,6 +7,8 @@ import { MapPin } from 'lucide-react';
 
 interface DateTimeContainerProps {
   hijriAdjustment: number;
+  hijriDateChangeAtMaghrib: boolean;
+  maghribTime?: string;
   location?: {
     city: string;
     country: string;
@@ -14,9 +16,10 @@ interface DateTimeContainerProps {
   timeFormat?: 'system' | '12h' | '24h';
 }
 
-export function DateTimeContainer({ hijriAdjustment, location, timeFormat = 'system' }: DateTimeContainerProps) {
+export function DateTimeContainer({ hijriAdjustment, hijriDateChangeAtMaghrib, maghribTime, location, timeFormat = 'system' }: DateTimeContainerProps) {
   const [currentTime, setCurrentTime] = useState(getCurrentTimeFormatted(timeFormat));
   const [hijriDate, setHijriDate] = useState<HijriDateResult | null>(null);
+  const [lastCalculatedDate, setLastCalculatedDate] = useState<string>('');
 
   // Update current time every second
   useEffect(() => {
@@ -27,12 +30,26 @@ export function DateTimeContainer({ hijriAdjustment, location, timeFormat = 'sys
     return () => clearInterval(timer);
   }, [timeFormat]);
 
-  // Calculate Hijri date locally on component mount and adjustment change
+  // Calculate Hijri date locally on component mount, adjustment change, and date change
   useEffect(() => {
-    // Calculate Hijri date locally using Umm al-Qura calendar (no API call needed!)
-    const hijri = calculateHijriDate(new Date(), hijriAdjustment);
-    setHijriDate(hijri);
-  }, [hijriAdjustment]);
+    const updateHijriDate = () => {
+      const today = new Date().toDateString();
+      if (lastCalculatedDate !== today) {
+        // Calculate Hijri date locally using Umm al-Qura calendar (no API call needed!)
+        const hijri = calculateHijriDate(new Date(), hijriAdjustment, maghribTime, hijriDateChangeAtMaghrib);
+        setHijriDate(hijri);
+        setLastCalculatedDate(today);
+      }
+    };
+
+    // Update immediately on mount
+    updateHijriDate();
+
+    // Check every minute for date change
+    const timer = setInterval(updateHijriDate, 60000);
+
+    return () => clearInterval(timer);
+  }, [hijriAdjustment, hijriDateChangeAtMaghrib, maghribTime, lastCalculatedDate]);
   
   return (
     <Card className="bg-muted/30 border shadow-sm mb-4 rounded-sm">

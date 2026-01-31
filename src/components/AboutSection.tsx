@@ -22,14 +22,14 @@ export function AboutSection() {
         <Separator className="my-2" />
 
         <Accordion type="single" collapsible className="w-full">
-          <AccordionItem value="prayer-times">
-            <AccordionTrigger>{t('about.sections.prayerTimes')}</AccordionTrigger>
+          <AccordionItem value="salat-times">
+            <AccordionTrigger>{t('about.sections.salatTimes')}</AccordionTrigger>
             <AccordionContent>
-              <p className="text-sm mb-2">{t('about.sections.prayerTimesDesc')}</p>
+              <p className="text-sm mb-2">{t('about.sections.salatTimesDesc')}</p>
               <ul className="list-disc list-inside text-sm space-y-1">
-                <li>{t('about.sections.prayerTimesList1')}</li>
-                <li>{t('about.sections.prayerTimesList2')}</li>
-                <li>{t('about.sections.prayerTimesList3')}</li>
+                <li>{t('about.sections.salatTimesList1')}</li>
+                <li>{t('about.sections.salatTimesList2')}</li>
+                <li>{t('about.sections.salatTimesList3')}</li>
               </ul>
             </AccordionContent>
           </AccordionItem>

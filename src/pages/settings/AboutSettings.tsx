@@ -53,12 +53,12 @@ export default function AboutSettings() {
         <Card className="bg-muted/30 border shadow-sm">
           <CardContent className="p-4">
             <div className="grid grid-cols-2 gap-3">
-              {/* Prayer Times */}
+              {/* Salat Times */}
               <div className="flex items-center gap-3 p-3 border border-secondary rounded-lg">
                 <Calendar className="h-5 w-5 text-primary" />
                 <div className="text-left">
-                  <p className="text-sm font-medium">{t('aboutPage.features.prayerTimes')}</p>
-                  <p className="text-xs text-muted-foreground">{t('aboutPage.features.prayerTimesDesc')}</p>
+                  <p className="text-sm font-medium">{t('aboutPage.features.salatTimes')}</p>
+                  <p className="text-xs text-muted-foreground">{t('aboutPage.features.salatTimesDesc')}</p>
                 </div>
               </div>
 
@@ -80,12 +80,12 @@ export default function AboutSettings() {
                 </div>
               </div>
 
-              {/* Fasting */}
+              {/* Saum */}
               <div className="flex items-center gap-3 p-3 border border-secondary rounded-lg">
                 <Sunset className="h-5 w-5 text-primary" />
                 <div className="text-left">
-                  <p className="text-sm font-medium">{t('aboutPage.features.fasting')}</p>
-                  <p className="text-xs text-muted-foreground">{t('aboutPage.features.fastingDesc')}</p>
+                  <p className="text-sm font-medium">{t('aboutPage.features.saum')}</p>
+                  <p className="text-xs text-muted-foreground">{t('aboutPage.features.saumDesc')}</p>
                 </div>
               </div>
             </div>

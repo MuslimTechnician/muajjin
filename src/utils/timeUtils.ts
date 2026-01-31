@@ -88,8 +88,21 @@ export function resolveTimeFormat(format: 'system' | '12h' | '24h'): '12h' | '24
 
 // Format time from 24h format to 12h or 24h format based on preference
 export function formatTime(time: string, format: 'system' | '12h' | '24h' = 'system'): string {
-  const [hours, minutes] = time.split(':');
+  if (!time || typeof time !== 'string') {
+    return '--:--';
+  }
+
+  const parts = time.split(':');
+  if (parts.length < 2) {
+    return '--:--';
+  }
+
+  const [hours, minutes] = parts;
   const hoursNum = parseInt(hours, 10);
+
+  if (isNaN(hoursNum) || !minutes) {
+    return '--:--';
+  }
 
   // Resolve the actual format (handle 'system' option)
   const actualFormat = resolveTimeFormat(format);
@@ -104,106 +117,119 @@ export function formatTime(time: string, format: 'system' | '12h' | '24h' = 'sys
   return `${hours12}:${minutes} ${ampm}`;
 }
 
-// Calculate end time of a prayer based on the start time of the next prayer
-export function calculatePrayerEndTime(currentPrayerStart: string, nextPrayerStart: string): string {
-  return nextPrayerStart;
+// Calculate end time of a salat based on the start time of the next salat
+export function calculateSalatEndTime(currentSalatStart: string, nextSalatStart: string): string {
+  return nextSalatStart;
 }
 
 // Adjust time by adding or subtracting minutes
 export function adjustTime(time: string, minutesAdjustment: number): string {
-  const [hours, minutes] = time.split(':').map(part => parseInt(part, 10));
-  
+  if (!time || typeof time !== 'string') {
+    return '--:--';
+  }
+
+  const parts = time.split(':');
+  if (parts.length < 2) {
+    return '--:--';
+  }
+
+  const [hours, minutes] = parts.map(part => parseInt(part, 10));
+
+  if (isNaN(hours) || isNaN(minutes) || isNaN(minutesAdjustment)) {
+    return time; // Return original time if adjustment fails
+  }
+
   const date = new Date();
   date.setHours(hours, minutes, 0, 0);
-  
+
   // Add or subtract minutes
   date.setMinutes(date.getMinutes() + minutesAdjustment);
-  
+
   const adjustedHours = String(date.getHours()).padStart(2, '0');
   const adjustedMinutes = String(date.getMinutes()).padStart(2, '0');
-  
+
   return `${adjustedHours}:${adjustedMinutes}`;
 }
 
-// Get the current prayer based on current time
-export function getCurrentPrayer(prayerTimes: PrayerTime[]): PrayerTime | null {
+// Get the current salat based on current time
+export function getCurrentSalat(salatTimes: PrayerTime[]): PrayerTime | null {
   const now = new Date();
   const currentHours = now.getHours();
   const currentMinutes = now.getMinutes();
   const currentTimeString = `${String(currentHours).padStart(2, '0')}:${String(currentMinutes).padStart(2, '0')}`;
-  
-  for (let i = 0; i < prayerTimes.length; i++) {
-    const currentPrayer = prayerTimes[i];
-    const nextPrayer = prayerTimes[i + 1] || prayerTimes[0]; // Loop back to the first prayer if we're at the end
-    
-    const [startHours, startMinutes] = currentPrayer.start.split(':').map(Number);
-    const [endHours, endMinutes] = (currentPrayer.end || nextPrayer.start).split(':').map(Number);
-    
+
+  for (let i = 0; i < salatTimes.length; i++) {
+    const currentSalat = salatTimes[i];
+    const nextSalat = salatTimes[i + 1] || salatTimes[0]; // Loop back to the first salat if we're at the end
+
+    const [startHours, startMinutes] = currentSalat.start.split(':').map(Number);
+    const [endHours, endMinutes] = (currentSalat.end || nextSalat.start).split(':').map(Number);
+
     // Convert to minutes for easier comparison
     const startTotalMinutes = startHours * 60 + startMinutes;
     const endTotalMinutes = endHours * 60 + endMinutes;
     const currentTotalMinutes = currentHours * 60 + currentMinutes;
-    
+
     // Handle day wraparound for Isha
-    if (currentPrayer.id === 'isha' && endTotalMinutes < startTotalMinutes) {
+    if (currentSalat.id === 'isha' && endTotalMinutes < startTotalMinutes) {
       if (currentTotalMinutes >= startTotalMinutes || currentTotalMinutes < endTotalMinutes) {
-        return currentPrayer;
+        return currentSalat;
       }
     } else if (currentTotalMinutes >= startTotalMinutes && currentTotalMinutes < endTotalMinutes) {
-      return currentPrayer;
+      return currentSalat;
     }
   }
-  
+
   return null;
 }
 
-// Get the next prayer based on current time
-export function getNextPrayer(prayerTimes: PrayerTime[]): PrayerTime | null {
+// Get the next salat based on current time
+export function getNextSalat(salatTimes: PrayerTime[]): PrayerTime | null {
   const now = new Date();
   const currentHours = now.getHours();
   const currentMinutes = now.getMinutes();
   const currentTotalMinutes = currentHours * 60 + currentMinutes;
-  
-  // Sort prayers by start time
-  const sortedPrayers = [...prayerTimes].sort((a, b) => {
+
+  // Sort salats by start time
+  const sortedSalats = [...salatTimes].sort((a, b) => {
     const [aHours, aMinutes] = a.start.split(':').map(Number);
     const [bHours, bMinutes] = b.start.split(':').map(Number);
-    
+
     const aTotalMinutes = aHours * 60 + aMinutes;
     const bTotalMinutes = bHours * 60 + bMinutes;
-    
+
     return aTotalMinutes - bTotalMinutes;
   });
-  
-  // Find the next prayer
-  for (const prayer of sortedPrayers) {
-    const [hours, minutes] = prayer.start.split(':').map(Number);
-    const prayerTotalMinutes = hours * 60 + minutes;
-    
-    if (prayerTotalMinutes > currentTotalMinutes) {
-      return prayer;
+
+  // Find the next salat
+  for (const salat of sortedSalats) {
+    const [hours, minutes] = salat.start.split(':').map(Number);
+    const salatTotalMinutes = hours * 60 + minutes;
+
+    if (salatTotalMinutes > currentTotalMinutes) {
+      return salat;
     }
   }
-  
-  // If no next prayer found today, return the first prayer of the day
-  return sortedPrayers[0];
+
+  // If no next salat found today, return the first salat of the day
+  return sortedSalats[0];
 }
 
-// Get prohibited prayer times with start and end ranges
+// Get prohibited salat times with start and end ranges
 export function getProhibitedTimes(prayerTimes: { [key: string]: string }): ProhibitedTime[] {
   const prohibitedTimes: ProhibitedTime[] = [
     {
-      name: t('prohibited.sunrise'),
-      start: prayerTimes['Sunrise'], // When Fajr ends
-      end: adjustTime(prayerTimes['Sunrise'], 15) // 15 minutes after sunrise
+      name: t('prohibited.shuruq'),
+      start: prayerTimes['Shuruq'], // When Fajr ends
+      end: adjustTime(prayerTimes['Shuruq'], 15) // 15 minutes after Shuruq
     },
     {
-      name: t('prohibited.zenith'),
+      name: t('prohibited.zawal'),
       start: adjustTime(prayerTimes['Dhuhr'], -3), // 3 minutes before Dhuhr
       end: prayerTimes['Dhuhr'] // Until Dhuhr starts
     },
     {
-      name: t('prohibited.sunset'),
+      name: t('prohibited.ghurub'),
       start: adjustTime(prayerTimes['Maghrib'], -15), // 15 minutes before Maghrib
       end: prayerTimes['Maghrib'] // Until Maghrib starts
     }

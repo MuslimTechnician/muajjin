@@ -1,6 +1,6 @@
 
 export interface PrayerTime {
-  id: string; // Prayer ID (e.g., 'fajr', 'dhuhr') - untranslated key for logic
+  id: string; // Salat ID (e.g., 'fajr', 'dhuhr') - untranslated key for logic
   name: string; // Translated display name (e.g., 'Fajr', 'الفجر')
   start: string;
   end?: string;
@@ -17,9 +17,10 @@ export interface UserSettings {
     Maghrib?: string;
     Isha?: string;
   };
-  sehriAdjustment: number;
+  suhoorAdjustment: number;
   iftarAdjustment: number;
   hijriAdjustment: number;
+  hijriDateChangeAtMaghrib: boolean;
   latitude?: number;
   longitude?: number;
   city?: string;
@@ -46,7 +47,7 @@ export type Madhab = {
 
 export type ContainerOrder = {
   dateTimeContainer: number;
-  prayerTimesContainer: number;
+  salatTimesContainer: number;
   prohibitedTimesContainer: number;
-  fastingTimesContainer: number;
+  saumTimesContainer: number;
 };

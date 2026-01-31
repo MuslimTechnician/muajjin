@@ -23,9 +23,10 @@ export default function FinalSettingsPage() {
       madhab: ONBOARDING_DEFAULTS.madhab ?? null, // User must select
       timeFormat: 'system', // Auto-detect from system (not selected in onboarding)
       jamaahTimes: {},
-      sehriAdjustment: 0,
+      suhoorAdjustment: 0,
       iftarAdjustment: 0,
       hijriAdjustment: 0,
+      hijriDateChangeAtMaghrib: true,
       manualLocation: true,
       city: ONBOARDING_DEFAULTS.city,
       country: ONBOARDING_DEFAULTS.country,

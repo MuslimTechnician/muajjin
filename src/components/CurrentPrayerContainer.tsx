@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PrayerTime } from '@/types';
 import { formatTime } from '@/utils/timeUtils';
-import { getCurrentPrayer, getNextPrayer } from '@/utils/timeUtils';
+import { getCurrentSalat, getNextSalat } from '@/utils/timeUtils';
 import { useTranslation } from '@/contexts/TranslationContext';
 
 interface CurrentPrayerContainerProps {
@@ -24,11 +24,22 @@ export function CurrentPrayerContainer({ allPrayers, timeFormat = 'system' }: Cu
   const [countdownLabel, setCountdownLabel] = useState<string>('Until Jama\'ah');
   const [countdownTarget, setCountdownTarget] = useState<string>('');
 
+  // Recalculate current/next salat every 30 seconds and on mount
   useEffect(() => {
-    if (allPrayers.length > 0) {
-      setCurrentPrayer(getCurrentPrayer(allPrayers));
-      setNextPrayer(getNextPrayer(allPrayers));
-    }
+    const updatePrayerState = () => {
+      if (allPrayers.length > 0) {
+        setCurrentPrayer(getCurrentSalat(allPrayers));
+        setNextPrayer(getNextSalat(allPrayers));
+      }
+    };
+
+    // Update immediately on mount
+    updatePrayerState();
+
+    // Update every 30 seconds to catch salat transitions
+    const timer = setInterval(updatePrayerState, 30000);
+
+    return () => clearInterval(timer);
   }, [allPrayers]);
 
   // Update countdown and progress every second
@@ -89,13 +100,13 @@ export function CurrentPrayerContainer({ allPrayers, timeFormat = 'system' }: Cu
           // Before Jama'ah time - countdown to Jama'ah
           targetTime = jamaahDateTime;
           totalTime = jamaahDateTime.getTime() - startTime.getTime();
-          setCountdownLabel(t('prayerTimes.untilJamaah'));
+          setCountdownLabel(t('salatTimes.untilJamaah'));
           setCountdownTarget(formatTime(jamaahTime, timeFormat));
         } else {
           // After Jama'ah time - countdown to End
           targetTime = endTime;
           totalTime = endTime.getTime() - jamaahDateTime.getTime();
-          setCountdownLabel(t('prayerTimes.untilEnd'));
+          setCountdownLabel(t('salatTimes.untilEnd'));
           setCountdownTarget(currentPrayer.end ? formatTime(currentPrayer.end, timeFormat) : 'N/A');
         }
 
@@ -129,7 +140,7 @@ export function CurrentPrayerContainer({ allPrayers, timeFormat = 'system' }: Cu
   }, [currentPrayer, nextPrayer, timeFormat]);
 
   if (!currentPrayer) {
-    return null; // Hide card entirely when no current prayer
+    return null; // Hide card entirely when no current salat
   }
 
   const jamaahTime = getJamaahTime(currentPrayer);
@@ -138,7 +149,7 @@ export function CurrentPrayerContainer({ allPrayers, timeFormat = 'system' }: Cu
     <Card className="bg-muted/30 border shadow-sm mb-4 rounded-sm">
       <CardHeader className="pb-1 pt-3">
         <CardTitle className="text-xs font-medium uppercase text-muted-foreground">
-          {t('prayerTimes.current')}
+          {t('salatTimes.current')}
         </CardTitle>
       </CardHeader>
       <CardContent className="p-4 pt-2">
@@ -148,11 +159,11 @@ export function CurrentPrayerContainer({ allPrayers, timeFormat = 'system' }: Cu
         {/* Jama'ah | End - Boxed Style */}
         <div className="grid grid-cols-2 gap-4 mb-3">
           <div className="border border-secondary rounded-lg p-4 text-center">
-            <p className="text-muted-foreground text-sm mb-1">{t('prayerTimes.jamaah')}</p>
+            <p className="text-muted-foreground text-sm mb-1">{t('salatTimes.jamaah')}</p>
             <p className="text-2xl font-bold">{formatTime(jamaahTime, timeFormat)}</p>
           </div>
           <div className="border border-secondary rounded-lg p-4 text-center">
-            <p className="text-muted-foreground text-sm mb-1">{t('prayerTimes.end')}</p>
+            <p className="text-muted-foreground text-sm mb-1">{t('salatTimes.end')}</p>
             <p className="text-2xl font-bold">{currentPrayer.end ? formatTime(currentPrayer.end, timeFormat) : 'N/A'}</p>
           </div>
         </div>

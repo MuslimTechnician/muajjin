@@ -18,26 +18,30 @@ export interface TranslationStrings {
     edit: string;
     close: string;
   };
-  prayerTimes: {
+  salatTimes: {
     title: string;
     current: string;
     next: string;
-    prayer: string;
+    salat: string;
     jamaah: string;
     start: string;
     end: string;
     untilJamaah: string;
     untilEnd: string;
   };
-  fasting: {
+  saum: {
     title: string;
-    sehriEnds: string;
+    suhoorEnds: string;
     iftarStarts: string;
-    sehriEndsIn: string;
+    suhoorEndsIn: string;
     iftarStartsIn: string;
   };
   prohibited: {
     title: string;
+    shuruq: string;
+    ghurub: string;
+    zawal: string;
+    description: string;
   };
   settings: {
     title: string;
@@ -55,7 +59,8 @@ export interface TranslationStrings {
     madhab: string;
     asrCalculation: string;
     hijriAdjustment: string;
-    sehriAdjustment: string;
+    hijriDateChangeAtMaghrib: string;
+    suhoorAdjustment: string;
     iftarAdjustment: string;
     theme: string;
     light: string;
@@ -94,14 +99,14 @@ export interface TranslationStrings {
     philosophy: string;
     philosophyDesc: string;
   };
-  prayers: {
+  salats: {
     fajr: string;
     dhuhr: string;
     asr: string;
     maghrib: string;
     isha: string;
-    sunrise: string;
-    sunset: string;
+    shuruq: string;
+    ghurub: string;
   };
   calculationMethods: {
     muslimWorldLeague: string;

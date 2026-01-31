@@ -40,8 +40,8 @@ export default function WelcomePage() {
   };
 
   const features = [
-    { icon: Calendar, title: t('onboarding.prayerTimesFeature'), description: t('onboarding.prayerTimesDesc') },
-    { icon: Sunset, title: t('onboarding.fastingFeature'), description: t('onboarding.fastingDesc') },
+    { icon: Calendar, title: t('onboarding.salatTimesFeature'), description: t('onboarding.salatTimesDesc') },
+    { icon: Sunset, title: t('onboarding.saumFeature'), description: t('onboarding.saumDesc') },
     { icon: Moon, title: t('onboarding.hijriFeature'), description: t('onboarding.hijriDesc') },
     { icon: MapPin, title: t('onboarding.gpsFeature'), description: t('onboarding.gpsDesc') }
   ];

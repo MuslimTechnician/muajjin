@@ -72,9 +72,10 @@ export default function LocationSetupPage() {
       madhab: ONBOARDING_DEFAULTS.madhab, // User must select in next step
       timeFormat: 'system', // Auto-detect from system
       jamaahTimes: {},
-      sehriAdjustment: 0,
+      suhoorAdjustment: 0,
       iftarAdjustment: 0,
       hijriAdjustment: 0,
+      hijriDateChangeAtMaghrib: true,
       manualLocation: true
     };
 

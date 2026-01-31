@@ -9,8 +9,8 @@ export default function SettingsHome() {
   const { t } = useTranslation();
 
   const settingsItems = [
-    { id: 'prayer-times', label: t('settings.prayerTimesSettings'), route: '/settings/prayer-times' },
-    { id: 'fasting', label: t('settings.fastingSettings'), route: '/settings/fasting' },
+    { id: 'prayer-times', label: t('settings.salatTimesSettings'), route: '/settings/prayer-times' },
+    { id: 'fasting', label: t('settings.saumSettings'), route: '/settings/fasting' },
     { id: 'hijri', label: t('settings.hijriSettings'), route: '/settings/hijri' },
     { id: 'time-location', label: t('settings.timeLocationSettings'), route: '/settings/time-location' },
     { id: 'display', label: t('settings.displaySettings'), route: '/settings/display' },

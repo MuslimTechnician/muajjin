@@ -20,21 +20,21 @@ import { useTranslation } from '@/contexts/TranslationContext';
 
 const CONTAINER_LABELS: Record<string, string> = {
   [ContainerType.DateTime]: 'Date & Time',
-  [ContainerType.CurrentPrayer]: 'Current Prayer',
-  [ContainerType.NextPrayer]: 'Next Prayer',
-  [ContainerType.PrayerTimes]: 'Prayer Times',
+  [ContainerType.CurrentSalat]: 'Current Salat',
+  [ContainerType.NextSalat]: 'Next Salat',
+  [ContainerType.SalatTimes]: 'Salat Times',
   [ContainerType.ProhibitedTimes]: 'Forbidden Times',
-  [ContainerType.FastingTimes]: 'Fasting Times'
+  [ContainerType.SaumTimes]: 'Saum Times'
 };
 
 // Translation keys mapping
 const CONTAINER_LABEL_KEYS: Record<string, string> = {
   [ContainerType.DateTime]: 'settings.dateTime',
-  [ContainerType.CurrentPrayer]: 'settings.currentPrayer',
-  [ContainerType.NextPrayer]: 'settings.nextPrayer',
-  [ContainerType.PrayerTimes]: 'settings.prayerTimes',
+  [ContainerType.CurrentSalat]: 'settings.currentSalat',
+  [ContainerType.NextSalat]: 'settings.nextSalat',
+  [ContainerType.SalatTimes]: 'settings.salatTimes',
   [ContainerType.ProhibitedTimes]: 'settings.forbiddenTimes',
-  [ContainerType.FastingTimes]: 'settings.fastingTimes'
+  [ContainerType.SaumTimes]: 'settings.saumTimes'
 };
 
 // Sortable item for container reordering
@@ -94,11 +94,11 @@ export default function DisplaySettings() {
   // Default visible containers - all visible by default
   const defaultVisibleContainers: Record<string, boolean> = {
     [ContainerType.DateTime]: true,
-    [ContainerType.CurrentPrayer]: true,
-    [ContainerType.NextPrayer]: true,
-    [ContainerType.PrayerTimes]: true,
+    [ContainerType.CurrentSalat]: true,
+    [ContainerType.NextSalat]: true,
+    [ContainerType.SalatTimes]: true,
     [ContainerType.ProhibitedTimes]: true,
-    [ContainerType.FastingTimes]: true
+    [ContainerType.SaumTimes]: true
   };
 
   const [visibleContainers, setVisibleContainers] = useLocalStorage<Record<string, boolean>>(

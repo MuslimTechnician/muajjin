@@ -5,44 +5,44 @@ import { formatTime } from '@/utils/timeUtils';
 import { useTranslation } from '@/contexts/TranslationContext';
 
 interface PrayerTimesContainerProps {
-  prayers: PrayerTime[];
+  salats: PrayerTime[];
   timeFormat?: 'system' | '12h' | '24h';
 }
 
 // Helper to get Jama'ah time with fallback to start time
-const getJamaahTime = (prayer: PrayerTime): string => {
-  return prayer.jamaah || prayer.start;
+const getJamaahTime = (salat: PrayerTime): string => {
+  return salat.jamaah || salat.start;
 };
 
-export function PrayerTimesContainer({ prayers, timeFormat = 'system' }: PrayerTimesContainerProps) {
+export function PrayerTimesContainer({ salats, timeFormat = 'system' }: PrayerTimesContainerProps) {
   const { t } = useTranslation();
 
   return (
     <Card className="bg-muted/30 border shadow-sm mb-4 rounded-sm">
       <CardHeader className="pb-2 pt-3">
         <CardTitle className="text-2xl font-bold">
-          {t('prayerTimes.title')}
+          {t('salatTimes.title')}
         </CardTitle>
       </CardHeader>
       <CardContent className="p-4">
         {/* Table Header */}
         <div className="grid grid-cols-4 gap-2 pb-2 mb-2 border-b border-secondary">
-          <div className="text-sm font-semibold">{t('prayerTimes.prayer')}</div>
-          <div className="text-sm font-semibold text-center">{t('prayerTimes.start')}</div>
-          <div className="text-sm font-semibold text-center">{t('prayerTimes.jamaah')}</div>
-          <div className="text-sm font-semibold text-center">{t('prayerTimes.end')}</div>
+          <div className="text-sm font-semibold">{t('salatTimes.salat')}</div>
+          <div className="text-sm font-semibold text-center">{t('salatTimes.start')}</div>
+          <div className="text-sm font-semibold text-center">{t('salatTimes.jamaah')}</div>
+          <div className="text-sm font-semibold text-center">{t('salatTimes.end')}</div>
         </div>
 
         {/* Table Rows */}
-        {prayers.map((prayer) => (
-          <div key={prayer.name} className="grid grid-cols-4 gap-2 py-3 border-b border-secondary last:border-0 items-center">
-            <div className="font-medium">{prayer.name}</div>
-            <div className="text-center text-sm">{formatTime(prayer.start, timeFormat)}</div>
+        {salats.map((salat) => (
+          <div key={salat.name} className="grid grid-cols-4 gap-2 py-3 border-b border-secondary last:border-0 items-center">
+            <div className="font-medium">{salat.name}</div>
+            <div className="text-center text-sm">{formatTime(salat.start, timeFormat)}</div>
             <div className="text-center text-sm text-primary font-medium">
-              {formatTime(getJamaahTime(prayer), timeFormat)}
+              {formatTime(getJamaahTime(salat), timeFormat)}
             </div>
             <div className="text-center text-sm text-muted-foreground">
-              {prayer.end ? formatTime(prayer.end, timeFormat) : '—'}
+              {salat.end ? formatTime(salat.end, timeFormat) : '—'}
             </div>
           </div>
         ))}

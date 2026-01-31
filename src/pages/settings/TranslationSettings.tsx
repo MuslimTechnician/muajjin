@@ -145,17 +145,11 @@ export default function TranslationSettings() {
                         <div className="flex items-center gap-2">
                           <FileText className="h-4 w-4 text-muted-foreground" />
                           <p className="font-medium">{translation.meta.languageName}</p>
-                          {translation.meta.font && (
-                            <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
-                              {translation.meta.font.name}
-                            </span>
-                          )}
                         </div>
                         <p className="text-xs text-muted-foreground mt-1">
                           {t('settings.code')}: {translation.meta.languageCode} •
                           {t('settings.direction')}: {translation.meta.direction.toUpperCase()} •
                           {t('settings.version')}: {translation.meta.version}
-                          {translation.meta.font && ` • ${t('settings.customFont')}`}
                         </p>
                         <p className="text-xs text-muted-foreground">
                           {t('settings.imported')}: {new Date(translation.importedAt).toLocaleDateString()}

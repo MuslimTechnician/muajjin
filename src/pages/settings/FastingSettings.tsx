@@ -41,22 +41,22 @@ export default function FastingSettings() {
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h1 className="text-lg font-semibold">{t('settings.fastingSettings')}</h1>
+          <h1 className="text-lg font-semibold">{t('settings.saumSettings')}</h1>
         </div>
       </div>
 
       {/* Content */}
       <div className="p-4 max-w-md mx-auto space-y-6">
-        {/* Sehri Adjustment */}
+        {/* Suhoor Adjustment */}
         <div className="space-y-2">
-          <Label htmlFor="sehri-adjustment">{t('settings.sehriAdjustment')}</Label>
+          <Label htmlFor="sehri-adjustment">{t('settings.suhoorAdjustment')}</Label>
           <Input
             id="sehri-adjustment"
             type="number"
             min={-10}
             max={10}
-            value={localSettings.sehriAdjustment}
-            onChange={(e) => updateSetting('sehriAdjustment', parseInt(e.target.value) || 0)}
+            value={localSettings.suhoorAdjustment}
+            onChange={(e) => updateSetting('suhoorAdjustment', parseInt(e.target.value) || 0)}
           />
         </div>
 

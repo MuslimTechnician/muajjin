@@ -13,17 +13,18 @@ export const DEFAULT_SETTINGS: Omit<UserSettings, 'city' | 'country' | 'latitude
   madhab?: number;
   timeFormat?: string;
 } = {
-  // Prayer Times
+  // Salat Times
   jamaahTimes: {}, // No Jama'ah times set by default
   method: 1, // Karachi (will be set in onboarding)
   madhab: 1, // Hanafi (will be set in onboarding)
 
-  // Fasting Adjustments
-  sehriAdjustment: 0, // No adjustment
+  // Saum Adjustments
+  suhoorAdjustment: 0, // No adjustment
   iftarAdjustment: 0, // No adjustment
 
   // Hijri Adjustment
   hijriAdjustment: 0, // No day adjustment
+  hijriDateChangeAtMaghrib: true, // Default to Maghrib (Islamic tradition)
 
   // Location
   manualLocation: true, // Always use manual location
@@ -37,7 +38,7 @@ export const DEFAULT_SETTINGS: Omit<UserSettings, 'city' | 'country' | 'latitude
 };
 
 /**
- * Default settings for onboarding (only location + prayer calculation preferences)
+ * Default settings for onboarding (only location + salat calculation preferences)
  * Users MUST select these values during onboarding
  */
 export const ONBOARDING_DEFAULTS = {
@@ -54,11 +55,11 @@ export const ONBOARDING_DEFAULTS = {
  */
 export const DEFAULT_CONTAINER_ORDER = [
   'dateTime',
-  'currentPrayer',
-  'nextPrayer',
-  'prayerTimes',
+  'currentSalat',
+  'nextSalat',
+  'salatTimes',
   'prohibitedTimes',
-  'fastingTimes'
+  'saumTimes'
 ] as const;
 
 /**
@@ -70,9 +71,10 @@ export const FALLBACK_SETTINGS: UserSettings = {
   madhab: 1,
   timeFormat: 'system',
   jamaahTimes: {},
-  sehriAdjustment: 0,
+  suhoorAdjustment: 0,
   iftarAdjustment: 0,
   hijriAdjustment: 0,
+  hijriDateChangeAtMaghrib: true,
   manualLocation: true,
   city: 'Dhaka',
   country: 'Bangladesh',

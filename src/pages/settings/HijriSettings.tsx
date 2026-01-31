@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { UserSettings } from '@/types';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { DEFAULT_SETTINGS } from '@/constants/defaultSettings';
@@ -60,6 +61,15 @@ export default function HijriSettings() {
               </Button>
             ))}
           </div>
+        </div>
+
+        {/* Change Hijri Date at Maghrib */}
+        <div className="flex items-center justify-between">
+          <Label>{t('settings.hijriDateChangeAtMaghrib')}</Label>
+          <Switch
+            checked={localSettings.hijriDateChangeAtMaghrib}
+            onCheckedChange={(checked) => setLocalSettings(prev => ({ ...prev, hijriDateChangeAtMaghrib: checked }))}
+          />
         </div>
 
         {/* Save Button */}

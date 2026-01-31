@@ -7,7 +7,7 @@ import { useTranslation } from '@/contexts/TranslationContext';
 interface FastingTimesContainerProps {
   sehriTime: string;
   iftarTime: string;
-  sehriAdjustment: number;
+  suhoorAdjustment: number;
   iftarAdjustment: number;
   timeFormat?: 'system' | '12h' | '24h';
 }
@@ -15,7 +15,7 @@ interface FastingTimesContainerProps {
 export function FastingTimesContainer({
   sehriTime,
   iftarTime,
-  sehriAdjustment,
+  suhoorAdjustment,
   iftarAdjustment,
   timeFormat = 'system'
 }: FastingTimesContainerProps) {
@@ -24,7 +24,7 @@ export function FastingTimesContainer({
   const [nextEventName, setNextEventName] = useState<string>('');
   const [progressPercent, setProgressPercent] = useState<number>(0);
 
-  // Function to calculate time difference in hours, minutes, seconds
+  // Function to calculate time difference in hours, minutes, seconds for saum times
   const calculateTimeDifference = (targetTime: string): { hours: number; minutes: number; seconds: number } | null => {
     const now = new Date();
     const [targetHours, targetMinutes] = targetTime.split(':').map(Number);
@@ -55,7 +55,7 @@ export function FastingTimesContainer({
       const currentHours = now.getHours();
       const currentMinutes = now.getMinutes();
 
-      // Convert sehri and iftar times to comparable values
+      // Convert suhoor and iftar times to comparable values
       const [sehriHours, sehriMinutes] = sehriTime.split(':').map(Number);
       const [iftarHours, iftarMinutes] = iftarTime.split(':').map(Number);
 
@@ -70,29 +70,29 @@ export function FastingTimesContainer({
       let endTime: Date;
 
       if (currentTotal < sehriTotal) {
-        // Before Sehri
+        // Before Suhoor
         targetTime = sehriTime;
-        eventName = t('fasting.sehriEndsIn');
-        // Progress from previous Iftar to Sehri
+        eventName = t('saum.suhoorEndsIn');
+        // Progress from previous Iftar to Suhoor
         startTime = new Date();
         startTime.setHours(iftarHours, iftarMinutes, 0, 0);
         startTime.setDate(startTime.getDate() - 1);
         endTime = new Date();
         endTime.setHours(sehriHours, sehriMinutes, 0, 0);
       } else if (currentTotal < iftarTotal) {
-        // After Sehri, before Iftar (fasting time)
+        // After Suhoor, before Iftar (saum/fasting time)
         targetTime = iftarTime;
-        eventName = t('fasting.iftarStartsIn');
-        // Progress from Sehri to Iftar
+        eventName = t('saum.iftarStartsIn');
+        // Progress from Suhoor to Iftar
         startTime = new Date();
         startTime.setHours(sehriHours, sehriMinutes, 0, 0);
         endTime = new Date();
         endTime.setHours(iftarHours, iftarMinutes, 0, 0);
       } else {
-        // After Iftar, next is tomorrow's Sehri
+        // After Iftar, next is tomorrow's Suhoor
         targetTime = sehriTime;
-        eventName = t('fasting.sehriEndsIn');
-        // Progress from Iftar to tomorrow's Sehri
+        eventName = t('saum.suhoorEndsIn');
+        // Progress from Iftar to tomorrow's Suhoor
         startTime = new Date();
         startTime.setHours(iftarHours, iftarMinutes, 0, 0);
         endTime = new Date();
@@ -132,27 +132,27 @@ export function FastingTimesContainer({
     <Card className="bg-muted/30 border shadow-sm mb-4 rounded-sm">
       <CardHeader className="pb-2 pt-3">
         <CardTitle className="text-2xl font-bold">
-          {t('fasting.title')}
+          {t('saum.title')}
         </CardTitle>
       </CardHeader>
       <CardContent className="p-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="border border-secondary rounded-lg p-4 text-center">
-              <p className="text-muted-foreground text-sm mb-1">{t('fasting.sehriEnds')}</p>
+              <p className="text-muted-foreground text-sm mb-1">{t('saum.suhoorEnds')}</p>
               <p className="text-2xl font-bold">{formatTime(sehriTime, timeFormat)}</p>
-              {sehriAdjustment !== 0 && (
+              {suhoorAdjustment !== 0 && (
                 <p className="text-xs text-muted-foreground mt-1">
-                  {t('fasting.adjustedBy', { minutes: sehriAdjustment > 0 ? `+${sehriAdjustment}` : sehriAdjustment })}
+                  {t('saum.adjustedBy', { minutes: suhoorAdjustment > 0 ? `+${suhoorAdjustment}` : suhoorAdjustment })}
                 </p>
               )}
             </div>
 
             <div className="border border-secondary rounded-lg p-4 text-center">
-              <p className="text-muted-foreground text-sm mb-1">{t('fasting.iftarStarts')}</p>
+              <p className="text-muted-foreground text-sm mb-1">{t('saum.iftarStarts')}</p>
               <p className="text-2xl font-bold">{formatTime(iftarTime, timeFormat)}</p>
               {iftarAdjustment !== 0 && (
                 <p className="text-xs text-muted-foreground mt-1">
-                  {t('fasting.adjustedBy', { minutes: iftarAdjustment > 0 ? `+${iftarAdjustment}` : iftarAdjustment })}
+                  {t('saum.adjustedBy', { minutes: iftarAdjustment > 0 ? `+${iftarAdjustment}` : iftarAdjustment })}
                 </p>
               )}
             </div>

@@ -14,38 +14,63 @@ import { adjustTime, getProhibitedTimes, setTranslationFunction } from '@/utils/
 import { DEFAULT_SETTINGS, DEFAULT_CONTAINER_ORDER } from '@/constants/defaultSettings';
 import { useTranslation } from '@/contexts/TranslationContext';
 
+/**
+ * Migrate old settings property names to new ones
+ * This handles the transition from legacy "prayer"/"sehri" to proper Arabic "salat"/"suhoor"
+ */
+function migrateSettings(settings: UserSettings): UserSettings {
+  const migrated = { ...settings };
+
+  // Migrate from legacy sehriAdjustment → suhoorAdjustment
+  if ('sehriAdjustment' in settings && !('suhoorAdjustment' in settings)) {
+    (migrated as any).suhoorAdjustment = (settings as any).sehriAdjustment;
+    delete (migrated as any).sehriAdjustment;
+  }
+
+  return migrated;
+}
+
 // Default visible containers - all visible by default
 const defaultVisibleContainers: Record<string, boolean> = {
   [ContainerType.DateTime]: true,
-  [ContainerType.CurrentPrayer]: true,
-  [ContainerType.NextPrayer]: true,
-  [ContainerType.PrayerTimes]: true,
+  [ContainerType.CurrentSalat]: true,
+  [ContainerType.NextSalat]: true,
+  [ContainerType.SalatTimes]: true,
   [ContainerType.ProhibitedTimes]: true,
-  [ContainerType.FastingTimes]: true
+  [ContainerType.SaumTimes]: true
 };
 
 // Container IDs for drag and drop
 export enum ContainerType {
   DateTime = 'dateTime',
-  CurrentPrayer = 'currentPrayer',
-  NextPrayer = 'nextPrayer',
-  PrayerTimes = 'prayerTimes',
+  CurrentSalat = 'currentSalat',
+  NextSalat = 'nextSalat',
+  SalatTimes = 'salatTimes',
   ProhibitedTimes = 'prohibitedTimes',
-  FastingTimes = 'fastingTimes'
+  SaumTimes = 'saumTimes'
 }
 
 const Index = () => {
   const navigate = useNavigate();
-  const { t, getPrayerName, mounted } = useTranslation();
+  const { t, getSalatName, mounted } = useTranslation();
   const [userSettings, setUserSettings] = useLocalStorage<UserSettings>('muajjin-settings', DEFAULT_SETTINGS);
   const [containerOrder, setContainerOrder] = useLocalStorage<string[]>('muajjin-container-order', DEFAULT_CONTAINER_ORDER);
   const [visibleContainers] = useLocalStorage<Record<string, boolean>>('muajjin-visible-containers', defaultVisibleContainers);
-  const [prayerTimes, setPrayerTimes] = useState<PrayerTime[]>([]);
+  const [salatTimes, setSalatTimes] = useState<PrayerTime[]>([]);
   const [prohibitedTimes, setProhibitedTimes] = useState<ProhibitedTime[]>([]);
   const [sehriTime, setSehriTime] = useState<string>('');
   const [iftarTime, setIftarTime] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [loadedWithTranslation, setLoadedWithTranslation] = useState(false);
+  const [lastCalculatedDate, setLastCalculatedDate] = useState<string>('');
+
+  // Migrate old settings property names (one-time migration)
+  useEffect(() => {
+    const migrated = migrateSettings(userSettings);
+    if (JSON.stringify(migrated) !== JSON.stringify(userSettings)) {
+      setUserSettings(migrated);
+    }
+  }, []); // Run once on mount
 
   // Check if onboarding is completed
   useEffect(() => {
@@ -55,51 +80,71 @@ const Index = () => {
     }
   }, [navigate]);
 
-  // Load prayer times on component mount and when translation changes
+  // Load salat times on component mount and when translation changes
   useEffect(() => {
     // Only load after translations are mounted
     if (!mounted) return;
 
-    // Initialize the translation function for timeUtils (use general 't', not 'getPrayerName')
+    // Initialize the translation function for timeUtils (use general 't', not 'getSalatName')
     setTranslationFunction(t);
 
     // If already loaded with this translation, don't reload
     if (loadedWithTranslation) return;
 
-    loadPrayerTimes(userSettings);
+    loadSalatTimes(userSettings);
     // Also reload prohibited times to ensure they're translated
     const timings = calculatePrayerTimesLocally(new Date(), userSettings);
     setProhibitedTimes(getProhibitedTimes(timings));
     setLoadedWithTranslation(true);
   }, [mounted, t]); // Reload when translation function changes or first mounted
 
-  const loadPrayerTimes = (settings: UserSettings) => {
+  const loadSalatTimes = (settings: UserSettings) => {
     setIsLoading(true);
 
-    // Calculate prayer times locally using adhan library (no API call!)
+    // Calculate salat times locally using adhan library (no API call!)
     const timings = calculatePrayerTimesLocally(new Date(), settings);
 
-    // Create prayer times array with jamaah times from settings
-    const prayers: PrayerTime[] = [
-      { id: 'fajr', name: getPrayerName('Fajr'), start: timings.Fajr, end: timings.Sunrise, jamaah: settings.jamaahTimes.Fajr },
-      { id: 'dhuhr', name: getPrayerName('Dhuhr'), start: timings.Dhuhr, end: timings.Asr, jamaah: settings.jamaahTimes.Dhuhr },
-      { id: 'asr', name: getPrayerName('Asr'), start: timings.Asr, end: timings.Maghrib, jamaah: settings.jamaahTimes.Asr },
-      { id: 'maghrib', name: getPrayerName('Maghrib'), start: timings.Maghrib, end: timings.Isha, jamaah: settings.jamaahTimes.Maghrib },
-      { id: 'isha', name: getPrayerName('Isha'), start: timings.Isha, end: timings.Fajr, jamaah: settings.jamaahTimes.Isha }
+    // Create salat times array with jamaah times from settings
+    const salats: PrayerTime[] = [
+      { id: 'fajr', name: getSalatName('Fajr'), start: timings.Fajr, end: timings.Shuruq, jamaah: settings.jamaahTimes.Fajr },
+      { id: 'dhuhr', name: getSalatName('Dhuhr'), start: timings.Dhuhr, end: timings.Asr, jamaah: settings.jamaahTimes.Dhuhr },
+      { id: 'asr', name: getSalatName('Asr'), start: timings.Asr, end: timings.Maghrib, jamaah: settings.jamaahTimes.Asr },
+      { id: 'maghrib', name: getSalatName('Maghrib'), start: timings.Maghrib, end: timings.Isha, jamaah: settings.jamaahTimes.Maghrib },
+      { id: 'isha', name: getSalatName('Isha'), start: timings.Isha, end: timings.Fajr, jamaah: settings.jamaahTimes.Isha }
     ];
 
-    setPrayerTimes(prayers);
+    setSalatTimes(salats);
 
     // Set prohibited times
     setProhibitedTimes(getProhibitedTimes(timings));
 
-    // Set fasting times with adjustments
-    setSehriTime(adjustTime(timings.Fajr, settings.sehriAdjustment));
+    // Set saum (fasting) times with adjustments
+    setSehriTime(adjustTime(timings.Fajr, settings.suhoorAdjustment));
     setIftarTime(adjustTime(timings.Maghrib, settings.iftarAdjustment));
 
     setIsLoading(false);
   };
-  
+
+  // Check for date change every minute and reload salat times at midnight
+  useEffect(() => {
+    const checkDateChange = () => {
+      const today = new Date().toDateString();
+      if (lastCalculatedDate && lastCalculatedDate !== today) {
+        // Date has changed, reload salat times
+        loadSalatTimes(userSettings);
+        setLastCalculatedDate(today);
+      }
+    };
+
+    // Set initial date
+    setLastCalculatedDate(new Date().toDateString());
+
+    // Check every minute
+    const timer = setInterval(checkDateChange, 60000);
+
+    return () => clearInterval(timer);
+  }, [lastCalculatedDate, userSettings]);
+
   // Render containers based on user order
   const renderContainers = () => {
     return (
@@ -116,6 +161,8 @@ const Index = () => {
                 <DateTimeContainer
                   key={containerId}
                   hijriAdjustment={userSettings.hijriAdjustment}
+                  hijriDateChangeAtMaghrib={userSettings.hijriDateChangeAtMaghrib}
+                  maghribTime={salatTimes.find(p => p.id === 'maghrib')?.start}
                   location={{
                     city: userSettings.city || 'Dhaka',
                     country: '' // Not used anymore, only showing city
@@ -123,29 +170,29 @@ const Index = () => {
                   timeFormat={userSettings.timeFormat}
                 />
               );
-            case ContainerType.CurrentPrayer:
+            case ContainerType.CurrentSalat:
               return (
-                <CurrentPrayerContainer key={containerId} allPrayers={prayerTimes} timeFormat={userSettings.timeFormat} />
+                <CurrentPrayerContainer key={containerId} allPrayers={salatTimes} timeFormat={userSettings.timeFormat} />
               );
-            case ContainerType.NextPrayer:
+            case ContainerType.NextSalat:
               return (
-                <NextPrayerContainer key={containerId} allPrayers={prayerTimes} timeFormat={userSettings.timeFormat} />
+                <NextPrayerContainer key={containerId} allPrayers={salatTimes} timeFormat={userSettings.timeFormat} />
               );
-            case ContainerType.PrayerTimes:
+            case ContainerType.SalatTimes:
               return (
-                <PrayerTimesContainer key={containerId} prayers={prayerTimes} timeFormat={userSettings.timeFormat} />
+                <PrayerTimesContainer key={containerId} salats={salatTimes} timeFormat={userSettings.timeFormat} />
               );
             case ContainerType.ProhibitedTimes:
               return (
                 <ProhibitedTimesContainer key={containerId} prohibitedTimes={prohibitedTimes} timeFormat={userSettings.timeFormat} />
               );
-            case ContainerType.FastingTimes:
+            case ContainerType.SaumTimes:
               return (
                 <FastingTimesContainer
                   key={containerId}
                   sehriTime={sehriTime}
                   iftarTime={iftarTime}
-                  sehriAdjustment={userSettings.sehriAdjustment}
+                  suhoorAdjustment={userSettings.suhoorAdjustment}
                   iftarAdjustment={userSettings.iftarAdjustment}
                   timeFormat={userSettings.timeFormat}
                 />

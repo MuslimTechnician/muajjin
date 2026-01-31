@@ -8,19 +8,19 @@ import { UserSettings } from '@/types';
 
 export interface LocalPrayerTimes {
   Fajr: string;
-  Sunrise: string;
+  Shuruq: string;
   Dhuhr: string;
   Asr: string;
-  Sunset: string;
+  Ghurub: string;
   Maghrib: string;
   Isha: string;
 }
 
 /**
- * Calculate prayer times locally using adhan library (no API call needed)
- * @param date - The Gregorian date to calculate prayer times for
+ * Calculate salat times locally using adhan library (no API call needed)
+ * @param date - The Gregorian date to calculate salat times for
  * @param settings - User settings including location and calculation method
- * @returns Prayer times in 24-hour format (HH:MM)
+ * @returns Salat times in 24-hour format (HH:MM)
  */
 export function calculatePrayerTimesLocally(
   date: Date,
@@ -39,16 +39,16 @@ export function calculatePrayerTimesLocally(
   // 1 = Hanafi (Asr is later)
   params.madhab = settings.madhab === 1 ? AdhanMadhab.Hanafi : AdhanMadhab.Shafi;
 
-  // Calculate prayer times using adhan library
+  // Calculate salat times using adhan library
   const prayerTimes = new PrayerTimes(coordinates, date, params);
 
   // Format times to HH:MM format (24-hour format)
   return {
     Fajr: formatTime(prayerTimes.fajr),
-    Sunrise: formatTime(prayerTimes.sunrise),
+    Shuruq: formatTime(prayerTimes.sunrise),
     Dhuhr: formatTime(prayerTimes.dhuhr),
     Asr: formatTime(prayerTimes.asr),
-    Sunset: formatTime(prayerTimes.maghrib), // Sunset is same as Maghrib
+    Ghurub: formatTime(prayerTimes.maghrib), // Ghurub is same as Maghrib
     Maghrib: formatTime(prayerTimes.maghrib),
     Isha: formatTime(prayerTimes.isha),
   };

@@ -1,7 +1,7 @@
 {
-  "name": "Muajjin - Islamic Prayer Times",
+  "name": "Muajjin - Islamic Salat Times",
   "short_name": "Muajjin",
-  "description": "Islamic Prayer Times App with accurate calculations",
+  "description": "Islamic Salat Times App with accurate calculations",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

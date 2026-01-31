@@ -19,9 +19,10 @@ const DEFAULT_SETTINGS: UserSettings = {
   method: 1, // University of Islamic Sciences Karachi
   madhab: 1, // Hanafi
   jamaahTimes: {},
-  sehriAdjustment: 0,
+  suhoorAdjustment: 0,
   iftarAdjustment: 0,
   hijriAdjustment: 0,
+  hijriDateChangeAtMaghrib: true,
   manualLocation: true, // Always use manual location
   country: 'Bangladesh',
   city: 'Dhaka'
@@ -39,7 +40,7 @@ const SettingsPage = () => {
     setUserSettings(localSettings);
     toast({
       title: "Settings Updated",
-      description: "Your prayer time settings have been saved.",
+      description: "Your salat time settings have been saved.",
     });
   };
   
@@ -65,15 +66,15 @@ const SettingsPage = () => {
       
       <Separator className="mb-6" />
       
-      <Tabs defaultValue="prayer-times" className="w-full">
+      <Tabs defaultValue="salat-times" className="w-full">
         <TabsList className="grid grid-cols-4 mb-4 w-full">
-          <TabsTrigger value="prayer-times">Prayer Times</TabsTrigger>
+          <TabsTrigger value="salat-times">Salat Times</TabsTrigger>
           <TabsTrigger value="location">Location</TabsTrigger>
           <TabsTrigger value="jamaah">Jama'ah</TabsTrigger>
           <TabsTrigger value="about">About</TabsTrigger>
         </TabsList>
-        
-        <TabsContent value="prayer-times">
+
+        <TabsContent value="salat-times">
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="calculation-method">Calculation Method</Label>
@@ -126,13 +127,13 @@ const SettingsPage = () => {
             
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Sehri Adjustment ({localSettings.sehriAdjustment} min)</Label>
-                <Slider 
-                  min={-3} 
-                  max={3} 
-                  step={1} 
-                  value={[localSettings.sehriAdjustment]} 
-                  onValueChange={(value) => updateSetting('sehriAdjustment', value[0])}
+                <Label>Suhoor Adjustment ({localSettings.suhoorAdjustment} min)</Label>
+                <Slider
+                  min={-3}
+                  max={3}
+                  step={1}
+                  value={[localSettings.suhoorAdjustment]}
+                  onValueChange={(value) => updateSetting('suhoorAdjustment', value[0])}
                 />
               </div>
               
