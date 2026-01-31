@@ -1,18 +1,18 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { toast } from '@/components/ui/use-toast';
-import { DateTimeContainer } from '@/components/DateTimeContainer';
 import { CurrentPrayerContainer } from '@/components/CurrentPrayerContainer';
+import { DateTimeContainer } from '@/components/DateTimeContainer';
+import { FastingTimesContainer } from '@/components/FastingTimesContainer';
 import { NextPrayerContainer } from '@/components/NextPrayerContainer';
 import { PrayerTimesContainer } from '@/components/PrayerTimesContainer';
 import { ProhibitedTimesContainer } from '@/components/ProhibitedTimesContainer';
-import { FastingTimesContainer } from '@/components/FastingTimesContainer';
-import { calculatePrayerTimesLocally } from '@/services/prayerTimesLocal';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { PrayerTime, ProhibitedTime, UserSettings } from '@/types';
-import { adjustTime, getProhibitedTimes, setTranslationFunction } from '@/utils/timeUtils';
-import { DEFAULT_SETTINGS, DEFAULT_CONTAINER_ORDER } from '@/constants/defaultSettings';
+import { DEFAULT_CONTAINER_ORDER, DEFAULT_SETTINGS } from '@/constants/defaultSettings';
 import { useTranslation } from '@/contexts/TranslationContext';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { calculatePrayerTimesLocally } from '@/services/prayerTimesLocal';
+import { PrayerTime, ProhibitedTime, UserSettings } from '@/types';
+import { EContainerType } from '@/types/enums';
+import { adjustTime, getProhibitedTimes, setTranslationFunction } from '@/utils/timeUtils';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 /**
  * Migrate old settings property names to new ones
@@ -32,23 +32,14 @@ function migrateSettings(settings: UserSettings): UserSettings {
 
 // Default visible containers - all visible by default
 const defaultVisibleContainers: Record<string, boolean> = {
-  [ContainerType.DateTime]: true,
-  [ContainerType.CurrentSalat]: true,
-  [ContainerType.NextSalat]: true,
-  [ContainerType.SalatTimes]: true,
-  [ContainerType.ProhibitedTimes]: true,
-  [ContainerType.SaumTimes]: true
+  [EContainerType.DateTime]: true,
+  [EContainerType.CurrentSalat]: true,
+  [EContainerType.NextSalat]: true,
+  [EContainerType.SalatTimes]: true,
+  [EContainerType.ProhibitedTimes]: true,
+  [EContainerType.SaumTimes]: true
 };
 
-// Container IDs for drag and drop
-export enum ContainerType {
-  DateTime = 'dateTime',
-  CurrentSalat = 'currentSalat',
-  NextSalat = 'nextSalat',
-  SalatTimes = 'salatTimes',
-  ProhibitedTimes = 'prohibitedTimes',
-  SaumTimes = 'saumTimes'
-}
 
 const Index = () => {
   const navigate = useNavigate();
@@ -156,7 +147,7 @@ const Index = () => {
           }
 
           switch (containerId) {
-            case ContainerType.DateTime:
+            case EContainerType.DateTime:
               return (
                 <DateTimeContainer
                   key={containerId}
@@ -170,23 +161,23 @@ const Index = () => {
                   timeFormat={userSettings.timeFormat}
                 />
               );
-            case ContainerType.CurrentSalat:
+            case EContainerType.CurrentSalat:
               return (
                 <CurrentPrayerContainer key={containerId} allPrayers={salatTimes} timeFormat={userSettings.timeFormat} />
               );
-            case ContainerType.NextSalat:
+            case EContainerType.NextSalat:
               return (
                 <NextPrayerContainer key={containerId} allPrayers={salatTimes} timeFormat={userSettings.timeFormat} />
               );
-            case ContainerType.SalatTimes:
+            case EContainerType.SalatTimes:
               return (
                 <PrayerTimesContainer key={containerId} salats={salatTimes} timeFormat={userSettings.timeFormat} />
               );
-            case ContainerType.ProhibitedTimes:
+            case EContainerType.ProhibitedTimes:
               return (
                 <ProhibitedTimesContainer key={containerId} prohibitedTimes={prohibitedTimes} timeFormat={userSettings.timeFormat} />
               );
-            case ContainerType.SaumTimes:
+            case EContainerType.SaumTimes:
               return (
                 <FastingTimesContainer
                   key={containerId}

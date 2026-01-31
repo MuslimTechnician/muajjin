@@ -4,15 +4,7 @@ import { UserSettings } from '@/types';
  * Default settings for values NOT set during onboarding
  * These are applied automatically and can be changed later in Settings
  */
-export const DEFAULT_SETTINGS: Omit<UserSettings, 'city' | 'country' | 'latitude' | 'longitude' | 'method' | 'madhab' | 'timeFormat'> & {
-  city?: string;
-  country?: string;
-  latitude?: number;
-  longitude?: number;
-  method?: number;
-  madhab?: number;
-  timeFormat?: string;
-} = {
+export const DEFAULT_SETTINGS: UserSettings = {
   // Salat Times
   jamaahTimes: {}, // No Jama'ah times set by default
   method: 1, // Karachi (will be set in onboarding)
@@ -60,7 +52,7 @@ export const DEFAULT_CONTAINER_ORDER = [
   'salatTimes',
   'prohibitedTimes',
   'saumTimes'
-] as const;
+] // removed 'as const' from array
 
 /**
  * Combined settings for when user skips onboarding (dev/testing only)

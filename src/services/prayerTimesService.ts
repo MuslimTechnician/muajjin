@@ -1,7 +1,5 @@
-import { UserSettings } from '@/types';
-
 // Re-export calculation methods and madhabs from local service
-export { CALCULATION_METHODS, CALCULATION_METHOD_KEYS, MADHABS } from './prayerTimesLocal';
+export { CALCULATION_METHOD_KEYS, CALCULATION_METHODS, MADHABS } from './prayerTimesLocal';
 
 // Note: Salat times and Hijri date calculations are done locally
 // Salat times: uses adhan library (see prayerTimesLocal.ts)

@@ -1,40 +1,39 @@
-import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Upload, Trash2, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { UserSettings } from '@/types';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { Separator } from '@/components/ui/separator';
-import { GripVertical } from 'lucide-react';
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { Switch } from '@/components/ui/switch';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { closestCenter, DndContext, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
-import { SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
+import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { ContainerType } from '@/pages/Index';
-import { useTheme } from 'next-themes';
-import { Sun, Moon, Monitor } from 'lucide-react';
-import { DEFAULT_SETTINGS, DEFAULT_CONTAINER_ORDER } from '@/constants/defaultSettings';
+import { ArrowLeft, Check, GripVertical, Trash2, Upload } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+import { DEFAULT_CONTAINER_ORDER } from '@/constants/defaultSettings';
 import { useTranslation } from '@/contexts/TranslationContext';
+import { EContainerType } from '@/types/enums';
+import { Monitor, Moon, Sun } from 'lucide-react';
+import { useTheme } from 'next-themes';
 
 const CONTAINER_LABELS: Record<string, string> = {
-  [ContainerType.DateTime]: 'Date & Time',
-  [ContainerType.CurrentSalat]: 'Current Salat',
-  [ContainerType.NextSalat]: 'Next Salat',
-  [ContainerType.SalatTimes]: 'Salat Times',
-  [ContainerType.ProhibitedTimes]: 'Forbidden Times',
-  [ContainerType.SaumTimes]: 'Saum Times'
+  [EContainerType.DateTime]: 'Date & Time',
+  [EContainerType.CurrentSalat]: 'Current Salat',
+  [EContainerType.NextSalat]: 'Next Salat',
+  [EContainerType.SalatTimes]: 'Salat Times',
+  [EContainerType.ProhibitedTimes]: 'Forbidden Times',
+  [EContainerType.SaumTimes]: 'Saum Times'
 };
 
 // Translation keys mapping
 const CONTAINER_LABEL_KEYS: Record<string, string> = {
-  [ContainerType.DateTime]: 'settings.dateTime',
-  [ContainerType.CurrentSalat]: 'settings.currentSalat',
-  [ContainerType.NextSalat]: 'settings.nextSalat',
-  [ContainerType.SalatTimes]: 'settings.salatTimes',
-  [ContainerType.ProhibitedTimes]: 'settings.forbiddenTimes',
-  [ContainerType.SaumTimes]: 'settings.saumTimes'
+  [EContainerType.DateTime]: 'settings.dateTime',
+  [EContainerType.CurrentSalat]: 'settings.currentSalat',
+  [EContainerType.NextSalat]: 'settings.nextSalat',
+  [EContainerType.SalatTimes]: 'settings.salatTimes',
+  [EContainerType.ProhibitedTimes]: 'settings.forbiddenTimes',
+  [EContainerType.SaumTimes]: 'settings.saumTimes'
 };
 
 // Sortable item for container reordering
@@ -86,19 +85,19 @@ export default function DisplaySettings() {
   const { theme, setTheme, resolvedTheme } = useTheme();
   const { t, uploadFont, removeFont, customFont } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [userSettings] = useLocalStorage<UserSettings>('muajjin-settings', DEFAULT_SETTINGS);
+  // const [userSettings] = useLocalStorage<UserSettings>('muajjin-settings', DEFAULT_SETTINGS);
   const [containerOrder, setContainerOrder] = useLocalStorage<string[]>('muajjin-container-order', DEFAULT_CONTAINER_ORDER);
   const [mounted, setMounted] = useState(false);
   const hasCustomFont = !!customFont;
 
   // Default visible containers - all visible by default
   const defaultVisibleContainers: Record<string, boolean> = {
-    [ContainerType.DateTime]: true,
-    [ContainerType.CurrentSalat]: true,
-    [ContainerType.NextSalat]: true,
-    [ContainerType.SalatTimes]: true,
-    [ContainerType.ProhibitedTimes]: true,
-    [ContainerType.SaumTimes]: true
+    [EContainerType.DateTime]: true,
+    [EContainerType.CurrentSalat]: true,
+    [EContainerType.NextSalat]: true,
+    [EContainerType.SalatTimes]: true,
+    [EContainerType.ProhibitedTimes]: true,
+    [EContainerType.SaumTimes]: true
   };
 
   const [visibleContainers, setVisibleContainers] = useLocalStorage<Record<string, boolean>>(
