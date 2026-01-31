@@ -1,10 +1,10 @@
+import { UserSettings } from "@/types";
 import {
-  Coordinates,
+  Madhab as AdhanMadhab,
   CalculationMethod,
+  Coordinates,
   PrayerTimes,
-  Madhab as AdhanMadhab
-} from 'adhan';
-import { UserSettings } from '@/types';
+} from "adhan";
 
 export interface LocalPrayerTimes {
   Fajr: string;
@@ -92,8 +92,8 @@ function getCalculationParameters(methodId: number) {
  * Format Date object to HH:MM string (24-hour format)
  */
 function formatTime(date: Date): string {
-  const hours = String(date.getHours()).padStart(2, '0');
-  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
   return `${hours}:${minutes}`;
 }
 
@@ -103,32 +103,32 @@ function formatTime(date: Date): string {
  * Maps to the IDs used in the app
  */
 export const CALCULATION_METHODS = [
-  { id: 5, name: "Egyptian General Authority of Survey" },
-  { id: 8, name: "Gulf Region" },
-  { id: 7, name: "Institute of Geophysics, University of Tehran" },
-  { id: 2, name: "Islamic Society of North America (ISNA)" },
-  { id: 9, name: "Kuwait" },
-  { id: 11, name: "Majlis Ugama Islam Singapore, Singapore" },
-  { id: 3, name: "Muslim World League" },
-  { id: 12, name: "Moonsighting Committee Worldwide" },
-  { id: 10, name: "Qatar" },
-  { id: 4, name: "Umm al-Qura, Makkah" },
-  { id: 1, name: "University of Islamic Sciences, Karachi" }
+  { id: 1, name: 'University of Islamic Sciences, Karachi' },
+  { id: 2, name: 'Islamic Society of North America (ISNA)' },
+  { id: 3, name: 'Muslim World League' },
+  { id: 4, name: 'Umm al-Qura, Makkah' },
+  { id: 5, name: 'Egyptian General Authority of Survey' },
+  { id: 7, name: 'Institute of Geophysics, University of Tehran' },
+  { id: 8, name: 'Gulf Region' },
+  { id: 9, name: 'Kuwait' },
+  { id: 10, name: 'Qatar' },
+  { id: 11, name: 'Majlis Ugama Islam Singapore, Singapore' },
+  { id: 12, name: 'Moonsighting Committee Worldwide' },
 ];
 
 // Map calculation method IDs to translation keys
 export const CALCULATION_METHOD_KEYS: Record<number, string> = {
-  5: 'calculationMethods.egyptian',
-  8: 'calculationMethods.other',
-  7: 'calculationMethods.tehran',
+  1: 'calculationMethods.karachi',
   2: 'calculationMethods.northAmerica',
-  9: 'calculationMethods.kuwait',
-  11: 'calculationMethods.singapore',
   3: 'calculationMethods.muslimWorldLeague',
-  12: 'calculationMethods.moonsightingCommittee',
-  10: 'calculationMethods.qatar',
   4: 'calculationMethods.ummAlQura',
-  1: 'calculationMethods.karachi'
+  5: 'calculationMethods.egyptian',
+  7: 'calculationMethods.tehran',
+  8: 'calculationMethods.other',
+  9: 'calculationMethods.kuwait',
+  10: 'calculationMethods.qatar',
+  11: 'calculationMethods.singapore',
+  12: 'calculationMethods.moonsightingCommittee',
 };
 
 /**
@@ -136,5 +136,5 @@ export const CALCULATION_METHOD_KEYS: Record<number, string> = {
  */
 export const MADHABS = [
   { id: 0, name: "Shafi'i, Maliki, Hanbali" },
-  { id: 1, name: "Hanafi" }
+  { id: 1, name: "Hanafi" },
 ];

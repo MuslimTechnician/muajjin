@@ -1,4 +1,5 @@
 
+import { LocalPrayerTimes } from "@/services/prayerTimesLocal";
 import { PrayerTime, ProhibitedTime } from "@/types";
 
 // Cache for translation function to avoid circular imports
@@ -216,7 +217,8 @@ export function getNextSalat(salatTimes: PrayerTime[]): PrayerTime | null {
 }
 
 // Get prohibited salat times with start and end ranges
-export function getProhibitedTimes(prayerTimes: { [key: string]: string }): ProhibitedTime[] {
+// export function getProhibitedTimes(prayerTimes: { [key: string]: string }): ProhibitedTime[] {
+export function getProhibitedTimes(prayerTimes: LocalPrayerTimes): ProhibitedTime[] { // changed type annotation
   const prohibitedTimes: ProhibitedTime[] = [
     {
       name: t('prohibited.shuruq'),

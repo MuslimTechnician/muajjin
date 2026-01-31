@@ -1,19 +1,19 @@
-import { useState, useEffect } from 'react';
+import { AboutSection } from '@/components/AboutSection';
+import { CountrySelect } from '@/components/CountrySelect';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
-import { CALCULATION_METHODS, CALCULATION_METHOD_KEYS, MADHABS } from '@/services/prayerTimesService';
-import { UserSettings } from '@/types';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from '@/components/ui/use-toast';
-import { Separator } from '@/components/ui/separator';
-import { ThemeToggle } from '@/components/ThemeToggle';
-import { CountrySelect } from '@/components/CountrySelect';
-import { AboutSection } from '@/components/AboutSection';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { CALCULATION_METHODS, MADHABS } from '@/services/prayerTimesService';
+import { UserSettings } from '@/types';
+import { useEffect, useState } from 'react';
 
 const DEFAULT_SETTINGS: UserSettings = {
   method: 1, // University of Islamic Sciences Karachi
@@ -25,7 +25,8 @@ const DEFAULT_SETTINGS: UserSettings = {
   hijriDateChangeAtMaghrib: true,
   manualLocation: true, // Always use manual location
   country: 'Bangladesh',
-  city: 'Dhaka'
+  city: 'Dhaka',
+  timeFormat: 'system'
 };
 
 const SettingsPage = () => {
