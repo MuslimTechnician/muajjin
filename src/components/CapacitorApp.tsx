@@ -23,7 +23,7 @@ export function CapacitorApp({ children }: { children: React.ReactNode }) {
       // Listen for back button presses
       const handler = await App.addListener('backButton', async () => {
         // Check if we can go back in navigation history
-        const canGoBack = await App.canGoBack();
+        const canGoBack = window.history.length > 1;
 
         if (canGoBack) {
           // Navigate back in React Router

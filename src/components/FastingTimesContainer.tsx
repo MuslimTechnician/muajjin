@@ -5,7 +5,7 @@ import { formatTime } from '@/utils/timeUtils';
 import { useTranslation } from '@/contexts/TranslationContext';
 
 interface FastingTimesContainerProps {
-  sehriTime: string;
+  suhoorTime: string;
   iftarTime: string;
   suhoorAdjustment: number;
   iftarAdjustment: number;
@@ -13,7 +13,7 @@ interface FastingTimesContainerProps {
 }
 
 export function FastingTimesContainer({
-  sehriTime,
+  suhoorTime,
   iftarTime,
   suhoorAdjustment,
   iftarAdjustment,
@@ -56,11 +56,11 @@ export function FastingTimesContainer({
       const currentMinutes = now.getMinutes();
 
       // Convert suhoor and iftar times to comparable values
-      const [sehriHours, sehriMinutes] = sehriTime.split(':').map(Number);
+      const [suhoorHours, suhoorMinutes] = suhoorTime.split(':').map(Number);
       const [iftarHours, iftarMinutes] = iftarTime.split(':').map(Number);
 
       const currentTotal = currentHours * 60 + currentMinutes;
-      const sehriTotal = sehriHours * 60 + sehriMinutes;
+      const suhoorTotal = suhoorHours * 60 + suhoorMinutes;
       const iftarTotal = iftarHours * 60 + iftarMinutes;
 
       // Determine which event is next
@@ -69,34 +69,34 @@ export function FastingTimesContainer({
       let startTime: Date;
       let endTime: Date;
 
-      if (currentTotal < sehriTotal) {
+      if (currentTotal < suhoorTotal) {
         // Before Suhoor
-        targetTime = sehriTime;
+        targetTime = suhoorTime;
         eventName = t('saum.suhoorEndsIn');
         // Progress from previous Iftar to Suhoor
         startTime = new Date();
         startTime.setHours(iftarHours, iftarMinutes, 0, 0);
         startTime.setDate(startTime.getDate() - 1);
         endTime = new Date();
-        endTime.setHours(sehriHours, sehriMinutes, 0, 0);
+        endTime.setHours(suhoorHours, suhoorMinutes, 0, 0);
       } else if (currentTotal < iftarTotal) {
         // After Suhoor, before Iftar (saum/fasting time)
         targetTime = iftarTime;
         eventName = t('saum.iftarStartsIn');
         // Progress from Suhoor to Iftar
         startTime = new Date();
-        startTime.setHours(sehriHours, sehriMinutes, 0, 0);
+        startTime.setHours(suhoorHours, suhoorMinutes, 0, 0);
         endTime = new Date();
         endTime.setHours(iftarHours, iftarMinutes, 0, 0);
       } else {
         // After Iftar, next is tomorrow's Suhoor
-        targetTime = sehriTime;
+        targetTime = suhoorTime;
         eventName = t('saum.suhoorEndsIn');
         // Progress from Iftar to tomorrow's Suhoor
         startTime = new Date();
         startTime.setHours(iftarHours, iftarMinutes, 0, 0);
         endTime = new Date();
-        endTime.setHours(sehriHours, sehriMinutes, 0, 0);
+        endTime.setHours(suhoorHours, suhoorMinutes, 0, 0);
         endTime.setDate(endTime.getDate() + 1);
       }
 
@@ -126,7 +126,7 @@ export function FastingTimesContainer({
 
     // Cleanup on unmount
     return () => clearInterval(interval);
-  }, [sehriTime, iftarTime]);
+  }, [suhoorTime, iftarTime, t]);
 
   return (
     <Card className="bg-muted/30 border shadow-sm mb-4 rounded-sm">
@@ -139,7 +139,7 @@ export function FastingTimesContainer({
           <div className="grid grid-cols-2 gap-4">
             <div className="border border-secondary rounded-lg p-4 text-center">
               <p className="text-muted-foreground text-sm mb-1">{t('saum.suhoorEnds')}</p>
-              <p className="text-2xl font-bold">{formatTime(sehriTime, timeFormat)}</p>
+              <p className="text-2xl font-bold">{formatTime(suhoorTime, timeFormat)}</p>
               {suhoorAdjustment !== 0 && (
                 <p className="text-xs text-muted-foreground mt-1">
                   {t('saum.adjustedBy', { minutes: suhoorAdjustment > 0 ? `+${suhoorAdjustment}` : suhoorAdjustment })}

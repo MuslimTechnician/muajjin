@@ -18,7 +18,7 @@ import {
   getProhibitedTimes,
   setTranslationFunction,
 } from '@/utils/timeUtils';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 /**
@@ -64,19 +64,24 @@ const Index = () => {
   );
   const [salatTimes, setSalatTimes] = useState<PrayerTime[]>([]);
   const [prohibitedTimes, setProhibitedTimes] = useState<ProhibitedTime[]>([]);
-  const [sehriTime, setSehriTime] = useState<string>('');
+  const [suhoorTime, setSuhoorTime] = useState<string>('');
   const [iftarTime, setIftarTime] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [loadedWithTranslation, setLoadedWithTranslation] = useState(false);
   const [lastCalculatedDate, setLastCalculatedDate] = useState<string>('');
+  const hasMigratedRef = useRef(false);
 
   // Migrate old settings property names (one-time migration)
   useEffect(() => {
+    // Only run once
+    if (hasMigratedRef.current) return;
+    hasMigratedRef.current = true;
+
     const migrated = migrateSettings(userSettings);
     if (JSON.stringify(migrated) !== JSON.stringify(userSettings)) {
       setUserSettings(migrated);
     }
-  }, []); // Run once on mount
+  }, [setUserSettings, userSettings]);
 
   // Check if onboarding is completed
   useEffect(() => {
@@ -88,25 +93,7 @@ const Index = () => {
     }
   }, [navigate]);
 
-  // Load salat times on component mount and when translation changes
-  useEffect(() => {
-    // Only load after translations are mounted
-    if (!mounted) return;
-
-    // Initialize the translation function for timeUtils (use general 't', not 'getSalatName')
-    setTranslationFunction(t);
-
-    // If already loaded with this translation, don't reload
-    if (loadedWithTranslation) return;
-
-    loadSalatTimes(userSettings);
-    // Also reload prohibited times to ensure they're translated
-    const timings = calculatePrayerTimesLocally(new Date(), userSettings);
-    setProhibitedTimes(getProhibitedTimes(timings));
-    setLoadedWithTranslation(true);
-  }, [mounted, t]); // Reload when translation function changes or first mounted
-
-  const loadSalatTimes = (settings: UserSettings) => {
+  const loadSalatTimes = useCallback((settings: UserSettings) => {
     setIsLoading(true);
 
     // Calculate salat times locally using adhan library (no API call!)
@@ -152,36 +139,48 @@ const Index = () => {
     ];
 
     setSalatTimes(salats);
-
-    // Set prohibited times
-    setProhibitedTimes(getProhibitedTimes(timings));
-
-    // Set saum (fasting) times with adjustments
-    setSehriTime(adjustTime(timings.Fajr, settings.suhoorAdjustment));
+    setSuhoorTime(adjustTime(timings.Fajr, settings.suhoorAdjustment));
     setIftarTime(adjustTime(timings.Maghrib, settings.iftarAdjustment));
+    setLastCalculatedDate(new Date().toDateString());
 
     setIsLoading(false);
-  };
+  }, [getSalatName]); // getSalatName changes with translations, so recreate when it changes
+
+  // Load salat times on component mount and when translation changes
+  useEffect(() => {
+    // Only load after translations are mounted
+    if (!mounted) return;
+
+    // Initialize the translation function for timeUtils (use general 't', not 'getSalatName')
+    setTranslationFunction(t);
+
+    // If already loaded with this translation, don't reload
+    if (loadedWithTranslation) return;
+
+    loadSalatTimes(userSettings);
+    // Also reload prohibited times to ensure they're translated
+    const timings = calculatePrayerTimesLocally(new Date(), userSettings);
+    setProhibitedTimes(getProhibitedTimes(timings));
+    setLoadedWithTranslation(true);
+  }, [loadSalatTimes, loadedWithTranslation, mounted, t, userSettings]); // Reload when translation function changes or first mounted
 
   // Check for date change every minute and reload salat times at midnight
   useEffect(() => {
     const checkDateChange = () => {
-      const today = new Date().toDateString();
-      if (lastCalculatedDate && lastCalculatedDate !== today) {
-        // Date has changed, reload salat times
+      const currentDate = new Date().toDateString();
+      if (lastCalculatedDate && currentDate !== lastCalculatedDate) {
         loadSalatTimes(userSettings);
-        setLastCalculatedDate(today);
       }
     };
 
-    // Set initial date
-    setLastCalculatedDate(new Date().toDateString());
+    // Check immediately
+    checkDateChange();
 
     // Check every minute
     const timer = setInterval(checkDateChange, 60000);
 
     return () => clearInterval(timer);
-  }, [lastCalculatedDate, userSettings]);
+  }, [lastCalculatedDate, loadSalatTimes, userSettings]);
 
   // Render containers based on user order
   const renderContainers = () => {
@@ -248,7 +247,7 @@ const Index = () => {
               return (
                 <FastingTimesContainer
                   key={containerId}
-                  sehriTime={sehriTime}
+                  suhoorTime={suhoorTime}
                   iftarTime={iftarTime}
                   suhoorAdjustment={userSettings.suhoorAdjustment}
                   iftarAdjustment={userSettings.iftarAdjustment}
@@ -274,7 +273,9 @@ const Index = () => {
           </div>
         </div>
       ) : (
-        renderContainers()
+        <div className="space-y-4">
+          {renderContainers()}
+        </div>
       )}
     </div>
   );

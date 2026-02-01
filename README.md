@@ -53,19 +53,19 @@ Any additional features beyond these core functions will **not** be implemented.
 ### Install Dependencies
 
 ```bash
-npm install
+bun install
 ````
 
 ### Development
 
 ```bash
-npm run dev
+bun run dev
 ```
 
 ### Production Build
 
 ```bash
-npm run build
+bun run build
 ```
 
 ---
@@ -96,10 +96,10 @@ keystore.key.password=your_key_password
 
 ```bash
 # Debug APK (larger, faster build)
-npm run android:build
+bun run android:build
 
 # Release APK (optimized, smaller)
-npm run android:release
+bun run android:release
 ```
 
 **APK Output Directory**

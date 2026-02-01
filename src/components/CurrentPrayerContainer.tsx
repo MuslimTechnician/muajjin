@@ -137,7 +137,7 @@ export function CurrentPrayerContainer({ allPrayers, timeFormat = 'system' }: Cu
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [currentPrayer, nextPrayer, timeFormat]);
+  }, [currentPrayer, nextPrayer, t, timeFormat]);
 
   if (!currentPrayer) {
     return null; // Hide card entirely when no current salat

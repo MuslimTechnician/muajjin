@@ -58,11 +58,11 @@ export default function FastingSettings() {
       <div className="mx-auto max-w-md space-y-6 p-4">
         {/* Suhoor Adjustment */}
         <div className="space-y-2">
-          <Label htmlFor="sehri-adjustment">
+          <Label htmlFor="suhoor-adjustment">
             {t('settings.suhoorAdjustment')}
           </Label>
           <Input
-            id="sehri-adjustment"
+            id="suhoor-adjustment"
             type="number"
             min={-10}
             max={10}
