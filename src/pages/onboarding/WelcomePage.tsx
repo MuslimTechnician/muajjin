@@ -1,14 +1,15 @@
-import { useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Calendar, MapPin, Moon, Sunset, Upload } from 'lucide-react';
 import { useTranslation } from '@/contexts/TranslationContext';
+import { Calendar, MapPin, Moon, Sunset, Upload } from 'lucide-react';
+import { useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 export default function WelcomePage() {
   const navigate = useNavigate();
-  const { t, importTranslation, setActiveTranslation, importedTranslations } = useTranslation();
+  const { t, importTranslation, setActiveTranslation, importedTranslations } =
+    useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileImport = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,30 +41,54 @@ export default function WelcomePage() {
   };
 
   const features = [
-    { icon: Calendar, title: t('onboarding.salatTimesFeature'), description: t('onboarding.salatTimesDesc') },
-    { icon: Sunset, title: t('onboarding.saumFeature'), description: t('onboarding.saumDesc') },
-    { icon: Moon, title: t('onboarding.hijriFeature'), description: t('onboarding.hijriDesc') },
-    { icon: MapPin, title: t('onboarding.gpsFeature'), description: t('onboarding.gpsDesc') }
+    {
+      icon: Calendar,
+      title: t('onboarding.salatTimesFeature'),
+      description: t('onboarding.salatTimesDesc'),
+    },
+    {
+      icon: Sunset,
+      title: t('onboarding.saumFeature'),
+      description: t('onboarding.saumDesc'),
+    },
+    {
+      icon: Moon,
+      title: t('onboarding.hijriFeature'),
+      description: t('onboarding.hijriDesc'),
+    },
+    {
+      icon: MapPin,
+      title: t('onboarding.gpsFeature'),
+      description: t('onboarding.gpsDesc'),
+    },
   ];
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="flex min-h-screen flex-col bg-background">
       {/* Content */}
-      <div className="flex-1 flex flex-col justify-center p-4 max-w-md mx-auto">
-        <div className="text-center space-y-8">
+      <div className="mx-auto flex max-w-md flex-1 flex-col justify-center p-4">
+        <div className="space-y-8 text-center">
           {/* Icon/Logo */}
-          <div className="w-20 h-20 mx-auto flex items-center justify-center">
-            <img src="/icon.png" alt="Muajjin" className="w-full h-full object-contain" />
+          <div className="mx-auto flex h-20 w-20 items-center justify-center">
+            <img
+              src="/icon.png"
+              alt="Muajjin"
+              className="h-full w-full object-contain"
+            />
           </div>
 
           {/* Title */}
           <div className="space-y-2">
-            <h1 className="text-3xl font-bold tracking-tight">{t('onboarding.welcome')}</h1>
-            <p className="text-muted-foreground text-lg">{t('onboarding.subtitle')}</p>
+            <h1 className="text-3xl font-bold tracking-tight">
+              {t('onboarding.welcome')}
+            </h1>
+            <p className="text-lg text-muted-foreground">
+              {t('onboarding.subtitle')}
+            </p>
           </div>
 
           {/* Features Grid */}
-          <Card className="bg-muted/30 border shadow-sm">
+          <Card className="border bg-muted/30 shadow-sm">
             <CardContent className="p-4">
               <div className="grid grid-cols-2 gap-3">
                 {features.map((feature, index) => {
@@ -71,12 +96,13 @@ export default function WelcomePage() {
                   return (
                     <div
                       key={index}
-                      className="flex items-center gap-3 p-3 border border-secondary rounded-lg"
-                    >
-                      <Icon className="h-5 w-5 text-primary flex-shrink-0" />
+                      className="flex items-center gap-3 rounded-lg border border-secondary p-3">
+                      <Icon className="h-5 w-5 flex-shrink-0 text-primary" />
                       <div className="text-left">
-                        <p className="text-sm font-medium leading-tight">{feature.title}</p>
-                        <p className="text-xs text-muted-foreground leading-tight mt-0.5">
+                        <p className="text-sm font-medium leading-tight">
+                          {feature.title}
+                        </p>
+                        <p className="mt-0.5 text-xs leading-tight text-muted-foreground">
                           {feature.description}
                         </p>
                       </div>
@@ -88,13 +114,12 @@ export default function WelcomePage() {
           </Card>
 
           {/* Translation Import */}
-          <div className="text-center space-y-2">
+          <div className="space-y-2 text-center">
             <Button
               variant="outline"
               onClick={() => fileInputRef.current?.click()}
-              className="w-full max-w-xs mx-auto"
-            >
-              <Upload className="h-4 w-4 mr-2" />
+              className="mx-auto w-full max-w-xs">
+              <Upload className="mr-2 h-4 w-4" />
               {t('settings.importTranslation')}
             </Button>
             <input
@@ -104,14 +129,13 @@ export default function WelcomePage() {
               onChange={handleFileImport}
               className="hidden"
             />
-            <p className="text-xs text-muted-foreground max-w-xs mx-auto">
-              {t('onboarding.translationImportDescription')}
-              {' '}<a
+            <p className="mx-auto max-w-xs text-xs text-muted-foreground">
+              {t('onboarding.translationImportDescription')}{' '}
+              <a
                 href="https://github.com/MuslimTechnician/muajjin/discussions/1"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-primary hover:underline"
-              >
+                className="text-primary hover:underline">
                 {t('onboarding.learnMore')}
               </a>
             </p>
@@ -119,21 +143,20 @@ export default function WelcomePage() {
 
           {/* Get Started Button */}
           <Button
-            onClick={() => navigate('/onboarding/location')}
+            onClick={() => navigate('/onboarding/location', { replace: true })}
             size="lg"
-            className="w-full max-w-xs mx-auto"
-          >
+            className="mx-auto w-full max-w-xs">
             {t('onboarding.getStarted')}
           </Button>
         </div>
       </div>
 
       {/* Progress indicator */}
-      <div className="p-4 max-w-md mx-auto">
+      <div className="mx-auto max-w-md p-4">
         <div className="flex gap-2">
-          <div className="h-1 flex-1 bg-primary rounded-full"></div>
-          <div className="h-1 flex-1 bg-muted rounded-full"></div>
-          <div className="h-1 flex-1 bg-muted rounded-full"></div>
+          <div className="h-1 flex-1 rounded-full bg-primary"></div>
+          <div className="h-1 flex-1 rounded-full bg-muted"></div>
+          <div className="h-1 flex-1 rounded-full bg-muted"></div>
         </div>
       </div>
     </div>

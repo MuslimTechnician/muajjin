@@ -1,22 +1,32 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { UserSettings } from '@/types';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { MapPin } from 'lucide-react';
-import { detectLocation, LocationResult } from '@/services/locationService';
 import { DEFAULT_SETTINGS } from '@/constants/defaultSettings';
 import { useTranslation } from '@/contexts/TranslationContext';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { detectLocation, LocationResult } from '@/services/locationService';
+import { UserSettings } from '@/types';
+import {
+  AlertCircle,
+  ArrowLeft,
+  CheckCircle2,
+  Loader2,
+  MapPin,
+} from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function TimeLocationSettings() {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const [userSettings, setUserSettings] = useLocalStorage<UserSettings>('muajjin-settings', DEFAULT_SETTINGS);
-  const [localSettings, setLocalSettings] = useState<UserSettings>({ ...userSettings });
+  const [userSettings, setUserSettings] = useLocalStorage<UserSettings>(
+    'muajjin-settings',
+    DEFAULT_SETTINGS,
+  );
+  const [localSettings, setLocalSettings] = useState<UserSettings>({
+    ...userSettings,
+  });
   const [isDetecting, setIsDetecting] = useState(false);
   const [locationStatus, setLocationStatus] = useState<{
     type: 'success' | 'error' | 'info';
@@ -29,11 +39,14 @@ export default function TimeLocationSettings() {
 
   const handleSave = () => {
     setUserSettings(localSettings);
-    navigate('/settings');
+    navigate(-1);
   };
 
-  const updateSetting = <K extends keyof UserSettings>(key: K, value: UserSettings[K]) => {
-    setLocalSettings(prev => ({ ...prev, [key]: value }));
+  const updateSetting = <K extends keyof UserSettings>(
+    key: K,
+    value: UserSettings[K],
+  ) => {
+    setLocalSettings((prev) => ({ ...prev, [key]: value }));
     // Clear status when user manually changes values
     if (locationStatus) {
       setLocationStatus(null);
@@ -44,31 +57,32 @@ export default function TimeLocationSettings() {
     setIsDetecting(true);
     setLocationStatus({
       type: 'info',
-      message: t('onboarding.detectingGps')
+      message: t('onboarding.detectingGps'),
     });
 
     try {
       const location: LocationResult = await detectLocation();
 
       // Update location fields
-      setLocalSettings(prev => ({
+      setLocalSettings((prev) => ({
         ...prev,
         latitude: location.latitude,
         longitude: location.longitude,
-        city: location.city
+        city: location.city,
       }));
 
       // Show success message with detection method
       const methodText = location.method === 'gps' ? 'GPS' : 'IP-based';
       setLocationStatus({
         type: 'success',
-        message: `${t('onboarding.locationDetected', { city: location.city, country: location.country })} (${methodText})`
+        message: `${t('onboarding.locationDetected', { city: location.city, country: location.country })} (${methodText})`,
       });
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : t('errors.locationFailed');
+      const errorMessage =
+        error instanceof Error ? error.message : t('errors.locationFailed');
       setLocationStatus({
         type: 'error',
-        message: errorMessage
+        message: errorMessage,
       });
     } finally {
       setIsDetecting(false);
@@ -79,47 +93,51 @@ export default function TimeLocationSettings() {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="sticky top-0 z-50 w-full border-b bg-background px-4 py-3">
-        <div className="flex items-center gap-3 max-w-md mx-auto">
+        <div className="mx-auto flex max-w-md items-center gap-3">
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => navigate('/settings')}
-            className="h-8 w-8"
-          >
+            onClick={() => navigate(-1)}
+            className="h-8 w-8">
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h1 className="text-lg font-semibold">{t('settings.timeLocationSettings')}</h1>
+          <h1 className="text-lg font-semibold">
+            {t('settings.timeLocationSettings')}
+          </h1>
         </div>
       </div>
 
       {/* Content */}
-      <div className="p-4 max-w-md mx-auto space-y-6">
+      <div className="mx-auto max-w-md space-y-6 p-4">
         {/* Time Format */}
         <div className="space-y-2">
           <Label>{t('settings.timeFormat')}</Label>
           <div className="grid grid-cols-3 gap-2">
             <Button
               type="button"
-              variant={localSettings.timeFormat === '24h' ? "default" : "outline"}
+              variant={
+                localSettings.timeFormat === '24h' ? 'default' : 'outline'
+              }
               onClick={() => updateSetting('timeFormat', '24h')}
-              className="w-full"
-            >
+              className="w-full">
               {t('settings.24hour')}
             </Button>
             <Button
               type="button"
-              variant={localSettings.timeFormat === '12h' ? "default" : "outline"}
+              variant={
+                localSettings.timeFormat === '12h' ? 'default' : 'outline'
+              }
               onClick={() => updateSetting('timeFormat', '12h')}
-              className="w-full"
-            >
+              className="w-full">
               {t('settings.12hour')}
             </Button>
             <Button
               type="button"
-              variant={localSettings.timeFormat === 'system' ? "default" : "outline"}
+              variant={
+                localSettings.timeFormat === 'system' ? 'default' : 'outline'
+              }
               onClick={() => updateSetting('timeFormat', 'system')}
-              className="w-full"
-            >
+              className="w-full">
               {t('settings.system')}
             </Button>
           </div>
@@ -136,7 +154,9 @@ export default function TimeLocationSettings() {
 
           {/* Location Name */}
           <div className="space-y-2">
-            <Label htmlFor="location-name">{t('settings.locationNameLabel')}</Label>
+            <Label htmlFor="location-name">
+              {t('settings.locationNameLabel')}
+            </Label>
             <Input
               id="location-name"
               placeholder={t('settings.locationNamePlaceholder')}
@@ -154,7 +174,9 @@ export default function TimeLocationSettings() {
               step="0.0001"
               placeholder={t('settings.latitudePlaceholder')}
               value={localSettings.latitude || ''}
-              onChange={(e) => updateSetting('latitude', parseFloat(e.target.value) || 0)}
+              onChange={(e) =>
+                updateSetting('latitude', parseFloat(e.target.value) || 0)
+              }
             />
           </div>
 
@@ -167,7 +189,9 @@ export default function TimeLocationSettings() {
               step="0.0001"
               placeholder={t('settings.longitudePlaceholder')}
               value={localSettings.longitude || ''}
-              onChange={(e) => updateSetting('longitude', parseFloat(e.target.value) || 0)}
+              onChange={(e) =>
+                updateSetting('longitude', parseFloat(e.target.value) || 0)
+              }
             />
           </div>
 
@@ -177,8 +201,7 @@ export default function TimeLocationSettings() {
             variant="outline"
             onClick={handleAutoDetect}
             disabled={isDetecting}
-            className="w-full"
-          >
+            className="w-full">
             {isDetecting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -195,17 +218,22 @@ export default function TimeLocationSettings() {
           {/* Status Message */}
           {locationStatus && (
             <div
-              className={`flex items-start gap-2 p-3 rounded-md border ${
+              className={`flex items-start gap-2 rounded-md border p-3 ${
                 locationStatus.type === 'success'
-                  ? 'bg-green-50 border-green-200 text-green-800 dark:bg-green-950 dark:border-green-800 dark:text-green-200'
+                  ? 'border-green-200 bg-green-50 text-green-800 dark:border-green-800 dark:bg-green-950 dark:text-green-200'
                   : locationStatus.type === 'error'
-                  ? 'bg-red-50 border-red-200 text-red-800 dark:bg-red-950 dark:border-red-800 dark:text-red-200'
-                  : 'bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-950 dark:border-blue-800 dark:text-blue-200'
-              }`}
-            >
-              {locationStatus.type === 'success' && <CheckCircle2 className="h-4 w-4 mt-0.5 flex-shrink-0" />}
-              {locationStatus.type === 'error' && <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />}
-              {locationStatus.type === 'info' && <Loader2 className="h-4 w-4 mt-0.5 flex-shrink-0 animate-spin" />}
+                    ? 'border-red-200 bg-red-50 text-red-800 dark:border-red-800 dark:bg-red-950 dark:text-red-200'
+                    : 'border-blue-200 bg-blue-50 text-blue-800 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-200'
+              }`}>
+              {locationStatus.type === 'success' && (
+                <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0" />
+              )}
+              {locationStatus.type === 'error' && (
+                <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
+              )}
+              {locationStatus.type === 'info' && (
+                <Loader2 className="mt-0.5 h-4 w-4 flex-shrink-0 animate-spin" />
+              )}
               <p className="text-sm">{locationStatus.message}</p>
             </div>
           )}
