@@ -4,13 +4,20 @@ import { FastingTimesContainer } from '@/components/FastingTimesContainer';
 import { NextPrayerContainer } from '@/components/NextPrayerContainer';
 import { PrayerTimesContainer } from '@/components/PrayerTimesContainer';
 import { ProhibitedTimesContainer } from '@/components/ProhibitedTimesContainer';
-import { DEFAULT_CONTAINER_ORDER, DEFAULT_SETTINGS } from '@/constants/defaultSettings';
+import {
+  DEFAULT_CONTAINER_ORDER,
+  DEFAULT_SETTINGS,
+} from '@/constants/defaultSettings';
 import { useTranslation } from '@/contexts/TranslationContext';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { calculatePrayerTimesLocally } from '@/services/prayerTimesLocal';
 import { PrayerTime, ProhibitedTime, UserSettings } from '@/types';
 import { EContainerType } from '@/types/enums';
-import { adjustTime, getProhibitedTimes, setTranslationFunction } from '@/utils/timeUtils';
+import {
+  adjustTime,
+  getProhibitedTimes,
+  setTranslationFunction,
+} from '@/utils/timeUtils';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -37,16 +44,24 @@ const defaultVisibleContainers: Record<string, boolean> = {
   [EContainerType.NextSalat]: true,
   [EContainerType.SalatTimes]: true,
   [EContainerType.ProhibitedTimes]: true,
-  [EContainerType.SaumTimes]: true
+  [EContainerType.SaumTimes]: true,
 };
-
 
 const Index = () => {
   const navigate = useNavigate();
   const { t, getSalatName, mounted } = useTranslation();
-  const [userSettings, setUserSettings] = useLocalStorage<UserSettings>('muajjin-settings', DEFAULT_SETTINGS);
-  const [containerOrder, setContainerOrder] = useLocalStorage<string[]>('muajjin-container-order', DEFAULT_CONTAINER_ORDER);
-  const [visibleContainers] = useLocalStorage<Record<string, boolean>>('muajjin-visible-containers', defaultVisibleContainers);
+  const [userSettings, setUserSettings] = useLocalStorage<UserSettings>(
+    'muajjin-settings',
+    DEFAULT_SETTINGS,
+  );
+  const [containerOrder, setContainerOrder] = useLocalStorage<string[]>(
+    'muajjin-container-order',
+    DEFAULT_CONTAINER_ORDER,
+  );
+  const [visibleContainers] = useLocalStorage<Record<string, boolean>>(
+    'muajjin-visible-containers',
+    defaultVisibleContainers,
+  );
   const [salatTimes, setSalatTimes] = useState<PrayerTime[]>([]);
   const [prohibitedTimes, setProhibitedTimes] = useState<ProhibitedTime[]>([]);
   const [sehriTime, setSehriTime] = useState<string>('');
@@ -65,9 +80,11 @@ const Index = () => {
 
   // Check if onboarding is completed
   useEffect(() => {
-    const onboardingCompleted = localStorage.getItem('muajjin-onboarding-completed');
+    const onboardingCompleted = localStorage.getItem(
+      'muajjin-onboarding-completed',
+    );
     if (!onboardingCompleted) {
-      navigate('/onboarding/welcome');
+      navigate('/onboarding/welcome', { replace: true });
     }
   }, [navigate]);
 
@@ -97,11 +114,41 @@ const Index = () => {
 
     // Create salat times array with jamaah times from settings
     const salats: PrayerTime[] = [
-      { id: 'fajr', name: getSalatName('Fajr'), start: timings.Fajr, end: timings.Shuruq, jamaah: settings.jamaahTimes.Fajr },
-      { id: 'dhuhr', name: getSalatName('Dhuhr'), start: timings.Dhuhr, end: timings.Asr, jamaah: settings.jamaahTimes.Dhuhr },
-      { id: 'asr', name: getSalatName('Asr'), start: timings.Asr, end: timings.Maghrib, jamaah: settings.jamaahTimes.Asr },
-      { id: 'maghrib', name: getSalatName('Maghrib'), start: timings.Maghrib, end: timings.Isha, jamaah: settings.jamaahTimes.Maghrib },
-      { id: 'isha', name: getSalatName('Isha'), start: timings.Isha, end: timings.Fajr, jamaah: settings.jamaahTimes.Isha }
+      {
+        id: 'fajr',
+        name: getSalatName('Fajr'),
+        start: timings.Fajr,
+        end: timings.Shuruq,
+        jamaah: settings.jamaahTimes.Fajr,
+      },
+      {
+        id: 'dhuhr',
+        name: getSalatName('Dhuhr'),
+        start: timings.Dhuhr,
+        end: timings.Asr,
+        jamaah: settings.jamaahTimes.Dhuhr,
+      },
+      {
+        id: 'asr',
+        name: getSalatName('Asr'),
+        start: timings.Asr,
+        end: timings.Maghrib,
+        jamaah: settings.jamaahTimes.Asr,
+      },
+      {
+        id: 'maghrib',
+        name: getSalatName('Maghrib'),
+        start: timings.Maghrib,
+        end: timings.Isha,
+        jamaah: settings.jamaahTimes.Maghrib,
+      },
+      {
+        id: 'isha',
+        name: getSalatName('Isha'),
+        start: timings.Isha,
+        end: timings.Fajr,
+        jamaah: settings.jamaahTimes.Isha,
+      },
     ];
 
     setSalatTimes(salats);
@@ -140,7 +187,7 @@ const Index = () => {
   const renderContainers = () => {
     return (
       <>
-        {containerOrder.map(containerId => {
+        {containerOrder.map((containerId) => {
           // Skip rendering if container is not visible
           if (!visibleContainers[containerId]) {
             return null;
@@ -152,30 +199,50 @@ const Index = () => {
                 <DateTimeContainer
                   key={containerId}
                   hijriAdjustment={userSettings.hijriAdjustment}
-                  hijriDateChangeAtMaghrib={userSettings.hijriDateChangeAtMaghrib}
-                  maghribTime={salatTimes.find(p => p.id === 'maghrib')?.start}
+                  hijriDateChangeAtMaghrib={
+                    userSettings.hijriDateChangeAtMaghrib
+                  }
+                  maghribTime={
+                    salatTimes.find((p) => p.id === 'maghrib')?.start
+                  }
                   location={{
                     city: userSettings.city || 'Dhaka',
-                    country: '' // Not used anymore, only showing city
+                    country: '', // Not used anymore, only showing city
                   }}
                   timeFormat={userSettings.timeFormat}
                 />
               );
             case EContainerType.CurrentSalat:
               return (
-                <CurrentPrayerContainer key={containerId} allPrayers={salatTimes} timeFormat={userSettings.timeFormat} />
+                <CurrentPrayerContainer
+                  key={containerId}
+                  allPrayers={salatTimes}
+                  timeFormat={userSettings.timeFormat}
+                />
               );
             case EContainerType.NextSalat:
               return (
-                <NextPrayerContainer key={containerId} allPrayers={salatTimes} timeFormat={userSettings.timeFormat} />
+                <NextPrayerContainer
+                  key={containerId}
+                  allPrayers={salatTimes}
+                  timeFormat={userSettings.timeFormat}
+                />
               );
             case EContainerType.SalatTimes:
               return (
-                <PrayerTimesContainer key={containerId} salats={salatTimes} timeFormat={userSettings.timeFormat} />
+                <PrayerTimesContainer
+                  key={containerId}
+                  salats={salatTimes}
+                  timeFormat={userSettings.timeFormat}
+                />
               );
             case EContainerType.ProhibitedTimes:
               return (
-                <ProhibitedTimesContainer key={containerId} prohibitedTimes={prohibitedTimes} timeFormat={userSettings.timeFormat} />
+                <ProhibitedTimesContainer
+                  key={containerId}
+                  prohibitedTimes={prohibitedTimes}
+                  timeFormat={userSettings.timeFormat}
+                />
               );
             case EContainerType.SaumTimes:
               return (
@@ -195,15 +262,15 @@ const Index = () => {
       </>
     );
   };
-  
+
   return (
-    <div className="min-h-screen p-4 max-w-md mx-auto">
+    <div className="mx-auto min-h-screen max-w-md p-4">
       {isLoading || !mounted ? (
-        <div className="flex flex-col items-center justify-center h-[60vh]">
-          <div className="animate-pulse flex flex-col items-center gap-4">
+        <div className="flex h-[60vh] flex-col items-center justify-center">
+          <div className="flex animate-pulse flex-col items-center gap-4">
             <div className="h-12 w-12 rounded-full bg-secondary"></div>
-            <div className="h-4 w-32 bg-secondary rounded"></div>
-            <div className="h-3 w-24 bg-secondary rounded"></div>
+            <div className="h-4 w-32 rounded bg-secondary"></div>
+            <div className="h-3 w-24 rounded bg-secondary"></div>
           </div>
         </div>
       ) : (

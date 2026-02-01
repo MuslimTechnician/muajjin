@@ -3,9 +3,20 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { closestCenter, DndContext, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import {
+  closestCenter,
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
-import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import {
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { ArrowLeft, Check, GripVertical, Trash2, Upload } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
@@ -23,7 +34,7 @@ const CONTAINER_LABELS: Record<string, string> = {
   [EContainerType.NextSalat]: 'Next Salat',
   [EContainerType.SalatTimes]: 'Salat Times',
   [EContainerType.ProhibitedTimes]: 'Forbidden Times',
-  [EContainerType.SaumTimes]: 'Saum Times'
+  [EContainerType.SaumTimes]: 'Saum Times',
 };
 
 // Translation keys mapping
@@ -33,7 +44,7 @@ const CONTAINER_LABEL_KEYS: Record<string, string> = {
   [EContainerType.NextSalat]: 'settings.nextSalat',
   [EContainerType.SalatTimes]: 'settings.salatTimes',
   [EContainerType.ProhibitedTimes]: 'settings.forbiddenTimes',
-  [EContainerType.SaumTimes]: 'settings.saumTimes'
+  [EContainerType.SaumTimes]: 'settings.saumTimes',
 };
 
 // Sortable item for container reordering
@@ -41,14 +52,15 @@ function SortableContainer({
   id,
   label,
   isVisible,
-  onToggle
+  onToggle,
 }: {
   id: string;
   label: string;
   isVisible: boolean;
   onToggle: (id: string) => void;
 }) {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -59,13 +71,15 @@ function SortableContainer({
     <div
       ref={setNodeRef}
       style={style}
-      className={`relative border rounded-sm p-3 hover:bg-muted/50 cursor-move ${
+      className={`relative cursor-move rounded-sm border p-3 hover:bg-muted/50 ${
         !isVisible ? 'opacity-50' : 'bg-background'
-      }`}
-    >
+      }`}>
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing">
+          <div
+            {...attributes}
+            {...listeners}
+            className="cursor-grab active:cursor-grabbing">
             <GripVertical size={18} className="text-muted-foreground" />
           </div>
           <span className="text-sm font-medium">{label}</span>
@@ -86,7 +100,10 @@ export default function DisplaySettings() {
   const { t, uploadFont, removeFont, customFont } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
   // const [userSettings] = useLocalStorage<UserSettings>('muajjin-settings', DEFAULT_SETTINGS);
-  const [containerOrder, setContainerOrder] = useLocalStorage<string[]>('muajjin-container-order', DEFAULT_CONTAINER_ORDER);
+  const [containerOrder, setContainerOrder] = useLocalStorage<string[]>(
+    'muajjin-container-order',
+    DEFAULT_CONTAINER_ORDER,
+  );
   const [mounted, setMounted] = useState(false);
   const hasCustomFont = !!customFont;
 
@@ -97,13 +114,12 @@ export default function DisplaySettings() {
     [EContainerType.NextSalat]: true,
     [EContainerType.SalatTimes]: true,
     [EContainerType.ProhibitedTimes]: true,
-    [EContainerType.SaumTimes]: true
+    [EContainerType.SaumTimes]: true,
   };
 
-  const [visibleContainers, setVisibleContainers] = useLocalStorage<Record<string, boolean>>(
-    'muajjin-visible-containers',
-    defaultVisibleContainers
-  );
+  const [visibleContainers, setVisibleContainers] = useLocalStorage<
+    Record<string, boolean>
+  >('muajjin-visible-containers', defaultVisibleContainers);
 
   useEffect(() => {
     setMounted(true);
@@ -121,7 +137,7 @@ export default function DisplaySettings() {
         distance: 8,
       },
     }),
-    useSensor(KeyboardSensor)
+    useSensor(KeyboardSensor),
   );
 
   const handleDragEnd = (event: any) => {
@@ -140,13 +156,15 @@ export default function DisplaySettings() {
   };
 
   const handleToggleContainer = (containerId: string) => {
-    setVisibleContainers(prev => ({
+    setVisibleContainers((prev) => ({
       ...prev,
-      [containerId]: !prev[containerId]
+      [containerId]: !prev[containerId],
     }));
   };
 
-  const handleFontUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFontUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -162,53 +180,55 @@ export default function DisplaySettings() {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="sticky top-0 z-50 w-full border-b bg-background px-4 py-3">
-        <div className="flex items-center gap-3 max-w-md mx-auto">
+        <div className="mx-auto flex max-w-md items-center gap-3">
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => navigate('/settings')}
-            className="h-8 w-8"
-          >
+            onClick={() => navigate(-1)}
+            className="h-8 w-8">
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h1 className="text-lg font-semibold">{t('settings.displaySettings')}</h1>
+
+          <h1 className="text-lg font-semibold">
+            {t('settings.displaySettings')}
+          </h1>
         </div>
       </div>
 
       {/* Content */}
-      <div className="p-4 max-w-md mx-auto space-y-6">
+      <div className="mx-auto max-w-md space-y-6 p-4">
         {/* Theme */}
         <div className="space-y-2">
           <Label>{t('settings.theme')}</Label>
+
           <div className="grid grid-cols-3 gap-2">
             <Button
               type="button"
               variant={theme === 'light' ? 'default' : 'outline'}
               onClick={() => setTheme('light')}
               className="w-full"
-              disabled={!mounted}
-            >
-              <Sun className="h-4 w-4 mr-2" />
+              disabled={!mounted}>
+              <Sun className="mr-2 h-4 w-4" />
               {t('settings.light')}
             </Button>
+
             <Button
               type="button"
               variant={theme === 'dark' ? 'default' : 'outline'}
               onClick={() => setTheme('dark')}
               className="w-full"
-              disabled={!mounted}
-            >
-              <Moon className="h-4 w-4 mr-2" />
+              disabled={!mounted}>
+              <Moon className="mr-2 h-4 w-4" />
               {t('settings.dark')}
             </Button>
+
             <Button
               type="button"
               variant={theme === 'system' ? 'default' : 'outline'}
               onClick={() => setTheme('system')}
               className="w-full"
-              disabled={!mounted}
-            >
-              <Monitor className="h-4 w-4 mr-2" />
+              disabled={!mounted}>
+              <Monitor className="mr-2 h-4 w-4" />
               {t('settings.system')}
             </Button>
           </div>
@@ -219,20 +239,25 @@ export default function DisplaySettings() {
         {/* Custom Font */}
         <div className="space-y-3">
           <Label>{t('settings.customFont')}</Label>
-          <p className="text-sm text-muted-foreground">{t('settings.uploadFontDesc')}</p>
+          <p className="text-sm text-muted-foreground">
+            {t('settings.uploadFontDesc')}
+          </p>
 
           {hasCustomFont ? (
-            <div className="flex items-center justify-between p-3 border rounded-sm bg-muted/30">
+            <div className="flex items-center justify-between rounded-sm border bg-muted/30 p-3">
               <div className="flex items-center gap-2">
                 <Check className="h-4 w-4 text-green-600" />
-                <span className="text-sm font-medium">{t('settings.currentFont')}: customfont.woff2</span>
+
+                <span className="text-sm font-medium">
+                  {t('settings.currentFont')}: customfont.woff2
+                </span>
               </div>
+
               <Button
                 variant="destructive"
                 size="sm"
                 onClick={removeFont}
-                className="gap-1"
-              >
+                className="gap-1">
                 <Trash2 className="h-4 w-4" />
                 {t('settings.removeFont')}
               </Button>
@@ -246,16 +271,17 @@ export default function DisplaySettings() {
                 onChange={handleFontUpload}
                 className="hidden"
               />
+
               <Button
                 type="button"
                 variant="outline"
                 className="w-full gap-2"
-                onClick={() => fileInputRef.current?.click()}
-              >
+                onClick={() => fileInputRef.current?.click()}>
                 <Upload className="h-4 w-4" />
                 {t('settings.uploadFont')}
               </Button>
-              <p className="text-xs text-muted-foreground text-center">
+
+              <p className="text-center text-xs text-muted-foreground">
                 {t('settings.fontFileName')}
               </p>
             </div>
@@ -271,15 +297,20 @@ export default function DisplaySettings() {
             sensors={sensors}
             collisionDetection={closestCenter}
             onDragEnd={handleDragEnd}
-            modifiers={[restrictToVerticalAxis]}
-          >
-            <SortableContext items={containerOrder} strategy={verticalListSortingStrategy}>
+            modifiers={[restrictToVerticalAxis]}>
+            <SortableContext
+              items={containerOrder}
+              strategy={verticalListSortingStrategy}>
               <div className="space-y-2">
-                {containerOrder.map(containerId => (
+                {containerOrder.map((containerId) => (
                   <SortableContainer
                     key={containerId}
                     id={containerId}
-                    label={t(CONTAINER_LABEL_KEYS[containerId]) || CONTAINER_LABELS[containerId] || containerId}
+                    label={
+                      t(CONTAINER_LABEL_KEYS[containerId]) ||
+                      CONTAINER_LABELS[containerId] ||
+                      containerId
+                    }
                     isVisible={visibleContainers[containerId] ?? true}
                     onToggle={handleToggleContainer}
                   />
@@ -291,7 +322,7 @@ export default function DisplaySettings() {
 
         {/* Save Button */}
         <div className="pt-4">
-          <Button onClick={() => navigate('/settings')} className="w-full" size="lg">
+          <Button onClick={() => navigate(-1)} className="w-full" size="lg">
             {t('common.save')}
           </Button>
         </div>
