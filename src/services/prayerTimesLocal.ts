@@ -73,7 +73,7 @@ function getCalculationParameters(methodId: number) {
     case 7:
       return CalculationMethod.Tehran();
     case 8:
-      return CalculationMethod.GulfRegion();
+      return CalculationMethod.Dubai();
     case 9:
       return CalculationMethod.Kuwait();
     case 10:
@@ -109,7 +109,7 @@ export const CALCULATION_METHODS = [
   { id: 4, name: 'Umm al-Qura, Makkah' },
   { id: 5, name: 'Egyptian General Authority of Survey' },
   { id: 7, name: 'Institute of Geophysics, University of Tehran' },
-  { id: 8, name: 'Gulf Region' },
+  { id: 8, name: 'Dubai' },
   { id: 9, name: 'Kuwait' },
   { id: 10, name: 'Qatar' },
   { id: 11, name: 'Majlis Ugama Islam Singapore, Singapore' },
@@ -124,7 +124,7 @@ export const CALCULATION_METHOD_KEYS: Record<number, string> = {
   4: 'calculationMethods.ummAlQura',
   5: 'calculationMethods.egyptian',
   7: 'calculationMethods.tehran',
-  8: 'calculationMethods.other',
+  8: 'calculationMethods.dubai',
   9: 'calculationMethods.kuwait',
   10: 'calculationMethods.qatar',
   11: 'calculationMethods.singapore',

@@ -31,12 +31,8 @@ async function getLocationByGPS(): Promise<Omit<LocationResult, 'method'>> {
 
     if (isNative) {
       // Use Capacitor Geolocation for native apps
-      console.log('Using Capacitor Geolocation (native)');
-
       // Request permissions first
       const permissionResult = await Geolocation.requestPermissions();
-
-      console.log('Location permission result:', permissionResult);
 
       if (permissionResult.location === 'denied' || permissionResult.coarseLocation === 'denied') {
         throw {
@@ -75,12 +71,10 @@ async function getLocationByGPS(): Promise<Omit<LocationResult, 'method'>> {
       }
     } else {
       // Use browser Geolocation for web
-      console.log('Using browser Geolocation (web)');
       return await getLocationByBrowser();
     }
   } catch (error: any) {
     // If Capacitor geolocation fails, try browser as fallback
-    console.log('Capacitor Geolocation failed, trying browser fallback...', error);
 
     if (!Capacitor.isNativePlatform()) {
       throw error;
@@ -170,13 +164,13 @@ async function getLocationByBrowser(): Promise<Omit<LocationResult, 'method'>> {
 
 /**
  * Get location using IP-based geolocation (fallback)
- * Uses ipapi.co free API (1000 requests/day free)
+ * Fallback order: ip-api.com (higher limit) → ipwhois.app (HTTPS/CORS-friendly)
  * @returns Promise<LocationResult>
  */
 async function getLocationByIP(): Promise<Omit<LocationResult, 'method'>> {
   try {
-    // Try ipapi.co first
-    const response = await fetch('https://ipapi.co/json/');
+    // Try ip-api.com first (higher rate limit, but HTTP only)
+    const response = await fetch('http://ip-api.com/json/?fields=status,message,country,countryCode,city,lat,lon');
 
     if (!response.ok) {
       throw new Error(`IP API returned ${response.status}`);
@@ -184,22 +178,20 @@ async function getLocationByIP(): Promise<Omit<LocationResult, 'method'>> {
 
     const data = await response.json();
 
-    if (data.error) {
-      throw new Error(data.reason || 'IP geolocation failed');
+    if (data.status !== 'success') {
+      throw new Error(data.message || 'IP geolocation failed');
     }
 
     return {
-      latitude: parseFloat(data.latitude) || 0,
-      longitude: parseFloat(data.longitude) || 0,
+      latitude: data.lat || 0,
+      longitude: data.lon || 0,
       city: data.city || 'Unknown',
-      country: data.country_name || 'Unknown'
+      country: data.country || 'Unknown'
     };
-  } catch (ipapiError) {
-    console.log('ipapi.co failed, trying ip-api.com...', ipapiError);
-
+  } catch (ipApiError) {
     try {
-      // Fallback to ip-api.com
-      const response = await fetch('http://ip-api.com/json/?fields=status,message,country,countryCode,city,lat,lon');
+      // Fallback to ipwhois.app (HTTPS, CORS-friendly for GitHub Pages)
+      const response = await fetch('https://ipwhois.app/json/');
 
       if (!response.ok) {
         throw new Error(`IP API fallback returned ${response.status}`);
@@ -207,17 +199,17 @@ async function getLocationByIP(): Promise<Omit<LocationResult, 'method'>> {
 
       const data = await response.json();
 
-      if (data.status !== 'success') {
-        throw new Error(data.message || 'IP geolocation fallback failed');
+      if (!data.success) {
+        throw new Error('IP geolocation fallback failed');
       }
 
       return {
-        latitude: data.lat || 0,
-        longitude: data.lon || 0,
+        latitude: data.latitude || 0,
+        longitude: data.longitude || 0,
         city: data.city || 'Unknown',
         country: data.country || 'Unknown'
       };
-    } catch (ipApiError) {
+    } catch (fallbackError) {
       throw {
         message: 'All IP geolocation methods failed. Please enter location manually.',
         type: 'ip'
@@ -274,7 +266,6 @@ async function reverseGeocode(
       country
     };
   } catch (error) {
-    console.error('Reverse geocoding failed:', error);
     throw {
       message: 'Failed to get location name from coordinates.',
       type: 'geocoding'
@@ -291,9 +282,7 @@ async function reverseGeocode(
 export async function detectLocation(): Promise<LocationResult> {
   try {
     // Try GPS first (high accuracy, 15 second timeout)
-    console.log('Attempting GPS location detection...');
     const gpsLocation = await getLocationByGPS();
-    console.log('GPS location detected:', gpsLocation);
 
     return {
       ...gpsLocation,
@@ -301,22 +290,16 @@ export async function detectLocation(): Promise<LocationResult> {
     };
   } catch (gpsError) {
     const error = gpsError as LocationError;
-    console.log('GPS location failed:', error.message);
-    console.log('Falling back to IP-based location...');
 
     try {
       // Fallback to IP-based location
       const ipLocation = await getLocationByIP();
-      console.log('IP-based location detected:', ipLocation);
 
       return {
         ...ipLocation,
         method: 'ip'
       };
     } catch (ipError) {
-      const ipErrorTyped = ipError as LocationError;
-      console.error('IP location also failed:', ipErrorTyped.message);
-
       // Both methods failed
       throw new Error(
         'Could not detect location automatically. Please enable GPS or check your internet connection, then try again. You can also enter your location manually.'
