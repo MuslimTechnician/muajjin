@@ -9,10 +9,12 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useTranslation } from '@/contexts/TranslationContext';
-import { ArrowLeft, FileText, Globe, Trash2, Upload } from 'lucide-react';
+import { FileText, Globe, Trash2, Upload } from 'lucide-react';
 import { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { AppHeader } from '@/components/AppHeader';
+import { StoredTranslation } from '@/types/translation';
 
 export default function TranslationSettings() {
   const navigate = useNavigate();
@@ -67,43 +69,27 @@ export default function TranslationSettings() {
     }
   };
 
-  const translationList = Object.values(importedTranslations);
+  const importedTranslationsList = Object.values(importedTranslations);
 
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="sticky top-0 z-50 w-full border-b bg-background px-4 py-3">
-        <div className="mx-auto flex max-w-md items-center gap-3">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate(-1)}
-            className="h-8 w-8">
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <h1 className="text-lg font-semibold">
-            {t('settings.translations')}
-          </h1>
-        </div>
-      </div>
+      <AppHeader showBackButton={true} title={t('settings.translations')} />
 
       {/* Content */}
-      <div className="mx-auto max-w-md space-y-6 p-4">
+      <div className="max-w-md mx-auto px-5 py-6 space-y-6">
         {/* Import Section */}
         <div className="space-y-3">
           <Label className="text-base font-semibold">
             {t('settings.importTranslation')}
           </Label>
-          <p className="text-sm text-muted-foreground">
-            {t('settings.communityDesc')}{' '}
-            <a
-              href="https://github.com/MuslimTechnician/muajjin/discussions/1"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary hover:underline">
-              {t('settings.learnMore')}
-            </a>
-          </p>
+          <a
+            href="https://github.com/MuslimTechnician/muajjin/discussions/1"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-muted-foreground text-primary hover:underline block">
+            {t('settings.importDescriptionWithLearnMore')}
+          </a>
 
           <Button
             variant="outline"
@@ -141,7 +127,7 @@ export default function TranslationSettings() {
                   {t('settings.englishDefault')}
                 </div>
               </SelectItem>
-              {translationList.map((translation) => (
+              {importedTranslationsList.map((translation) => (
                 <SelectItem key={translation.id} value={translation.id}>
                   <div className="flex items-center gap-2">
                     <FileText className="h-4 w-4" />
@@ -157,13 +143,13 @@ export default function TranslationSettings() {
         </div>
 
         {/* Imported Translations List */}
-        {translationList.length > 0 && (
+        {importedTranslationsList.length > 0 && (
           <div className="space-y-3">
             <Label className="text-base font-semibold">
               {t('settings.importedTranslations')}
             </Label>
             <div className="space-y-2">
-              {translationList.map((translation) => (
+              {importedTranslationsList.map((translation) => (
                 <Card key={translation.id}>
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
@@ -182,9 +168,7 @@ export default function TranslationSettings() {
                         </p>
                         <p className="text-xs text-muted-foreground">
                           {t('settings.imported')}:{' '}
-                          {new Date(
-                            translation.importedAt,
-                          ).toLocaleDateString()}
+                          {new Date(translation.importedAt).toLocaleDateString()}
                         </p>
                       </div>
                       <Button
@@ -205,20 +189,6 @@ export default function TranslationSettings() {
               ))}
             </div>
           </div>
-        )}
-
-        {translationList.length === 0 && (
-          <Card className="bg-muted/30">
-            <CardContent className="p-6 text-center">
-              <FileText className="mx-auto mb-3 h-12 w-12 text-muted-foreground" />
-              <p className="text-muted-foreground">
-                {t('settings.noTranslations')}
-              </p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                {t('settings.noTranslationsDesc')}
-              </p>
-            </CardContent>
-          </Card>
         )}
       </div>
     </div>

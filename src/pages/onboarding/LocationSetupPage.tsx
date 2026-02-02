@@ -1,16 +1,19 @@
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ONBOARDING_DEFAULTS } from '@/constants/defaultSettings';
 import { useTranslation } from '@/contexts/TranslationContext';
 import { detectLocation, LocationResult } from '@/services/locationService';
-import { AlertCircle, CheckCircle2, Loader2, MapPin } from 'lucide-react';
+import { useApp } from '@/contexts/AppContext';
+import { AlertCircle, CheckCircle2, Info, Loader2, MapPin } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export default function LocationSetupPage() {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { updateSettings } = useApp();
   const [location, setLocation] = useState<{
     city: string;
     country: string;
@@ -45,13 +48,9 @@ export default function LocationSetupPage() {
         longitude: result.longitude,
       });
 
-      const methodText = result.method === 'gps' ? 'GPS' : 'IP-based';
       setLocationStatus({
         type: 'success',
-        message: t('onboarding.locationDetected', {
-          city: result.city,
-          country: result.country,
-        }),
+        message: `${result.city}, ${result.country}`,
       });
     } catch (error) {
       const errorMessage =
@@ -66,15 +65,15 @@ export default function LocationSetupPage() {
   };
 
   const handleContinue = () => {
-    // Save to localStorage and continue
+    // Save to global settings via AppContext and continue
     const settings = {
       latitude: location.latitude || ONBOARDING_DEFAULTS.latitude,
       longitude: location.longitude || ONBOARDING_DEFAULTS.longitude,
       city: location.city || ONBOARDING_DEFAULTS.city,
       country: location.country || ONBOARDING_DEFAULTS.country,
-      method: ONBOARDING_DEFAULTS.method, // Karachi (default)
-      madhab: ONBOARDING_DEFAULTS.madhab, // User must select in next step
-      timeFormat: 'system', // Auto-detect from system
+      method: ONBOARDING_DEFAULTS.method,
+      madhab: ONBOARDING_DEFAULTS.madhab,
+      timeFormat: 'system' as const,
       jamaahTimes: {},
       suhoorAdjustment: 0,
       iftarAdjustment: 0,
@@ -83,130 +82,158 @@ export default function LocationSetupPage() {
       manualLocation: true,
     };
 
-    localStorage.setItem('muajjin-settings', JSON.stringify(settings));
+    updateSettings(settings);
     navigate('/onboarding/settings', { replace: true });
   };
 
+  const getStatusIcon = () => {
+    if (!locationStatus) return null;
+
+    switch (locationStatus.type) {
+      case 'success':
+        return <CheckCircle2 className="w-5 h-5 text-green-500" />;
+      case 'error':
+        return <AlertCircle className="w-5 h-5 text-destructive" />;
+      case 'info':
+        return <Info className="w-5 h-5 text-blue-500" />;
+    }
+  };
+
+  const getStatusBgColor = () => {
+    if (!locationStatus) return '';
+
+    switch (locationStatus.type) {
+      case 'success':
+        return 'bg-green-500/10 text-green-700 dark:text-green-400';
+      case 'error':
+        return 'bg-destructive/10 text-destructive';
+      case 'info':
+        return 'bg-blue-500/10 text-blue-700 dark:text-blue-400';
+    }
+  };
+
   return (
-    <div className="flex min-h-screen flex-col bg-background">
-      {/* Content */}
-      <div className="mx-auto max-w-md flex-1 space-y-6 p-4">
-        {/* Explanation */}
-        <div className="space-y-2 text-center">
-          <p className="text-lg font-medium">{t('onboarding.setLocation')}</p>
-          <p className="text-sm text-muted-foreground">
+    <div className="min-h-screen bg-background">
+      {/* Content - same width/padding as dashboard and settings */}
+      <div className="mx-auto max-w-md px-5 py-6 space-y-6">
+        {/* Icon */}
+        <div className="flex justify-center">
+          <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
+            <MapPin className="w-10 h-10 text-primary" />
+          </div>
+        </div>
+
+        {/* Title */}
+        <div className="text-center space-y-2">
+          <h1 className="text-3xl font-bold tracking-tight">{t('onboarding.setLocation')}</h1>
+          <p className="text-base text-muted-foreground">
             {t('onboarding.setLocationDesc')}
           </p>
         </div>
 
-        {/* Location Name */}
-        <div className="space-y-2">
-          <Label htmlFor="location-name">{t('onboarding.locationName')}</Label>
-          <Input
-            id="location-name"
-            placeholder={t('onboarding.locationPlaceholder')}
-            value={location.city}
-            onChange={(e) => setLocation({ ...location, city: e.target.value })}
-          />
-        </div>
+        <Card className="shadow-lg">
+            <CardContent className="p-6 space-y-4">
+              {/* Form */}
+              <div className="space-y-4">
+                {/* Location Name */}
+                <div className="space-y-2">
+                  <Label htmlFor="location-name">{t('onboarding.locationName')}</Label>
+                  <Input
+                    id="location-name"
+                    placeholder={t('onboarding.locationPlaceholder')}
+                    value={location.city}
+                    onChange={(e) => setLocation({ ...location, city: e.target.value })}
+                    className="bg-card"
+                  />
+                </div>
 
-        {/* Latitude */}
-        <div className="space-y-2">
-          <Label htmlFor="latitude">{t('onboarding.latitude')}</Label>
-          <Input
-            id="latitude"
-            type="number"
-            step="0.0001"
-            placeholder={t('onboarding.latitudePlaceholder')}
-            value={location.latitude || ''}
-            onChange={(e) =>
-              setLocation({
-                ...location,
-                latitude: parseFloat(e.target.value) || 0,
-              })
-            }
-          />
-        </div>
+                <div className="grid grid-cols-2 gap-3">
+                  {/* Latitude */}
+                  <div className="space-y-2">
+                    <Label htmlFor="latitude">{t('onboarding.latitude')}</Label>
+                    <Input
+                      id="latitude"
+                      type="number"
+                      step="0.0001"
+                      placeholder={t('onboarding.latitudePlaceholder')}
+                      value={location.latitude || ''}
+                      onChange={(e) =>
+                        setLocation({
+                          ...location,
+                          latitude: parseFloat(e.target.value) || 0,
+                        })
+                      }
+                      className="bg-card"
+                    />
+                  </div>
 
-        {/* Longitude */}
-        <div className="space-y-2">
-          <Label htmlFor="longitude">{t('onboarding.longitude')}</Label>
-          <Input
-            id="longitude"
-            type="number"
-            step="0.0001"
-            placeholder={t('onboarding.longitudePlaceholder')}
-            value={location.longitude || ''}
-            onChange={(e) =>
-              setLocation({
-                ...location,
-                longitude: parseFloat(e.target.value) || 0,
-              })
-            }
-          />
-        </div>
+                  {/* Longitude */}
+                  <div className="space-y-2">
+                    <Label htmlFor="longitude">{t('onboarding.longitude')}</Label>
+                    <Input
+                      id="longitude"
+                      type="number"
+                      step="0.0001"
+                      placeholder={t('onboarding.longitudePlaceholder')}
+                      value={location.longitude || ''}
+                      onChange={(e) =>
+                        setLocation({
+                          ...location,
+                          longitude: parseFloat(e.target.value) || 0,
+                        })
+                      }
+                      className="bg-card"
+                    />
+                  </div>
+                </div>
 
-        {/* Auto Detect Button */}
+                {/* Auto Detect Button */}
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={handleAutoDetect}
+                  disabled={isDetecting}
+                  className="w-full">
+                  {isDetecting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      {t('onboarding.detecting')}
+                    </>
+                  ) : (
+                    <>
+                      <MapPin className="w-4 h-4 mr-2" />
+                      {t('onboarding.autoDetect')}
+                    </>
+                  )}
+                </Button>
+
+                {/* Status Message */}
+                {locationStatus && (
+                  <div className={`flex items-center gap-2 p-3 rounded-lg ${getStatusBgColor()}`}>
+                    {getStatusIcon()}
+                    <span className="text-sm font-medium">{locationStatus.message}</span>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+        {/* Continue Button - outside card for better reachability */}
         <Button
-          type="button"
-          variant="outline"
-          onClick={handleAutoDetect}
-          disabled={isDetecting}
-          className="w-full">
-          {isDetecting ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              {t('onboarding.detecting')}
-            </>
-          ) : (
-            <>
-              <MapPin className="mr-2 h-4 w-4" />
-              {t('onboarding.autoDetect')}
-            </>
-          )}
+          onClick={handleContinue}
+          size="lg"
+          className="w-full"
+          disabled={!location.city}>
+          {t('onboarding.continue')}
         </Button>
-
-        {/* Status Message */}
-        {locationStatus && (
-          <div
-            className={`flex items-start gap-2 rounded-md border p-3 ${
-              locationStatus.type === 'success'
-                ? 'border-green-200 bg-green-50 text-green-800 dark:border-green-800 dark:bg-green-950 dark:text-green-200'
-                : locationStatus.type === 'error'
-                  ? 'border-red-200 bg-red-50 text-red-800 dark:border-red-800 dark:bg-red-950 dark:text-red-200'
-                  : 'border-blue-200 bg-blue-50 text-blue-800 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-200'
-            }`}>
-            {locationStatus.type === 'success' && (
-              <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0" />
-            )}
-            {locationStatus.type === 'error' && (
-              <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
-            )}
-            {locationStatus.type === 'info' && (
-              <Loader2 className="mt-0.5 h-4 w-4 flex-shrink-0 animate-spin" />
-            )}
-            <p className="text-sm">{locationStatus.message}</p>
-          </div>
-        )}
-
-        {/* Continue Button */}
-        <div className="pt-4">
-          <Button
-            onClick={handleContinue}
-            className="w-full"
-            size="lg"
-            disabled={!location.city}>
-            {t('onboarding.continue')}
-          </Button>
-        </div>
       </div>
 
-      {/* Progress indicator */}
-      <div className="mx-auto max-w-md p-4">
-        <div className="flex gap-2">
-          <div className="h-1 flex-1 rounded-full bg-muted"></div>
-          <div className="h-1 flex-1 rounded-full bg-primary"></div>
-          <div className="h-1 flex-1 rounded-full bg-muted"></div>
+      {/* Progress indicator - same width/padding as content */}
+      <div className="mx-auto max-w-md px-5 py-4">
+        <div className="flex justify-center gap-2">
+          <div className="w-2 h-2 rounded-full bg-primary" />
+          <div className="w-2 h-2 rounded-full bg-primary" />
+          <div className="w-2 h-2 rounded-full bg-muted" />
         </div>
       </div>
     </div>

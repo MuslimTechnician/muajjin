@@ -1,8 +1,14 @@
-
 import { useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { formatGregorianDateShort, getCurrentTimeFormatted, getDayName, resolveTimeFormat } from '@/utils/timeUtils';
-import { calculateHijriDate, formatHijriDateLocal, HijriDateResult } from '@/utils/hijriUtils';
+import {
+  formatGregorianDateShort,
+  getCurrentTimeFormatted,
+} from '@/utils/timeUtils';
+import {
+  calculateHijriDate,
+  formatHijriDateLocal,
+  HijriDateResult,
+} from '@/utils/hijriUtils';
 import { MapPin } from 'lucide-react';
 
 interface DateTimeContainerProps {
@@ -16,8 +22,16 @@ interface DateTimeContainerProps {
   timeFormat?: 'system' | '12h' | '24h';
 }
 
-export function DateTimeContainer({ hijriAdjustment, hijriDateChangeAtMaghrib, maghribTime, location, timeFormat = 'system' }: DateTimeContainerProps) {
-  const [currentTime, setCurrentTime] = useState(getCurrentTimeFormatted(timeFormat));
+export function DateTimeContainer({
+  hijriAdjustment,
+  hijriDateChangeAtMaghrib,
+  maghribTime,
+  location,
+  timeFormat = 'system',
+}: DateTimeContainerProps) {
+  const [currentTime, setCurrentTime] = useState(
+    getCurrentTimeFormatted(timeFormat),
+  );
   const [hijriDate, setHijriDate] = useState<HijriDateResult | null>(null);
   const [lastCalculatedDate, setLastCalculatedDate] = useState<string>('');
 
@@ -36,7 +50,12 @@ export function DateTimeContainer({ hijriAdjustment, hijriDateChangeAtMaghrib, m
       const today = new Date().toDateString();
       if (lastCalculatedDate !== today) {
         // Calculate Hijri date locally using Umm al-Qura calendar (no API call needed!)
-        const hijri = calculateHijriDate(new Date(), hijriAdjustment, maghribTime, hijriDateChangeAtMaghrib);
+        const hijri = calculateHijriDate(
+          new Date(),
+          hijriAdjustment,
+          maghribTime,
+          hijriDateChangeAtMaghrib
+        );
         setHijriDate(hijri);
         setLastCalculatedDate(today);
       }
@@ -50,49 +69,28 @@ export function DateTimeContainer({ hijriAdjustment, hijriDateChangeAtMaghrib, m
 
     return () => clearInterval(timer);
   }, [hijriAdjustment, hijriDateChangeAtMaghrib, maghribTime, lastCalculatedDate]);
-  
+
   return (
-    <Card className="bg-muted/30 border shadow-sm mb-4 rounded-sm">
-      <CardContent className="p-4">
-          <div className="space-y-3">
-            {/* Row 1: Time + Day Name | Location */}
-            <div className="grid grid-cols-2 gap-4">
-              {/* Left Column: Time + Day Name (same row) */}
-              <div className="text-left flex items-baseline gap-2">
-                <span className="text-base">
-                  {resolveTimeFormat(timeFormat) === '24h'
-                    ? currentTime.split(':').slice(0, 2).join(':')
-                    : currentTime.split(':').slice(0, 2).join(':') + ' ' + currentTime.split(' ').slice(-1)[0]
-                  }
-                </span>
-                <span className="text-base">{getDayName(new Date())}</span>
-              </div>
+    <div className="text-center space-y-3">
+      {/* Large Clock Time */}
+      <div className="text-5xl font-bold tracking-tighter text-primary">
+        {currentTime.split(':').slice(0, 2).join(':')}
+      </div>
 
-              {/* Right Column: Location */}
-              <div className="text-right flex items-center justify-end gap-2">
-                {location && (
-                  <>
-                    <span className="text-base">{location.city}</span>
-                    <MapPin size={14} className="text-muted-foreground" />
-                  </>
-                )}
-              </div>
-            </div>
+      {/* Date Row */}
+      <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+        <span>{formatGregorianDateShort(new Date())}</span>
+        <span className="w-1 h-1 rounded-full bg-muted-foreground" />
+        <span>{formatHijriDateLocal(hijriDate)}</span>
+      </div>
 
-            {/* Row 2: Hijri Date | Gregorian Date */}
-            <div className="grid grid-cols-2 gap-4">
-              {/* Left Column: Hijri Date */}
-              <div className="text-left">
-                <p className="text-base">{formatHijriDateLocal(hijriDate)}</p>
-              </div>
-
-              {/* Right Column: Gregorian Date */}
-              <div className="text-right">
-                <p className="text-base text-muted-foreground">{formatGregorianDateShort(new Date())}</p>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Location Badge */}
+      {location && (
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold uppercase tracking-wider">
+          <MapPin className="w-3 h-3" />
+          {location.city}
+        </div>
+      )}
+    </div>
   );
 }

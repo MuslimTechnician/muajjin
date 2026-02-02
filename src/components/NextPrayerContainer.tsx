@@ -1,19 +1,14 @@
 import { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { PrayerTime } from '@/types';
-import { formatTime } from '@/utils/timeUtils';
-import { getNextSalat } from '@/utils/timeUtils';
+import { formatTime, getNextSalat } from '@/utils/timeUtils';
 import { useTranslation } from '@/contexts/TranslationContext';
+import { ChevronRight } from 'lucide-react';
 
 interface NextPrayerContainerProps {
   allPrayers: PrayerTime[];
   timeFormat?: 'system' | '12h' | '24h';
 }
-
-// Helper to get Jama'ah time with fallback to start time
-const getJamaahTime = (salat: PrayerTime): string => {
-  return salat.jamaah || salat.start;
-};
 
 export function NextPrayerContainer({ allPrayers, timeFormat = 'system' }: NextPrayerContainerProps) {
   const { t } = useTranslation();
@@ -37,43 +32,37 @@ export function NextPrayerContainer({ allPrayers, timeFormat = 'system' }: NextP
   }, [allPrayers]);
 
   if (!nextPrayer) {
-    return (
-      <Card className="bg-muted/30 border shadow-sm mb-4 rounded-sm">
-        <CardHeader className="pb-1 pt-3">
-          <CardTitle className="text-xs font-medium uppercase text-muted-foreground">
-            {t('salatTimes.next')}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-4 pt-2">
-          <p className="text-lg">{t('common.loading')}</p>
-        </CardContent>
-      </Card>
-    );
+    return null;
   }
 
-  const jamaahTime = getJamaahTime(nextPrayer);
+  const jamaahTime = nextPrayer.jamaah || nextPrayer.start;
 
   return (
-    <Card className="bg-muted/30 border shadow-sm mb-4 rounded-sm">
-      <CardHeader className="pb-1 pt-3">
-        <CardTitle className="text-xs font-medium uppercase text-muted-foreground">
-          {t('salatTimes.next')}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="p-4 pt-2">
-        {/* Prayer Name */}
-        <p className="text-2xl font-bold text-primary mb-3 text-center">{nextPrayer.name}</p>
-
-        {/* Start | Jama'ah - Boxed Style */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="border border-secondary rounded-lg p-4 text-center">
-            <p className="text-muted-foreground text-sm mb-1">{t('salatTimes.start')}</p>
-            <p className="text-2xl font-bold text-primary">{formatTime(nextPrayer.start, timeFormat)}</p>
+    <Card>
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1">
+            <div>
+              <p className="text-xs text-muted-foreground uppercase tracking-wider">{t('salatTimes.next')}</p>
+              <h3 className="text-lg font-bold uppercase">{nextPrayer.name}</h3>
+            </div>
+            <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0" />
           </div>
-
-          <div className="border border-secondary rounded-lg p-4 text-center">
-            <p className="text-muted-foreground text-sm mb-1">{t('salatTimes.jamaah')}</p>
-            <p className="text-2xl font-bold">{formatTime(jamaahTime, timeFormat)}</p>
+          <div className="flex gap-4">
+            <div className="text-right">
+              <p className="text-xs text-muted-foreground">{t('salatTimes.start')}</p>
+              <p className="text-lg font-bold">
+                {formatTime(nextPrayer.start, timeFormat)}
+              </p>
+            </div>
+            {nextPrayer.jamaah && (
+              <div className="text-right">
+                <p className="text-xs text-muted-foreground">{t('salatTimes.jamaah')}</p>
+                <p className="text-lg font-bold text-primary">
+                  {formatTime(jamaahTime, timeFormat)}
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </CardContent>

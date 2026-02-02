@@ -1,15 +1,14 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useTranslation } from '@/contexts/TranslationContext';
-import { Calendar, MapPin, Moon, Sunset, Upload } from 'lucide-react';
+import { Calendar, MapPin, Moon, Sunrise, Upload } from 'lucide-react';
 import { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 export default function WelcomePage() {
   const navigate = useNavigate();
-  const { t, importTranslation, setActiveTranslation, importedTranslations } =
-    useTranslation();
+  const { t, importTranslation, setActiveTranslation } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileImport = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -43,120 +42,121 @@ export default function WelcomePage() {
   const features = [
     {
       icon: Calendar,
+      iconColor: 'text-blue-500',
+      iconBg: 'bg-blue-500/10',
       title: t('onboarding.salatTimesFeature'),
       description: t('onboarding.salatTimesDesc'),
     },
     {
-      icon: Sunset,
+      icon: Sunrise,
+      iconColor: 'text-orange-500',
+      iconBg: 'bg-orange-500/10',
       title: t('onboarding.saumFeature'),
       description: t('onboarding.saumDesc'),
     },
     {
       icon: Moon,
+      iconColor: 'text-purple-500',
+      iconBg: 'bg-purple-500/10',
       title: t('onboarding.hijriFeature'),
       description: t('onboarding.hijriDesc'),
     },
     {
       icon: MapPin,
+      iconColor: 'text-primary',
+      iconBg: 'bg-primary/10',
       title: t('onboarding.gpsFeature'),
       description: t('onboarding.gpsDesc'),
     },
   ];
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
-      {/* Content */}
-      <div className="mx-auto flex max-w-md flex-1 flex-col justify-center p-4">
-        <div className="space-y-8 text-center">
-          {/* Icon/Logo */}
+    <div className="min-h-screen bg-background">
+      {/* Content - same width/padding as dashboard and settings */}
+      <div className="mx-auto max-w-md px-5 py-6 space-y-6">
+        {/* App Logo */}
+        <div className="flex justify-center">
           <div className="mx-auto flex h-20 w-20 items-center justify-center">
             <img
               src="/icon.png"
-              alt="Muajjin"
+              alt={t('aboutPage.appName')}
               className="h-full w-full object-contain"
             />
           </div>
+        </div>
 
           {/* Title */}
-          <div className="space-y-2">
+          <div className="text-center space-y-2">
             <h1 className="text-3xl font-bold tracking-tight">
               {t('onboarding.welcome')}
             </h1>
-            <p className="text-lg text-muted-foreground">
+            <p className="text-base text-muted-foreground">
               {t('onboarding.subtitle')}
             </p>
           </div>
 
-          {/* Features Grid */}
-          <Card className="border bg-muted/30 shadow-sm">
-            <CardContent className="p-4">
-              <div className="grid grid-cols-2 gap-3">
+        {/* Features Grid */}
+        <Card className="shadow-lg">
+          <CardContent className="p-6">
+              <div className="grid grid-cols-2 gap-4">
                 {features.map((feature, index) => {
                   const Icon = feature.icon;
                   return (
                     <div
                       key={index}
-                      className="flex items-center gap-3 rounded-lg border border-secondary p-3">
-                      <Icon className="h-5 w-5 flex-shrink-0 text-primary" />
-                      <div className="text-left">
-                        <p className="text-sm font-medium leading-tight">
-                          {feature.title}
-                        </p>
-                        <p className="mt-0.5 text-xs leading-tight text-muted-foreground">
-                          {feature.description}
-                        </p>
+                      className="text-center space-y-2">
+                      <div className={`w-12 h-12 mx-auto rounded-xl ${feature.iconBg} flex items-center justify-center`}>
+                        <Icon className={`w-6 h-6 ${feature.iconColor}`} />
                       </div>
+                      <h3 className="font-semibold text-sm">{feature.title}</h3>
+                      <p className="text-xs text-muted-foreground">{feature.description}</p>
                     </div>
                   );
                 })}
-              </div>
-            </CardContent>
-          </Card>
+            </div>
+          </CardContent>
+        </Card>
 
-          {/* Translation Import */}
-          <div className="space-y-2 text-center">
-            <Button
-              variant="outline"
-              onClick={() => fileInputRef.current?.click()}
-              className="mx-auto w-full max-w-xs">
-              <Upload className="mr-2 h-4 w-4" />
-              {t('settings.importTranslation')}
-            </Button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".json"
-              onChange={handleFileImport}
-              className="hidden"
-            />
-            <p className="mx-auto max-w-xs text-xs text-muted-foreground">
-              {t('onboarding.translationImportDescription')}{' '}
-              <a
-                href="https://github.com/MuslimTechnician/muajjin/discussions/1"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary hover:underline">
-                {t('onboarding.learnMore')}
-              </a>
-            </p>
-          </div>
+        {/* Translation Import */}
+        <Button
+          variant="outline"
+          onClick={() => fileInputRef.current?.click()}
+          className="w-full">
+          <Upload className="w-4 h-4 mr-2" />
+          {t('settings.importTranslation')}
+        </Button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".json"
+          onChange={handleFileImport}
+          className="hidden"
+        />
 
-          {/* Get Started Button */}
-          <Button
-            onClick={() => navigate('/onboarding/location', { replace: true })}
-            size="lg"
-            className="mx-auto w-full max-w-xs">
-            {t('onboarding.getStarted')}
-          </Button>
-        </div>
+        {/* Translation import help text (after import button) */}
+        <a
+          href="https://github.com/MuslimTechnician/muajjin/discussions/1"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mx-auto text-center text-xs text-muted-foreground text-primary hover:underline block">
+          {t('onboarding.translationImportDescriptionWithLearnMore')}
+        </a>
+
+        {/* Get Started Button */}
+        <Button
+          onClick={() => navigate('/onboarding/location', { replace: true })}
+          size="lg"
+          className="w-full">
+          {t('onboarding.getStarted')}
+        </Button>
       </div>
 
-      {/* Progress indicator */}
-      <div className="mx-auto max-w-md p-4">
-        <div className="flex gap-2">
-          <div className="h-1 flex-1 rounded-full bg-primary"></div>
-          <div className="h-1 flex-1 rounded-full bg-muted"></div>
-          <div className="h-1 flex-1 rounded-full bg-muted"></div>
+      {/* Progress indicator - same width/padding as content */}
+      <div className="mx-auto max-w-md px-5 py-4">
+        <div className="flex justify-center gap-2">
+          <div className="w-2 h-2 rounded-full bg-primary" />
+          <div className="w-2 h-2 rounded-full bg-muted" />
+          <div className="w-2 h-2 rounded-full bg-muted" />
         </div>
       </div>
     </div>

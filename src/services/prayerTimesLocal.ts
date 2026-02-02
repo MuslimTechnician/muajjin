@@ -1,10 +1,10 @@
-import { UserSettings } from "@/types";
 import {
-  Madhab as AdhanMadhab,
-  CalculationMethod,
-  Coordinates,
   PrayerTimes,
+  Coordinates,
+  CalculationMethod,
+  Madhab as AdhanMadhab,
 } from "adhan";
+import { UserSettings } from "@/types";
 
 export interface LocalPrayerTimes {
   Fajr: string;
@@ -20,7 +20,7 @@ export interface LocalPrayerTimes {
  * Calculate salat times locally using adhan library (no API call needed)
  * @param date - The Gregorian date to calculate salat times for
  * @param settings - User settings including location and calculation method
- * @returns Salat times in 24-hour format (HH:MM)
+ * @returns Salat times in 24-hour format ("HH:MM")
  */
 export function calculatePrayerTimesLocally(
   date: Date,
@@ -29,26 +29,28 @@ export function calculatePrayerTimesLocally(
   // Get coordinates from settings
   const latitude = settings.latitude || 23.81; // Default: Dhaka
   const longitude = settings.longitude || 90.41;
+
+  // Create coordinates using adhan Coordinates class
   const coordinates = new Coordinates(latitude, longitude);
 
-  // Get calculation parameters based on method ID
-  const params = getCalculationParameters(settings.method);
+  // Get calculation parameters using adhan CalculationMethod
+  const params = getCalculationMethod(settings.method);
 
-  // Set madhab (school of jurisprudence)
+  // Set madhab using adhan Madhab enum
   // 0 = Shafi'i, Maliki, Hanbali (default)
   // 1 = Hanafi (Asr is later)
   params.madhab = settings.madhab === 1 ? AdhanMadhab.Hanafi : AdhanMadhab.Shafi;
 
-  // Calculate salat times using adhan library
+  // Calculate prayer times using adhan PrayerTimes class
   const prayerTimes = new PrayerTimes(coordinates, date, params);
 
-  // Format times to HH:MM format (24-hour format)
+  // Format to "HH:MM" strings (24-hour)
   return {
     Fajr: formatTime(prayerTimes.fajr),
     Shuruq: formatTime(prayerTimes.sunrise),
     Dhuhr: formatTime(prayerTimes.dhuhr),
     Asr: formatTime(prayerTimes.asr),
-    Ghurub: formatTime(prayerTimes.maghrib), // Ghurub is same as Maghrib
+    Ghurub: formatTime(prayerTimes.maghrib), // Ghurub is sunset (same as Maghrib time)
     Maghrib: formatTime(prayerTimes.maghrib),
     Isha: formatTime(prayerTimes.isha),
   };
@@ -58,38 +60,28 @@ export function calculatePrayerTimesLocally(
  * Get calculation parameters for the specified method ID
  * Only includes methods supported by the adhan library
  */
-function getCalculationParameters(methodId: number) {
-  switch (methodId) {
-    case 1:
-      return CalculationMethod.Karachi();
-    case 2:
-      return CalculationMethod.NorthAmerica();
-    case 3:
-      return CalculationMethod.MuslimWorldLeague();
-    case 4:
-      return CalculationMethod.UmmAlQura();
-    case 5:
-      return CalculationMethod.Egyptian();
-    case 7:
-      return CalculationMethod.Tehran();
-    case 8:
-      return CalculationMethod.Dubai();
-    case 9:
-      return CalculationMethod.Kuwait();
-    case 10:
-      return CalculationMethod.Qatar();
-    case 11:
-      return CalculationMethod.Singapore();
-    case 12:
-    case 15:
-      return CalculationMethod.MoonsightingCommittee();
-    default:
-      return CalculationMethod.Karachi();
-  }
+function getCalculationMethod(methodId: number) {
+  // Type-safe method mapping using adhan CalculationMethod
+  const methods: Record<number, ReturnType<typeof CalculationMethod[keyof typeof CalculationMethod]>> = {
+    1: CalculationMethod.Karachi(),
+    2: CalculationMethod.NorthAmerica(),
+    3: CalculationMethod.MuslimWorldLeague(),
+    4: CalculationMethod.UmmAlQura(),
+    5: CalculationMethod.Egyptian(),
+    7: CalculationMethod.Tehran(),
+    8: CalculationMethod.Dubai(),
+    9: CalculationMethod.Kuwait(),
+    10: CalculationMethod.Qatar(),
+    11: CalculationMethod.Singapore(),
+    12: CalculationMethod.MoonsightingCommittee(),
+    15: CalculationMethod.MoonsightingCommittee(),
+  };
+
+  return methods[methodId] || CalculationMethod.Karachi();
 }
 
 /**
- * Format Date object to HH:MM string (24-hour format)
+ * Format Date object to "HH:MM" string (24-hour format)
  */
 function formatTime(date: Date): string {
   const hours = String(date.getHours()).padStart(2, "0");

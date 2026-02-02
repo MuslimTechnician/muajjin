@@ -4,12 +4,8 @@ import { FastingTimesContainer } from '@/components/FastingTimesContainer';
 import { NextPrayerContainer } from '@/components/NextPrayerContainer';
 import { PrayerTimesContainer } from '@/components/PrayerTimesContainer';
 import { ProhibitedTimesContainer } from '@/components/ProhibitedTimesContainer';
-import {
-  DEFAULT_CONTAINER_ORDER,
-  DEFAULT_SETTINGS,
-} from '@/constants/defaultSettings';
+import { DEFAULT_CONTAINER_ORDER } from '@/constants/defaultSettings';
 import { useTranslation } from '@/contexts/TranslationContext';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { calculatePrayerTimesLocally } from '@/services/prayerTimesLocal';
 import { PrayerTime, ProhibitedTime, UserSettings } from '@/types';
 import { EContainerType } from '@/types/enums';
@@ -18,20 +14,26 @@ import {
   getProhibitedTimes,
   setTranslationFunction,
 } from '@/utils/timeUtils';
+import { useApp } from '@/contexts/AppContext';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 /**
- * Migrate old settings property names to new ones
- * This handles the transition from legacy "prayer"/"sehri" to proper Arabic "salat"/"suhoor"
+ * Migrate old settings property names and values to the current shape.
+ * - Handles legacy "sehriAdjustment" → "suhoorAdjustment".
+ * - Normalizes madhab values so Shafi = 0, Hanafi = 1.
  */
-function migrateSettings(settings: UserSettings): UserSettings {
-  const migrated = { ...settings };
+function migrateSettings(settings: UserSettings): Partial<UserSettings> {
+  const migrated: Partial<UserSettings> = {};
 
-  // Migrate from legacy sehriAdjustment → suhoorAdjustment
-  if ('sehriAdjustment' in settings && !('suhoorAdjustment' in settings)) {
-    (migrated as any).suhoorAdjustment = (settings as any).sehriAdjustment;
-    delete (migrated as any).sehriAdjustment;
+  // Legacy sehriAdjustment → suhoorAdjustment
+  if ((settings as any).sehriAdjustment !== undefined && settings.suhoorAdjustment === undefined) {
+    migrated.suhoorAdjustment = (settings as any).sehriAdjustment;
+  }
+
+  // Normalize madhab: any legacy value 2 should become 0 (Shafi)
+  if ((settings as any).madhab === 2) {
+    migrated.madhab = 0;
   }
 
   return migrated;
@@ -48,12 +50,8 @@ const defaultVisibleContainers: Record<string, boolean> = {
 };
 
 const Index = () => {
-  const navigate = useNavigate();
   const { t, getSalatName, mounted } = useTranslation();
-  const [userSettings, setUserSettings] = useLocalStorage<UserSettings>(
-    'muajjin-settings',
-    DEFAULT_SETTINGS,
-  );
+  const { settings, updateSettings } = useApp();
   const [containerOrder, setContainerOrder] = useLocalStorage<string[]>(
     'muajjin-container-order',
     DEFAULT_CONTAINER_ORDER,
@@ -77,21 +75,11 @@ const Index = () => {
     if (hasMigratedRef.current) return;
     hasMigratedRef.current = true;
 
-    const migrated = migrateSettings(userSettings);
-    if (JSON.stringify(migrated) !== JSON.stringify(userSettings)) {
-      setUserSettings(migrated);
+    const migrated = migrateSettings(settings);
+    if (Object.keys(migrated).length > 0) {
+      updateSettings(migrated);
     }
-  }, [setUserSettings, userSettings]);
-
-  // Check if onboarding is completed
-  useEffect(() => {
-    const onboardingCompleted = localStorage.getItem(
-      'muajjin-onboarding-completed',
-    );
-    if (!onboardingCompleted) {
-      navigate('/onboarding/welcome', { replace: true });
-    }
-  }, [navigate]);
+  }, [settings, updateSettings]);
 
   const loadSalatTimes = useCallback((settings: UserSettings) => {
     setIsLoading(true);
@@ -157,19 +145,19 @@ const Index = () => {
     // If already loaded with this translation, don't reload
     if (loadedWithTranslation) return;
 
-    loadSalatTimes(userSettings);
+    loadSalatTimes(settings);
     // Also reload prohibited times to ensure they're translated
-    const timings = calculatePrayerTimesLocally(new Date(), userSettings);
+    const timings = calculatePrayerTimesLocally(new Date(), settings);
     setProhibitedTimes(getProhibitedTimes(timings));
     setLoadedWithTranslation(true);
-  }, [loadSalatTimes, loadedWithTranslation, mounted, t, userSettings]); // Reload when translation function changes or first mounted
+  }, [loadSalatTimes, loadedWithTranslation, mounted, t, settings]); // Reload when translation function changes or first mounted
 
   // Check for date change every minute and reload salat times at midnight
   useEffect(() => {
     const checkDateChange = () => {
       const currentDate = new Date().toDateString();
       if (lastCalculatedDate && currentDate !== lastCalculatedDate) {
-        loadSalatTimes(userSettings);
+        loadSalatTimes(settings);
       }
     };
 
@@ -180,13 +168,13 @@ const Index = () => {
     const timer = setInterval(checkDateChange, 60000);
 
     return () => clearInterval(timer);
-  }, [lastCalculatedDate, loadSalatTimes, userSettings]);
+  }, [lastCalculatedDate, loadSalatTimes, settings]);
 
   // Render containers based on user order
   const renderContainers = () => {
     return (
       <>
-        {containerOrder.map((containerId) => {
+        {containerOrder.map((containerId, index) => {
           // Skip rendering if container is not visible
           if (!visibleContainers[containerId]) {
             return null;
@@ -195,64 +183,68 @@ const Index = () => {
           switch (containerId) {
             case EContainerType.DateTime:
               return (
-                <DateTimeContainer
-                  key={containerId}
-                  hijriAdjustment={userSettings.hijriAdjustment}
-                  hijriDateChangeAtMaghrib={
-                    userSettings.hijriDateChangeAtMaghrib
-                  }
-                  maghribTime={
-                    salatTimes.find((p) => p.id === 'maghrib')?.start
-                  }
-                  location={{
-                    city: userSettings.city || 'Dhaka',
-                    country: '', // Not used anymore, only showing city
-                  }}
-                  timeFormat={userSettings.timeFormat}
-                />
+                <div key={containerId} className="animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: `${index * 100}ms` }}>
+                  <DateTimeContainer
+                    hijriAdjustment={settings.hijriAdjustment}
+                    hijriDateChangeAtMaghrib={
+                      settings.hijriDateChangeAtMaghrib
+                    }
+                    maghribTime={
+                      salatTimes.find((p) => p.id === 'maghrib')?.start
+                    }
+                    location={{
+                      city: settings.city || 'Dhaka',
+                      country: '',
+                    }}
+                    timeFormat={settings.timeFormat}
+                  />
+                </div>
               );
             case EContainerType.CurrentSalat:
               return (
-                <CurrentPrayerContainer
-                  key={containerId}
-                  allPrayers={salatTimes}
-                  timeFormat={userSettings.timeFormat}
-                />
+                <div key={containerId} className="animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: `${index * 100}ms` }}>
+                  <CurrentPrayerContainer
+                    allPrayers={salatTimes}
+                    timeFormat={settings.timeFormat}
+                  />
+                </div>
               );
             case EContainerType.NextSalat:
               return (
-                <NextPrayerContainer
-                  key={containerId}
-                  allPrayers={salatTimes}
-                  timeFormat={userSettings.timeFormat}
-                />
+                <div key={containerId} className="animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: `${index * 100}ms` }}>
+                  <NextPrayerContainer
+                    allPrayers={salatTimes}
+                    timeFormat={settings.timeFormat}
+                  />
+                </div>
               );
             case EContainerType.SalatTimes:
               return (
-                <PrayerTimesContainer
-                  key={containerId}
-                  salats={salatTimes}
-                  timeFormat={userSettings.timeFormat}
-                />
+                <div key={containerId} className="animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: `${index * 100}ms` }}>
+                  <PrayerTimesContainer
+                    salats={salatTimes}
+                    timeFormat={settings.timeFormat}
+                  />
+                </div>
               );
             case EContainerType.ProhibitedTimes:
               return (
-                <ProhibitedTimesContainer
-                  key={containerId}
-                  prohibitedTimes={prohibitedTimes}
-                  timeFormat={userSettings.timeFormat}
-                />
+                <div key={containerId} className="animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: `${index * 100}ms` }}>
+                  <ProhibitedTimesContainer
+                    prohibitedTimes={prohibitedTimes}
+                    timeFormat={settings.timeFormat}
+                  />
+                </div>
               );
             case EContainerType.SaumTimes:
               return (
-                <FastingTimesContainer
-                  key={containerId}
-                  suhoorTime={suhoorTime}
-                  iftarTime={iftarTime}
-                  suhoorAdjustment={userSettings.suhoorAdjustment}
-                  iftarAdjustment={userSettings.iftarAdjustment}
-                  timeFormat={userSettings.timeFormat}
-                />
+                <div key={containerId} className="animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: `${index * 100}ms` }}>
+                  <FastingTimesContainer
+                    suhoorTime={suhoorTime}
+                    iftarTime={iftarTime}
+                    timeFormat={settings.timeFormat}
+                  />
+                </div>
               );
             default:
               return null;
@@ -263,20 +255,21 @@ const Index = () => {
   };
 
   return (
-    <div className="mx-auto min-h-screen max-w-md p-4">
-      {isLoading || !mounted ? (
-        <div className="flex h-[60vh] flex-col items-center justify-center">
-          <div className="flex animate-pulse flex-col items-center gap-4">
-            <div className="h-12 w-12 rounded-full bg-secondary"></div>
-            <div className="h-4 w-32 rounded bg-secondary"></div>
-            <div className="h-3 w-24 rounded bg-secondary"></div>
+    <div className="min-h-screen bg-background">
+      {/* Main Content */}
+      <div className="mx-auto max-w-md px-5 py-6 space-y-6">
+        {isLoading || !mounted ? (
+          <div className="flex h-[60vh] flex-col items-center justify-center animate-pulse">
+            <div className="flex flex-col items-center gap-4">
+              <div className="h-12 w-12 rounded-full bg-secondary animate-bounce" style={{ animationDelay: '0ms' }}></div>
+              <div className="h-4 w-32 rounded bg-secondary" style={{ animationDelay: '150ms' }}></div>
+              <div className="h-3 w-24 rounded bg-secondary" style={{ animationDelay: '300ms' }}></div>
+            </div>
           </div>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {renderContainers()}
-        </div>
-      )}
+        ) : (
+          renderContainers()
+        )}
+      </div>
     </div>
   );
 };

@@ -19,43 +19,131 @@ import LocationSetupPage from "./pages/onboarding/LocationSetupPage";
 import FinalSettingsPage from "./pages/onboarding/FinalSettingsPage";
 import NotFound from "./pages/NotFound";
 import { CapacitorApp } from "./components/CapacitorApp";
+import { AppProvider } from "./contexts/AppContext";
+import { RouteGuard } from "./components/layout/RouteGuard";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <CapacitorApp>
-          <Routes>
-          {/* Onboarding routes - separate layout without AppHeader */}
-          <Route path="/onboarding/welcome" element={<WelcomePage />} />
-          <Route path="/onboarding/location" element={<LocationSetupPage />} />
-          <Route path="/onboarding/settings" element={<FinalSettingsPage />} />
+    <AppProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <CapacitorApp>
+            <Routes>
+            {/* Onboarding routes - blocked after completion */}
+            <Route
+              path="/onboarding/welcome"
+              element={
+                <RouteGuard requireOnboardingComplete={false} redirectTo="/">
+                  <WelcomePage />
+                </RouteGuard>
+              }
+            />
+            <Route
+              path="/onboarding/location"
+              element={
+                <RouteGuard requireOnboardingComplete={false} redirectTo="/">
+                  <LocationSetupPage />
+                </RouteGuard>
+              }
+            />
+            <Route
+              path="/onboarding/settings"
+              element={
+                <RouteGuard requireOnboardingComplete={false} redirectTo="/">
+                  <FinalSettingsPage />
+                </RouteGuard>
+              }
+            />
 
-          {/* Home page routes */}
-          <Route path="/" element={<HomePage />}>
-            <Route index element={<Index />} />
-          </Route>
+            {/* Home page routes - require onboarding completion */}
+            <Route
+              path="/"
+              element={
+                <RouteGuard requireOnboardingComplete={true} redirectTo="/onboarding/welcome">
+                  <HomePage />
+                </RouteGuard>
+              }
+            >
+              <Route index element={<Index />} />
+            </Route>
 
-          {/* Settings routes - separate layout without AppHeader */}
-          <Route path="/settings" element={<SettingsHome />} />
-          <Route path="/settings/prayer-times" element={<PrayerTimesSettings />} />
-          <Route path="/settings/fasting" element={<FastingSettings />} />
-          <Route path="/settings/hijri" element={<HijriSettings />} />
-          <Route path="/settings/time-location" element={<TimeLocationSettings />} />
-          <Route path="/settings/display" element={<DisplaySettings />} />
-          <Route path="/settings/translations" element={<TranslationSettings />} />
-          <Route path="/settings/about" element={<AboutSettings />} />
+            {/* Settings routes - require onboarding completion */}
+            <Route
+              path="/settings"
+              element={
+                <RouteGuard requireOnboardingComplete={true} redirectTo="/onboarding/welcome">
+                  <SettingsHome />
+                </RouteGuard>
+              }
+            />
+            <Route
+              path="/settings/prayer-times"
+              element={
+                <RouteGuard requireOnboardingComplete={true} redirectTo="/onboarding/welcome">
+                  <PrayerTimesSettings />
+                </RouteGuard>
+              }
+            />
+            <Route
+              path="/settings/fasting"
+              element={
+                <RouteGuard requireOnboardingComplete={true} redirectTo="/onboarding/welcome">
+                  <FastingSettings />
+                </RouteGuard>
+              }
+            />
+            <Route
+              path="/settings/hijri"
+              element={
+                <RouteGuard requireOnboardingComplete={true} redirectTo="/onboarding/welcome">
+                  <HijriSettings />
+                </RouteGuard>
+              }
+            />
+            <Route
+              path="/settings/time-location"
+              element={
+                <RouteGuard requireOnboardingComplete={true} redirectTo="/onboarding/welcome">
+                  <TimeLocationSettings />
+                </RouteGuard>
+              }
+            />
+            <Route
+              path="/settings/display"
+              element={
+                <RouteGuard requireOnboardingComplete={true} redirectTo="/onboarding/welcome">
+                  <DisplaySettings />
+                </RouteGuard>
+              }
+            />
+            <Route
+              path="/settings/translations"
+              element={
+                <RouteGuard requireOnboardingComplete={true} redirectTo="/onboarding/welcome">
+                  <TranslationSettings />
+                </RouteGuard>
+              }
+            />
+            <Route
+              path="/settings/about"
+              element={
+                <RouteGuard requireOnboardingComplete={true} redirectTo="/onboarding/welcome">
+                  <AboutSettings />
+                </RouteGuard>
+              }
+            />
 
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-        </CapacitorApp>
-      </BrowserRouter>
-    </TooltipProvider>
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+          </CapacitorApp>
+        </BrowserRouter>
+      </TooltipProvider>
+    </AppProvider>
   </QueryClientProvider>
 );
 

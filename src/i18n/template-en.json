@@ -10,11 +10,16 @@
       "loading": "Loading...",
       "save": "Save",
       "cancel": "Cancel",
-      "delete": "Delete",
-      "edit": "Edit",
-      "close": "Close",
       "am": "AM",
-      "pm": "PM"
+      "pm": "PM",
+      "appName": "Muajjin",
+      "city": "City",
+      "selectCountry": "Select country...",
+      "searchCountry": "Search country...",
+      "noCountryFound": "No country found.",
+      "selectCity": "Select city...",
+      "searchCity": "Search city...",
+      "noCityFound": "No city found."
     },
     "salatTimes": {
       "title": "Salat Times",
@@ -25,7 +30,8 @@
       "start": "Start",
       "end": "End",
       "untilJamaah": "Until Jama'ah",
-      "untilEnd": "Until End"
+      "untilEnd": "Until End",
+      "remainingToTarget": "Remaining to {{target}}"
     },
     "saum": {
       "title": "Saum Times",
@@ -33,14 +39,14 @@
       "iftarStarts": "Iftar Starts",
       "suhoorEndsIn": "Suhoor Ends in",
       "iftarStartsIn": "Iftar Starts in",
-      "adjustedBy": "Adjusted by {{minutes}} min"
+      "adjustedBy": "Adjusted by {{minutes}} min",
+      "nextMeal": "Next Meal"
     },
     "prohibited": {
       "title": "Prohibited Salat Times",
       "shuruq": "Shuruq",
       "ghurub": "Ghurub",
-      "zawal": "Zawal",
-      "description": "Salat is prohibited during Shuruq, Zawal, and Ghurub"
+      "zawal": "Zawal"
     },
     "settings": {
       "title": "Settings",
@@ -54,17 +60,26 @@
       "importError": "Invalid translation file format",
       "deleteConfirm": "Are you sure you want to delete this translation?",
       "calculationMethod": "Calculation Method",
+      "calculationMethodDesc": "Choose the prayer time calculation method for your region",
       "madhab": "Madhab (for Asr)",
+      "madhabDesc": "Affects Asr prayer time calculation",
       "asrCalculation": "Asr Calculation",
       "hijriAdjustment": "Hijri Date Adjustment",
+      "hijriAdjustmentDesc": "Adjust the calculated Hijri date if needed",
       "hijriDateChangeAtMaghrib": "Hijri date changes at Maghrib",
+      "hijriDateChangeAtMaghribDesc": "Islamic date changes after sunset (Maghrib) instead of midnight",
+      "useMaghribForDateChange": "Use Maghrib for date change",
       "suhoorAdjustment": "Suhoor Adjustment (minutes)",
+      "suhoorAdjustmentDesc": "Adjust Suhoor end time (in minutes)",
       "iftarAdjustment": "Iftar Adjustment (minutes)",
+      "iftarAdjustmentDesc": "Adjust Iftar start time (in minutes)",
       "theme": "Theme",
+      "themeDesc": "Customize the app appearance",
       "light": "Light",
       "dark": "Dark",
       "system": "System",
       "homeScreenLayout": "Home Screen Layout",
+      "homeScreenLayoutDesc": "Reorder or toggle home screen sections",
       "dateTime": "Date & Time",
       "currentSalat": "Current Salat",
       "nextSalat": "Next Salat",
@@ -73,13 +88,13 @@
       "saumTimes": "Saum Times",
       "salatTimesSettings": "Salat Times Settings",
       "jamaahTimes": "Jama'ah Times",
+      "jamaahTimesDesc": "Set congregation times for each prayer (optional)",
       "saumSettings": "Saum Settings",
       "hijriSettings": "Hijri Date Settings",
       "timeLocationSettings": "Time & Location Settings",
       "aboutSettings": "About App",
-      "minutes": "minutes",
-      "adjustment": "Adjustment",
       "timeFormat": "Time Format",
+      "timeFormatDesc": "Choose your preferred time format",
       "24hour": "24 Hour",
       "12hour": "12 Hour",
       "location": "Location",
@@ -111,14 +126,14 @@
       "changeFont": "Change Font",
       "removeFont": "Remove Font",
       "fontUploaded": "Font uploaded successfully",
+      "fontUploadedDesc": "Custom font is now active.",
       "fontRemoved": "Custom font removed",
+      "fontRemovedDesc": "Custom font has been removed. Using default font.",
       "currentFont": "Current Font",
       "noFontUploaded": "No custom font uploaded",
       "fontFileName": "customfont.woff2",
-      "noTranslationsDesc": "Visit our community to get translation templates",
       "translationDeleted": "Translation deleted",
-      "communityDesc": "Get community translations or translation templates and share your translations with the community",
-      "learnMore": "here"
+      "importDescriptionWithLearnMore": "Get community translations or translation templates and share your translations with the community. Learn more"
     },
     "onboarding": {
       "welcome": "Muajjin",
@@ -155,28 +170,17 @@
       "detecting": "Detecting Location...",
       "detectingGps": "Detecting location via GPS...",
       "locationDetected": "Location detected: {{city}}, {{country}}",
+      "locationDetectedWithMethod": "Location detected: {{city}}, {{country}} ({{method}})",
       "continue": "Continue",
       "selectCalculationMethod": "Select calculation method",
       "selectMadhab": "Madhab",
       "madhabRequired": "Please select all options",
       "translationImportDescription": "Imported translations are applied immediately.",
+      "translationImportDescriptionWithLearnMore": "Imported translations are applied immediately. Learn more",
       "learnMore": "Learn more"
     },
     "about": {
       "title": "About Muajjin",
-      "version": "Version",
-      "description": "A lightweight, privacy-friendly Islamic salat times app",
-      "features": {
-        "accurate": "Accurate salat time calculation based on location",
-        "location": "Automatic GPS location with IP-based fallback",
-        "countdown": "Current salat highlighting and next salat countdown",
-        "ramadan": "Suhoor and Iftar times for Ramadan",
-        "hijri": "Hijri date display",
-        "theme": "Automatic light and dark theme support",
-        "privacy": "Salat times calculated locally—no tracking, no remote APIs"
-      },
-      "philosophy": "Minimal Feature Philosophy",
-      "philosophyDesc": "This app is designed with a minimal feature philosophy. The focus is intentionally narrow: salat times and saum times only. Any additional features beyond these core functions will not be implemented.",
       "appDescription": "Muajjin is your comprehensive Islamic salat times application that provides accurate salat times, Hijri calendar information, and Ramadan timings.",
       "information": "Information and usage instructions",
       "sections": {
@@ -232,7 +236,8 @@
       "locationFailed": "Failed to get your location",
       "locationDenied": "Location permission denied. Please enable location access.",
       "invalidFile": "Invalid translation file. Please check the format.",
-      "fileRequired": "Please select a translation file"
+      "fileRequired": "Please select a translation file",
+      "fontUploadFailed": "Failed to upload font"
     },
     "notFound": {
       "title": "404",
@@ -258,7 +263,7 @@
       "builtWith": "Built With",
       "builtWithDesc": "Adhan Salat Times Library • Umm al-Qura Calendar • React • TypeScript",
       "madeWithLove": "Made with ❤️ for Muslim Ummah",
-      "credits": "by"
+      "credits": "By Muslim Technician"
     }
   }
 }

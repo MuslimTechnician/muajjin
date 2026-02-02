@@ -1,6 +1,5 @@
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import {
@@ -18,7 +17,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { ArrowLeft, Check, GripVertical, Trash2, Upload } from 'lucide-react';
+import { Check, GripVertical, Trash2, Upload } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -27,6 +26,7 @@ import { useTranslation } from '@/contexts/TranslationContext';
 import { EContainerType } from '@/types/enums';
 import { Monitor, Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
+import { AppHeader } from '@/components/AppHeader';
 
 const CONTAINER_LABELS: Record<string, string> = {
   [EContainerType.DateTime]: 'Date & Time',
@@ -179,29 +179,20 @@ export default function DisplaySettings() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="sticky top-0 z-50 w-full border-b bg-background px-4 py-3">
-        <div className="mx-auto flex max-w-md items-center gap-3">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate(-1)}
-            className="h-8 w-8">
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-
-          <h1 className="text-lg font-semibold">
-            {t('settings.displaySettings')}
-          </h1>
-        </div>
-      </div>
+      <AppHeader showBackButton={true} title={t('settings.displaySettings')} />
 
       {/* Content */}
-      <div className="mx-auto max-w-md space-y-6 p-4">
+      <div className="max-w-md mx-auto px-5 py-6 space-y-6">
         {/* Theme */}
-        <div className="space-y-2">
-          <Label>{t('settings.theme')}</Label>
+        <div className="space-y-3">
+          <div className="space-y-1">
+            <Label>{t('settings.theme')}</Label>
+            <p className="text-sm text-muted-foreground">
+              {t('settings.themeDesc')}
+            </p>
+          </div>
 
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-3 gap-3">
             <Button
               type="button"
               variant={theme === 'light' ? 'default' : 'outline'}
@@ -234,17 +225,17 @@ export default function DisplaySettings() {
           </div>
         </div>
 
-        <Separator />
-
         {/* Custom Font */}
         <div className="space-y-3">
-          <Label>{t('settings.customFont')}</Label>
-          <p className="text-sm text-muted-foreground">
-            {t('settings.uploadFontDesc')}
-          </p>
+          <div className="space-y-1">
+            <Label>{t('settings.customFont')}</Label>
+            <p className="text-sm text-muted-foreground">
+              {t('settings.uploadFontDesc')}
+            </p>
+          </div>
 
           {hasCustomFont ? (
-            <div className="flex items-center justify-between rounded-sm border bg-muted/30 p-3">
+            <div className="flex items-center justify-between rounded-lg border bg-card p-4">
               <div className="flex items-center gap-2">
                 <Check className="h-4 w-4 text-green-600" />
 
@@ -263,7 +254,7 @@ export default function DisplaySettings() {
               </Button>
             </div>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-3">
               <input
                 ref={fileInputRef}
                 type="file"
@@ -288,11 +279,14 @@ export default function DisplaySettings() {
           )}
         </div>
 
-        <Separator />
-
         {/* Home Screen Layout */}
         <div className="space-y-3">
-          <Label>{t('settings.homeScreenLayout')}</Label>
+          <div className="space-y-1">
+            <Label>{t('settings.homeScreenLayout')}</Label>
+            <p className="text-sm text-muted-foreground">
+              {t('settings.homeScreenLayoutDesc')}
+            </p>
+          </div>
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}

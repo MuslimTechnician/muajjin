@@ -1,31 +1,27 @@
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { DEFAULT_SETTINGS } from '@/constants/defaultSettings';
 import { useTranslation } from '@/contexts/TranslationContext';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { UserSettings } from '@/types';
-import { ArrowLeft } from 'lucide-react';
+import { AppHeader } from '@/components/AppHeader';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useApp } from '@/contexts/AppContext';
 
 export default function HijriSettings() {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const [userSettings, setUserSettings] = useLocalStorage<UserSettings>(
-    'muajjin-settings',
-    DEFAULT_SETTINGS,
-  );
+  const { settings, updateSettings } = useApp();
   const [localSettings, setLocalSettings] = useState<UserSettings>({
-    ...userSettings,
+    ...settings,
   });
 
   useEffect(() => {
-    setLocalSettings({ ...userSettings });
-  }, [userSettings]);
+    setLocalSettings({ ...settings });
+  }, [settings]);
 
   const handleSave = () => {
-    setUserSettings(localSettings);
+    updateSettings(localSettings);
     navigate(-1);
   };
 
@@ -34,27 +30,19 @@ export default function HijriSettings() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="sticky top-0 z-50 w-full border-b bg-background px-4 py-3">
-        <div className="mx-auto flex max-w-md items-center gap-3">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate(-1)}
-            className="h-8 w-8">
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <h1 className="text-lg font-semibold">
-            {t('settings.hijriSettings')}
-          </h1>
-        </div>
-      </div>
+      <AppHeader showBackButton={true} title={t('settings.hijriSettings')} />
 
       {/* Content */}
-      <div className="mx-auto max-w-md space-y-6 p-4">
+      <div className="max-w-md mx-auto px-5 py-6 space-y-6">
         {/* Adjust Hijri Date */}
         <div className="space-y-3">
-          <Label>{t('settings.hijriAdjustment')}</Label>
-          <div className="grid grid-cols-7 gap-2">
+          <div className="space-y-1">
+            <Label>{t('settings.hijriAdjustment')}</Label>
+            <p className="text-sm text-muted-foreground">
+              {t('settings.hijriAdjustmentDesc')}
+            </p>
+          </div>
+          <div className="flex gap-2 flex-wrap">
             {adjustmentOptions.map((value) => (
               <Button
                 key={value}
@@ -70,7 +58,7 @@ export default function HijriSettings() {
                     hijriAdjustment: value,
                   }))
                 }
-                className="w-full">
+                className="flex-1 min-w-[60px]">
                 {value > 0 ? `+${value}` : value}
               </Button>
             ))}
@@ -78,17 +66,25 @@ export default function HijriSettings() {
         </div>
 
         {/* Change Hijri Date at Maghrib */}
-        <div className="flex items-center justify-between">
-          <Label>{t('settings.hijriDateChangeAtMaghrib')}</Label>
-          <Switch
-            checked={localSettings.hijriDateChangeAtMaghrib}
-            onCheckedChange={(checked) =>
-              setLocalSettings((prev) => ({
-                ...prev,
-                hijriDateChangeAtMaghrib: checked,
-              }))
-            }
-          />
+        <div className="space-y-3">
+          <div className="space-y-1">
+            <Label>{t('settings.hijriDateChangeAtMaghrib')}</Label>
+            <p className="text-sm text-muted-foreground">
+              {t('settings.hijriDateChangeAtMaghribDesc')}
+            </p>
+          </div>
+          <div className="flex items-center justify-between p-4 rounded-lg bg-card border border-border">
+            <span className="font-medium">{t('settings.useMaghribForDateChange')}</span>
+            <Switch
+              checked={localSettings.hijriDateChangeAtMaghrib}
+              onCheckedChange={(checked) =>
+                setLocalSettings((prev) => ({
+                  ...prev,
+                  hijriDateChangeAtMaghrib: checked,
+                }))
+              }
+            />
+          </div>
         </div>
 
         {/* Save Button */}
