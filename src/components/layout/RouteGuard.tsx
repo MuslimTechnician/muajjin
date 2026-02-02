@@ -1,6 +1,6 @@
 import { Navigate } from 'react-router-dom';
 import { useApp } from '@/contexts/AppContext';
-import { ReactNode } from 'react';
+import { FC, ReactNode } from 'react';
 
 interface RouteGuardProps {
   children: ReactNode;
@@ -19,7 +19,7 @@ interface RouteGuardProps {
  * RouteGuard - Single guard for both protected and onboarding routes.
  * Uses AppContext.settings.onboardingComplete as the single source of truth.
  */
-export const RouteGuard: React.FC<RouteGuardProps> = ({
+export const RouteGuard: FC<RouteGuardProps> = ({
   children,
   requireOnboardingComplete,
   redirectTo,
