@@ -1,9 +1,10 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useTranslation } from '@/contexts/TranslationContext';
-import { ArrowLeft, Calendar, MapPin, Moon, Sunset } from 'lucide-react';
+import { Calendar, MapPin, Moon, Sunset } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import packageInfo from '../../../package.json';
+import { AppHeader } from '@/components/AppHeader';
 
 export default function AboutSettings() {
   const navigate = useNavigate();
@@ -12,21 +13,10 @@ export default function AboutSettings() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="sticky top-0 z-50 w-full border-b bg-background px-4 py-3">
-        <div className="mx-auto flex max-w-md items-center gap-3">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate(-1)}
-            className="h-8 w-8">
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <h1 className="text-lg font-semibold">{t('aboutPage.title')}</h1>
-        </div>
-      </div>
+      <AppHeader showBackButton={true} title={t('aboutPage.title')} />
 
       {/* Content */}
-      <div className="mx-auto max-w-md space-y-4 p-4">
+      <div className="max-w-md mx-auto px-5 py-6 space-y-4">
         {/* App Info Card */}
         <Card className="border bg-muted/30 shadow-sm">
           <CardContent className="space-y-4 p-6 text-center">
@@ -139,21 +129,18 @@ export default function AboutSettings() {
           </CardContent>
         </Card>
 
-        {/* Footer */}
+        {/* Footer - one translatable string in JSON (editable in language file only) */}
         <div className="space-y-2 py-4 text-center">
           <p className="text-xs text-muted-foreground">
             {t('aboutPage.madeWithLove')}
           </p>
-          <p className="text-xs text-muted-foreground">
-            {t('aboutPage.credits')}{' '}
-            <a
-              href="https://t.me/MuslimTechnician"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary hover:underline">
-              Muslim Technician
-            </a>
-          </p>
+          <a
+            href="https://t.me/MuslimTechnician"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-primary hover:underline inline-block">
+            {t('aboutPage.credits')}
+          </a>
         </div>
       </div>
     </div>

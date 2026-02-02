@@ -14,6 +14,7 @@ import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { CALCULATION_METHODS, MADHABS } from '@/services/prayerTimesService';
 import { UserSettings } from '@/types';
 import { useEffect, useState } from 'react';
+import { useTranslation } from '@/contexts/TranslationContext';
 
 const DEFAULT_SETTINGS: UserSettings = {
   method: 1, // University of Islamic Sciences Karachi
@@ -30,6 +31,7 @@ const DEFAULT_SETTINGS: UserSettings = {
 };
 
 const SettingsPage = () => {
+  const { t } = useTranslation();
   const [userSettings, setUserSettings] = useLocalStorage<UserSettings>('muajjin-settings', DEFAULT_SETTINGS);
   const [localSettings, setLocalSettings] = useState<UserSettings>({ ...userSettings });
   
@@ -40,8 +42,8 @@ const SettingsPage = () => {
   const handleSave = () => {
     setUserSettings(localSettings);
     toast({
-      title: "Settings Updated",
-      description: "Your salat time settings have been saved.",
+      title: t('settings.settingsUpdated'),
+      description: t('settings.settingsSavedDesc'),
     });
   };
   
@@ -69,22 +71,22 @@ const SettingsPage = () => {
       
       <Tabs defaultValue="salat-times" className="w-full">
         <TabsList className="grid grid-cols-4 mb-4 w-full">
-          <TabsTrigger value="salat-times">Salat Times</TabsTrigger>
-          <TabsTrigger value="location">Location</TabsTrigger>
-          <TabsTrigger value="jamaah">Jama'ah</TabsTrigger>
-          <TabsTrigger value="about">About</TabsTrigger>
+          <TabsTrigger value="salat-times">{t('settings.salatTimes')}</TabsTrigger>
+          <TabsTrigger value="location">{t('settings.location')}</TabsTrigger>
+          <TabsTrigger value="jamaah">{t('settings.jamaahTimes')}</TabsTrigger>
+          <TabsTrigger value="about">{t('aboutPage.title')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="salat-times">
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="calculation-method">Calculation Method</Label>
-              <Select 
-                value={localSettings.method.toString()} 
+              <Label htmlFor="calculation-method">{t('settings.calculationMethod')}</Label>
+              <Select
+                value={localSettings.method.toString()}
                 onValueChange={(value) => updateSetting('method', parseInt(value))}
               >
                 <SelectTrigger id="calculation-method">
-                  <SelectValue placeholder="Select method" />
+                  <SelectValue placeholder={t('settings.selectMethod')} />
                 </SelectTrigger>
                 <SelectContent>
                   {CALCULATION_METHODS.map((method) => (
@@ -97,13 +99,13 @@ const SettingsPage = () => {
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="madhab">Madhab (for Asr)</Label>
-              <Select 
-                value={localSettings.madhab.toString()} 
+              <Label htmlFor="madhab">{t('settings.madhab')}</Label>
+              <Select
+                value={localSettings.madhab.toString()}
                 onValueChange={(value) => updateSetting('madhab', parseInt(value))}
               >
                 <SelectTrigger id="madhab">
-                  <SelectValue placeholder="Select madhab" />
+                  <SelectValue placeholder={t('settings.selectMadhabOption')} />
                 </SelectTrigger>
                 <SelectContent>
                   {MADHABS.map((madhab) => (
@@ -116,7 +118,7 @@ const SettingsPage = () => {
             </div>
             
             <div className="space-y-2">
-              <Label>Hijri Date Adjustment ({localSettings.hijriAdjustment} days)</Label>
+              <Label>{t('settings.hijriAdjustment')} ({localSettings.hijriAdjustment} days)</Label>
               <Slider 
                 min={-3} 
                 max={3} 
@@ -128,7 +130,7 @@ const SettingsPage = () => {
             
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Suhoor Adjustment ({localSettings.suhoorAdjustment} min)</Label>
+                <Label>{t('settings.suhoorAdjustment')}</Label>
                 <Slider
                   min={-3}
                   max={3}
@@ -139,7 +141,7 @@ const SettingsPage = () => {
               </div>
               
               <div className="space-y-2">
-                <Label>Iftar Adjustment ({localSettings.iftarAdjustment} min)</Label>
+                <Label>{t('settings.iftarAdjustment')}</Label>
                 <Slider 
                   min={-3} 
                   max={3} 
@@ -160,13 +162,13 @@ const SettingsPage = () => {
                 checked={localSettings.manualLocation}
                 onCheckedChange={(checked) => updateSetting('manualLocation', checked)}
               />
-              <Label htmlFor="manual-location">Manual location</Label>
+              <Label htmlFor="manual-location">{t('settings.manualLocation')}</Label>
             </div>
             
             {localSettings.manualLocation ? (
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="latitude">Latitude</Label>
+                  <Label htmlFor="latitude">{t('settings.latitudeLabel')}</Label>
                   <Input 
                     id="latitude" 
                     type="number" 
@@ -175,7 +177,7 @@ const SettingsPage = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="longitude">Longitude</Label>
+                  <Label htmlFor="longitude">{t('settings.longitudeLabel')}</Label>
                   <Input 
                     id="longitude" 
                     type="number" 
@@ -201,7 +203,7 @@ const SettingsPage = () => {
           <div className="space-y-4">
             {['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'].map((prayer) => (
               <div key={prayer} className="space-y-2">
-                <Label htmlFor={`jamaah-${prayer}`}>{prayer} Jama'ah Time</Label>
+                <Label htmlFor={`jamaah-${prayer}`}>{prayer} {t('settings.jamaahTimeLabel')}</Label>
                 <Input 
                   id={`jamaah-${prayer}`}
                   type="time"
@@ -222,7 +224,7 @@ const SettingsPage = () => {
       </Tabs>
       
       <div className="flex justify-end mt-6">
-        <Button onClick={handleSave}>Save Settings</Button>
+        <Button onClick={handleSave}>{t('settings.saveSettings')}</Button>
       </div>
     </div>
   );

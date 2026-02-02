@@ -11,6 +11,7 @@ import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { CALCULATION_METHODS, MADHABS } from '@/services/prayerTimesService';
 import { UserSettings } from '@/types';
+import { useTranslation } from '@/contexts/TranslationContext';
 
 interface SettingsDialogProps {
   settings: UserSettings;
@@ -18,6 +19,7 @@ interface SettingsDialogProps {
 }
 
 export function SettingsDialog({ settings, onUpdateSettings }: SettingsDialogProps) {
+  const { t } = useTranslation();
   const [localSettings, setLocalSettings] = useState<UserSettings>({ ...settings });
   
   const handleSave = () => {
@@ -47,26 +49,26 @@ export function SettingsDialog({ settings, onUpdateSettings }: SettingsDialogPro
       </DialogTrigger>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>Settings</DialogTitle>
+          <DialogTitle>{t('settings.title')}</DialogTitle>
         </DialogHeader>
-        
+
         <Tabs defaultValue="salat-times">
           <TabsList className="grid grid-cols-3 mb-4">
-            <TabsTrigger value="salat-times">Salat Times</TabsTrigger>
-            <TabsTrigger value="location">Location</TabsTrigger>
-            <TabsTrigger value="jamaah">Jama'ah Times</TabsTrigger>
+            <TabsTrigger value="salat-times">{t('settings.salatTimes')}</TabsTrigger>
+            <TabsTrigger value="location">{t('settings.location')}</TabsTrigger>
+            <TabsTrigger value="jamaah">{t('settings.jamaahTimes')}</TabsTrigger>
           </TabsList>
           
           <TabsContent value="salat-times">
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="calculation-method">Calculation Method</Label>
+                <Label htmlFor="calculation-method">{t('settings.calculationMethod')}</Label>
                 <Select 
                   value={localSettings.method.toString()} 
                   onValueChange={(value) => updateSetting('method', parseInt(value))}
                 >
                   <SelectTrigger id="calculation-method">
-                    <SelectValue placeholder="Select method" />
+                    <SelectValue placeholder={t('settings.selectMethod')} />
                   </SelectTrigger>
                   <SelectContent>
                     {CALCULATION_METHODS.map((method) => (
@@ -79,13 +81,13 @@ export function SettingsDialog({ settings, onUpdateSettings }: SettingsDialogPro
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="madhab">Madhab (for Asr)</Label>
+                <Label htmlFor="madhab">{t('settings.madhab')}</Label>
                 <Select 
                   value={localSettings.madhab.toString()} 
                   onValueChange={(value) => updateSetting('madhab', parseInt(value))}
                 >
                   <SelectTrigger id="madhab">
-                    <SelectValue placeholder="Select madhab" />
+                    <SelectValue placeholder={t('settings.selectMadhabOption')} />
                   </SelectTrigger>
                   <SelectContent>
                     {MADHABS.map((madhab) => (
@@ -148,7 +150,7 @@ export function SettingsDialog({ settings, onUpdateSettings }: SettingsDialogPro
               {localSettings.manualLocation ? (
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="latitude">Latitude</Label>
+                    <Label htmlFor="latitude">{t('settings.latitudeLabel')}</Label>
                     <Input 
                       id="latitude" 
                       type="number" 
@@ -157,7 +159,7 @@ export function SettingsDialog({ settings, onUpdateSettings }: SettingsDialogPro
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="longitude">Longitude</Label>
+                    <Label htmlFor="longitude">{t('settings.longitudeLabel')}</Label>
                     <Input 
                       id="longitude" 
                       type="number" 
@@ -193,7 +195,7 @@ export function SettingsDialog({ settings, onUpdateSettings }: SettingsDialogPro
             <div className="space-y-4">
               {['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'].map((prayer) => (
                 <div key={prayer} className="space-y-2">
-                  <Label htmlFor={`jamaah-${prayer}`}>{prayer} Jama'ah Time</Label>
+                  <Label htmlFor={`jamaah-${prayer}`}>{prayer} {t('settings.jamaahTimeLabel')}</Label>
                   <Input 
                     id={`jamaah-${prayer}`}
                     type="time"
@@ -210,7 +212,7 @@ export function SettingsDialog({ settings, onUpdateSettings }: SettingsDialogPro
         </Tabs>
         
         <div className="flex justify-end mt-4">
-          <Button onClick={handleSave}>Save Settings</Button>
+          <Button onClick={handleSave}>{t('settings.saveSettings')}</Button>
         </div>
       </DialogContent>
     </Dialog>

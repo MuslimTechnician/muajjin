@@ -8,36 +8,31 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Separator } from '@/components/ui/separator';
-import { DEFAULT_SETTINGS } from '@/constants/defaultSettings';
 import { useTranslation } from '@/contexts/TranslationContext';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
 import {
   CALCULATION_METHODS,
   CALCULATION_METHOD_KEYS,
 } from '@/services/prayerTimesService';
 import { UserSettings } from '@/types';
-import { ArrowLeft } from 'lucide-react';
+import { AppHeader } from '@/components/AppHeader';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useApp } from '@/contexts/AppContext';
 
 export default function PrayerTimesSettings() {
   const navigate = useNavigate();
   const { t, getSalatName } = useTranslation();
-  const [userSettings, setUserSettings] = useLocalStorage<UserSettings>(
-    'muajjin-settings',
-    DEFAULT_SETTINGS,
-  );
+  const { settings, updateSettings } = useApp();
   const [localSettings, setLocalSettings] = useState<UserSettings>({
-    ...userSettings,
+    ...settings,
   });
 
   useEffect(() => {
-    setLocalSettings({ ...userSettings });
-  }, [userSettings]);
+    setLocalSettings({ ...settings });
+  }, [settings]);
 
   const handleSave = () => {
-    setUserSettings(localSettings);
+    updateSettings(localSettings);
     navigate(-1);
   };
 
@@ -64,32 +59,22 @@ export default function PrayerTimesSettings() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="sticky top-0 z-50 w-full border-b bg-background px-4 py-3">
-        <div className="mx-auto flex max-w-md items-center gap-3">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate(-1)}
-            className="h-8 w-8">
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <h1 className="text-lg font-semibold">
-            {t('settings.salatTimesSettings')}
-          </h1>
-        </div>
-      </div>
+      <AppHeader showBackButton={true} title={t('settings.salatTimesSettings')} />
 
       {/* Content */}
-      <div className="mx-auto max-w-md space-y-6 p-4">
+      <div className="max-w-md mx-auto px-5 py-6 space-y-6">
         {/* Calculation Method */}
         <div className="space-y-3">
-          <Label className="text-base font-medium">
-            {t('settings.calculationMethod')}
-          </Label>
+          <div className="space-y-1">
+            <Label>{t('settings.calculationMethod')}</Label>
+            <p className="text-sm text-muted-foreground">
+              {t('settings.calculationMethodDesc')}
+            </p>
+          </div>
           <Select
             value={localSettings.method?.toString()}
             onValueChange={(value) => updateSetting('method', parseInt(value))}>
-            <SelectTrigger>
+            <SelectTrigger className="bg-card">
               <SelectValue
                 placeholder={t('onboarding.selectCalculationMethod')}
               />
@@ -108,13 +93,18 @@ export default function PrayerTimesSettings() {
         </div>
 
         {/* Madhab */}
-        <div className="space-y-2">
-          <Label>{t('settings.madhab')}</Label>
-          <div className="grid grid-cols-2 gap-2">
+        <div className="space-y-3">
+          <div className="space-y-1">
+            <Label>{t('settings.madhab')}</Label>
+            <p className="text-sm text-muted-foreground">
+              {t('settings.madhabDesc')}
+            </p>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
             <Button
               type="button"
-              variant={localSettings.madhab === 2 ? 'default' : 'outline'}
-              onClick={() => updateSetting('madhab', 2)}
+              variant={localSettings.madhab === 0 ? 'default' : 'outline'}
+              onClick={() => updateSetting('madhab', 0)}
               className="w-full">
               {t('madhabs.shafi')}
             </Button>
@@ -128,26 +118,32 @@ export default function PrayerTimesSettings() {
           </div>
         </div>
 
-        <Separator />
-
         {/* Jama'ah Times */}
-        <div className="space-y-4">
-          <Label className="text-base">{t('settings.jamaahTimes')}</Label>
-          {(['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'] as const).map(
-            (salat) => (
-              <div key={salat} className="space-y-2">
-                <Label htmlFor={`jamaah-${salat}`}>{getSalatName(salat)}</Label>
-                <Input
-                  id={`jamaah-${salat}`}
-                  type="time"
-                  value={localSettings.jamaahTimes[salat] || ''}
-                  onChange={(e) =>
-                    handleJamaahTimeChange(salat, e.target.value)
-                  }
-                />
-              </div>
-            ),
-          )}
+        <div className="space-y-3">
+          <div className="space-y-1">
+            <Label>{t('settings.jamaahTimes')}</Label>
+            <p className="text-sm text-muted-foreground">
+              {t('settings.jamaahTimesDesc')}
+            </p>
+          </div>
+          <div className="space-y-3">
+            {(['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'] as const).map(
+              (salat) => (
+                <div key={salat} className="space-y-1">
+                  <Label htmlFor={`jamaah-${salat}`}>{getSalatName(salat)}</Label>
+                  <Input
+                    id={`jamaah-${salat}`}
+                    type="time"
+                    value={localSettings.jamaahTimes[salat] || ''}
+                    onChange={(e) =>
+                      handleJamaahTimeChange(salat, e.target.value)
+                    }
+                    className="bg-card"
+                  />
+                </div>
+              ),
+            )}
+          </div>
         </div>
 
         {/* Save Button */}

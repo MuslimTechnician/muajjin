@@ -6,6 +6,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Check, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useTranslation } from '@/contexts/TranslationContext';
 
 interface CountrySelectProps {
   selectedCountry: string;
@@ -262,6 +263,7 @@ const COUNTRIES: Country[] = [
 ];
 
 export function CountrySelect({ selectedCountry, selectedCity, onCountryChange, onCityChange }: CountrySelectProps) {
+  const { t } = useTranslation();
   const [countryOpen, setCountryOpen] = useState(false);
   const [cityOpen, setCityOpen] = useState(false);
   const [countrySearch, setCountrySearch] = useState('');
@@ -304,19 +306,19 @@ export function CountrySelect({ selectedCountry, selectedCity, onCountryChange, 
               aria-expanded={countryOpen}
               className="w-full justify-between"
             >
-              {selectedCountry || "Select country..."}
+              {selectedCountry || t('common.selectCountry')}
               <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-full p-0" align="start">
             <Command>
-              <CommandInput 
-                placeholder="Search country..." 
+              <CommandInput
+                placeholder={t('common.searchCountry')}
                 value={countrySearch}
                 onValueChange={setCountrySearch}
               />
               <CommandList className="max-h-[300px]">
-                <CommandEmpty>No country found.</CommandEmpty>
+                <CommandEmpty>{t('common.noCountryFound')}</CommandEmpty>
                 <CommandGroup>
                   {filteredCountries.map((country) => (
                     <CommandItem
@@ -345,7 +347,7 @@ export function CountrySelect({ selectedCountry, selectedCity, onCountryChange, 
       </div>
       
       <div className="space-y-2">
-        <Label htmlFor="city">City</Label>
+        <Label htmlFor="city">{t('common.city')}</Label>
         <Popover open={cityOpen} onOpenChange={setCityOpen}>
           <PopoverTrigger asChild>
             <Button
@@ -355,19 +357,19 @@ export function CountrySelect({ selectedCountry, selectedCity, onCountryChange, 
               className="w-full justify-between"
               disabled={!selectedCountry}
             >
-              {selectedCity || "Select city..."}
+              {selectedCity || t('common.selectCity')}
               <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-full p-0" align="start">
             <Command>
-              <CommandInput 
-                placeholder="Search city..." 
+              <CommandInput
+                placeholder={t('common.searchCity')}
                 value={citySearch}
                 onValueChange={setCitySearch}
               />
               <CommandList className="max-h-[300px]">
-                <CommandEmpty>No city found.</CommandEmpty>
+                <CommandEmpty>{t('common.noCityFound')}</CommandEmpty>
                 <CommandGroup>
                   {filteredCities.map((city) => (
                     <CommandItem

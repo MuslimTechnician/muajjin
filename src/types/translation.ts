@@ -28,6 +28,7 @@ export interface TranslationStrings {
     end: string;
     untilJamaah: string;
     untilEnd: string;
+    remainingToTarget?: string;
   };
   saum: {
     title: string;

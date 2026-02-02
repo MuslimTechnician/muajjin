@@ -118,11 +118,6 @@ export function formatTime(time: string, format: 'system' | '12h' | '24h' = 'sys
   return `${hours12}:${minutes} ${ampm}`;
 }
 
-// Calculate end time of a salat based on the start time of the next salat
-export function calculateSalatEndTime(currentSalatStart: string, nextSalatStart: string): string {
-  return nextSalatStart;
-}
-
 // Adjust time by adding or subtracting minutes
 export function adjustTime(time: string, minutesAdjustment: number): string {
   if (!time || typeof time !== 'string') {
@@ -157,11 +152,10 @@ export function getCurrentSalat(salatTimes: PrayerTime[]): PrayerTime | null {
   const now = new Date();
   const currentHours = now.getHours();
   const currentMinutes = now.getMinutes();
-  const currentTimeString = `${String(currentHours).padStart(2, '0')}:${String(currentMinutes).padStart(2, '0')}`;
 
   for (let i = 0; i < salatTimes.length; i++) {
     const currentSalat = salatTimes[i];
-    const nextSalat = salatTimes[i + 1] || salatTimes[0]; // Loop back to the first salat if we're at the end
+    const nextSalat = salatTimes[i + 1] || salatTimes[0]; // Loop back to first salat if needed
 
     const [startHours, startMinutes] = currentSalat.start.split(':').map(Number);
     const [endHours, endMinutes] = (currentSalat.end || nextSalat.start).split(':').map(Number);
@@ -171,13 +165,15 @@ export function getCurrentSalat(salatTimes: PrayerTime[]): PrayerTime | null {
     const endTotalMinutes = endHours * 60 + endMinutes;
     const currentTotalMinutes = currentHours * 60 + currentMinutes;
 
-    // Handle day wraparound for Isha
+    // Handle day wraparound for Isha (end time can be "earlier" than start time)
     if (currentSalat.id === 'isha' && endTotalMinutes < startTotalMinutes) {
       if (currentTotalMinutes >= startTotalMinutes || currentTotalMinutes < endTotalMinutes) {
         return currentSalat;
       }
-    } else if (currentTotalMinutes >= startTotalMinutes && currentTotalMinutes < endTotalMinutes) {
-      return currentSalat;
+    } else {
+      if (currentTotalMinutes >= startTotalMinutes && currentTotalMinutes < endTotalMinutes) {
+        return currentSalat;
+      }
     }
   }
 
@@ -195,11 +191,7 @@ export function getNextSalat(salatTimes: PrayerTime[]): PrayerTime | null {
   const sortedSalats = [...salatTimes].sort((a, b) => {
     const [aHours, aMinutes] = a.start.split(':').map(Number);
     const [bHours, bMinutes] = b.start.split(':').map(Number);
-
-    const aTotalMinutes = aHours * 60 + aMinutes;
-    const bTotalMinutes = bHours * 60 + bMinutes;
-
-    return aTotalMinutes - bTotalMinutes;
+    return (aHours * 60 + aMinutes) - (bHours * 60 + bMinutes);
   });
 
   // Find the next salat
@@ -217,23 +209,22 @@ export function getNextSalat(salatTimes: PrayerTime[]): PrayerTime | null {
 }
 
 // Get prohibited salat times with start and end ranges
-// export function getProhibitedTimes(prayerTimes: { [key: string]: string }): ProhibitedTime[] {
-export function getProhibitedTimes(prayerTimes: LocalPrayerTimes): ProhibitedTime[] { // changed type annotation
+export function getProhibitedTimes(prayerTimes: LocalPrayerTimes): ProhibitedTime[] {
   const prohibitedTimes: ProhibitedTime[] = [
     {
       name: t('prohibited.shuruq'),
-      start: prayerTimes['Shuruq'], // When Fajr ends
-      end: adjustTime(prayerTimes['Shuruq'], 15) // 15 minutes after Shuruq
+      start: prayerTimes.Shuruq, // When Fajr ends
+      end: adjustTime(prayerTimes.Shuruq, 15) // 15 minutes after Shuruq
     },
     {
       name: t('prohibited.zawal'),
-      start: adjustTime(prayerTimes['Dhuhr'], -3), // 3 minutes before Dhuhr
-      end: prayerTimes['Dhuhr'] // Until Dhuhr starts
+      start: adjustTime(prayerTimes.Dhuhr, -15), // 15 minutes before Dhuhr
+      end: prayerTimes.Dhuhr // Until Dhuhr starts
     },
     {
       name: t('prohibited.ghurub'),
-      start: adjustTime(prayerTimes['Maghrib'], -15), // 15 minutes before Maghrib
-      end: prayerTimes['Maghrib'] // Until Maghrib starts
+      start: adjustTime(prayerTimes.Maghrib, -5), // 5 minutes before Maghrib
+      end: prayerTimes.Maghrib // Until Maghrib starts
     }
   ];
 

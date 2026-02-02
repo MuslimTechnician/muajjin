@@ -1,31 +1,27 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { DEFAULT_SETTINGS } from '@/constants/defaultSettings';
 import { useTranslation } from '@/contexts/TranslationContext';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { UserSettings } from '@/types';
-import { ArrowLeft } from 'lucide-react';
+import { AppHeader } from '@/components/AppHeader';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useApp } from '@/contexts/AppContext';
 
 export default function FastingSettings() {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const [userSettings, setUserSettings] = useLocalStorage<UserSettings>(
-    'muajjin-settings',
-    DEFAULT_SETTINGS,
-  );
+  const { settings, updateSettings } = useApp();
   const [localSettings, setLocalSettings] = useState<UserSettings>({
-    ...userSettings,
+    ...settings,
   });
 
   useEffect(() => {
-    setLocalSettings({ ...userSettings });
-  }, [userSettings]);
+    setLocalSettings({ ...settings });
+  }, [settings]);
 
   const handleSave = () => {
-    setUserSettings(localSettings);
+    updateSettings(localSettings);
     navigate(-1);
   };
 
@@ -39,55 +35,98 @@ export default function FastingSettings() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="sticky top-0 z-50 w-full border-b bg-background px-4 py-3">
-        <div className="mx-auto flex max-w-md items-center gap-3">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate(-1)}
-            className="h-8 w-8">
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <h1 className="text-lg font-semibold">
-            {t('settings.saumSettings')}
-          </h1>
-        </div>
-      </div>
+      <AppHeader showBackButton={true} title={t('settings.saumSettings')} />
 
       {/* Content */}
-      <div className="mx-auto max-w-md space-y-6 p-4">
+      <div className="max-w-md mx-auto px-5 py-6 space-y-6">
         {/* Suhoor Adjustment */}
-        <div className="space-y-2">
-          <Label htmlFor="suhoor-adjustment">
-            {t('settings.suhoorAdjustment')}
-          </Label>
-          <Input
-            id="suhoor-adjustment"
-            type="number"
-            min={-10}
-            max={10}
-            value={localSettings.suhoorAdjustment}
-            onChange={(e) =>
-              updateSetting('suhoorAdjustment', parseInt(e.target.value) || 0)
-            }
-          />
+        <div className="space-y-3">
+          <div className="space-y-1">
+            <Label>{t('settings.suhoorAdjustment')}</Label>
+            <p className="text-sm text-muted-foreground">
+              {t('settings.suhoorAdjustmentDesc')}
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() =>
+                updateSetting(
+                  'suhoorAdjustment',
+                  Math.max((localSettings.suhoorAdjustment || 0) - 1, -10),
+                )
+              }>
+              -
+            </Button>
+            <Input
+              id="suhoor-adjustment"
+              type="number"
+              min={-10}
+              max={10}
+              value={localSettings.suhoorAdjustment}
+              onChange={(e) =>
+                updateSetting('suhoorAdjustment', parseInt(e.target.value) || 0)
+              }
+              className="bg-card text-center"
+            />
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() =>
+                updateSetting(
+                  'suhoorAdjustment',
+                  Math.min((localSettings.suhoorAdjustment || 0) + 1, 10),
+                )
+              }>
+              +
+            </Button>
+          </div>
         </div>
 
         {/* Iftar Adjustment */}
-        <div className="space-y-2">
-          <Label htmlFor="iftar-adjustment">
-            {t('settings.iftarAdjustment')}
-          </Label>
-          <Input
-            id="iftar-adjustment"
-            type="number"
-            min={-10}
-            max={10}
-            value={localSettings.iftarAdjustment}
-            onChange={(e) =>
-              updateSetting('iftarAdjustment', parseInt(e.target.value) || 0)
-            }
-          />
+        <div className="space-y-3">
+          <div className="space-y-1">
+            <Label>{t('settings.iftarAdjustment')}</Label>
+            <p className="text-sm text-muted-foreground">
+              {t('settings.iftarAdjustmentDesc')}
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() =>
+                updateSetting(
+                  'iftarAdjustment',
+                  Math.max((localSettings.iftarAdjustment || 0) - 1, -10),
+                )
+              }>
+              -
+            </Button>
+            <Input
+              id="iftar-adjustment"
+              type="number"
+              min={-10}
+              max={10}
+              value={localSettings.iftarAdjustment}
+              onChange={(e) =>
+                updateSetting('iftarAdjustment', parseInt(e.target.value) || 0)
+              }
+              className="bg-card text-center"
+            />
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() =>
+                updateSetting(
+                  'iftarAdjustment',
+                  Math.min((localSettings.iftarAdjustment || 0) + 1, 10),
+                )
+              }>
+              +
+            </Button>
+          </div>
         </div>
 
         {/* Save Button */}

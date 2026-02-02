@@ -9,6 +9,15 @@ const ACTIVE_TRANSLATION_KEY = 'muajjin-active-translation';
 const CUSTOM_FONT_KEY = 'muajjin-custom-font';
 const FONT_FAMILY_NAME = 'MuajjinCustomFont';
 
+// Built-in translations (ships with the app)
+const BUILTIN_TRANSLATIONS: Record<string, StoredTranslation> = {
+  en: {
+    ...enTemplate,
+    id: 'en',
+    importedAt: new Date().toISOString(),
+  },
+};
+
 interface StoredFont {
   name: string;
   data: string; // base64
@@ -104,32 +113,35 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
     }
   }, [state, mounted]);
 
-  // Get active translation
+  // Get active translation (check both built-in and user-imported)
   const activeTranslation = state.activeTranslationId
-    ? state.translations[state.activeTranslationId]
+    ? (state.translations[state.activeTranslationId] || BUILTIN_TRANSLATIONS[state.activeTranslationId])
     : null;
 
   const direction = activeTranslation?.meta.direction || 'ltr';
 
   // Translation function
-  const t = (key: string, params?: Record<string, string | number>): string => {
+  const t = useCallback((key: string, params?: Record<string, string | number>): string => {
+    let translated: string | undefined;
+
     // Try active translation first
     if (activeTranslation) {
-      const translated = getNestedValue(activeTranslation.translations, key);
-      if (translated) {
-        return interpolate(translated, params);
-      }
+      translated = getNestedValue(activeTranslation.translations, key);
     }
 
     // Fallback to English template
-    const englishValue = getNestedValue(enTemplate.translations, key);
-    if (englishValue) {
-      return interpolate(englishValue, params);
+    if (!translated) {
+      translated = getNestedValue(enTemplate.translations, key);
     }
 
-    // Final fallback: return the key itself
-    return key;
-  };
+    // If still no translation, return key itself
+    if (!translated) {
+      return key;
+    }
+
+    // Interpolate params
+    return interpolate(translated, params);
+  }, [activeTranslation]);
 
   // Helper to get translated salat name
   const getSalatName = (salat: string): string => {
@@ -140,7 +152,7 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
   // Initialize translation function for timeUtils
   useEffect(() => {
     setTranslationFunction(t);
-  }, [t, activeTranslation]);
+  }, [t]);
 
   const setActiveTranslation = (id: string | null) => {
     setState(prev => ({ ...prev, activeTranslationId: id }));
@@ -244,13 +256,13 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
       setCustomFont(null);
 
       toast({
-        title: "Font removed",
-        description: "Custom font has been removed. Using default font.",
+        title: t('settings.fontRemoved'),
+        description: t('settings.fontRemovedDesc'),
       });
     } catch (error) {
       console.error('Failed to remove font:', error);
     }
-  }, []);
+  }, [t]);
 
   // Upload and set custom font
   const uploadFont = useCallback(async (file: File): Promise<boolean> => {
@@ -296,21 +308,21 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
       setCustomFont(fontData);
 
       toast({
-        title: "Font uploaded successfully",
-        description: "Custom font is now active.",
+        title: t('settings.fontUploaded'),
+        description: t('settings.fontUploadedDesc'),
       });
 
       return true;
     } catch (error) {
       console.error('Failed to upload font:', error);
       toast({
-        title: "Failed to upload font",
-        description: error instanceof Error ? error.message : "Unknown error",
+        title: t('errors.fontUploadFailed'),
+        description: error instanceof Error ? error.message : t('common.unknownError') || 'Unknown error',
         variant: "destructive",
       });
       return false;
     }
-  }, [removeFont]);
+  }, [removeFont, t]);
 
   return (
     <TranslationContext.Provider

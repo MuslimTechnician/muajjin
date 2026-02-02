@@ -45,6 +45,9 @@ ios/
 logs
 *.log
 
+#extras
+tmp/
+
 # Lock files (optional - uncomment if you want to ignore them)
 # package-lock.json
 # bun.lockb

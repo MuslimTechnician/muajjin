@@ -2,16 +2,16 @@
 export interface PrayerTime {
   id: string; // Salat ID (e.g., 'fajr', 'dhuhr') - untranslated key for logic
   name: string; // Translated display name (e.g., 'Fajr', 'الفجر')
-  start: string;
-  end?: string;
-  jamaah?: string;
+  start: string; // "HH:MM" in 24h format (use formatTime() for display)
+  end?: string; // "HH:MM" in 24h format
+  jamaah?: string; // "HH:MM" in 24h format (user optional)
 }
 
 export interface UserSettings {
   method: number;
   madhab: number;
   jamaahTimes: {
-    Fajr?: string;
+    Fajr?: string; // Stored as string "HH:MM" for user input
     Dhuhr?: string;
     Asr?: string;
     Maghrib?: string;
@@ -31,8 +31,8 @@ export interface UserSettings {
 
 export interface ProhibitedTime {
   name: string;
-  start: string;
-  end: string;
+  start: string; // "HH:MM" in 24h format
+  end: string; // "HH:MM" in 24h format
 }
 
 export type CalculationMethod = {

@@ -1,31 +1,26 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
-import { DEFAULT_SETTINGS } from '@/constants/defaultSettings';
 import { useTranslation } from '@/contexts/TranslationContext';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { detectLocation, LocationResult } from '@/services/locationService';
 import { UserSettings } from '@/types';
 import {
   AlertCircle,
-  ArrowLeft,
   CheckCircle2,
   Loader2,
   MapPin,
 } from 'lucide-react';
+import { AppHeader } from '@/components/AppHeader';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useApp } from '@/contexts/AppContext';
 
 export default function TimeLocationSettings() {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const [userSettings, setUserSettings] = useLocalStorage<UserSettings>(
-    'muajjin-settings',
-    DEFAULT_SETTINGS,
-  );
+  const { settings, updateSettings } = useApp();
   const [localSettings, setLocalSettings] = useState<UserSettings>({
-    ...userSettings,
+    ...settings,
   });
   const [isDetecting, setIsDetecting] = useState(false);
   const [locationStatus, setLocationStatus] = useState<{
@@ -34,11 +29,11 @@ export default function TimeLocationSettings() {
   } | null>(null);
 
   useEffect(() => {
-    setLocalSettings({ ...userSettings });
-  }, [userSettings]);
+    setLocalSettings({ ...settings });
+  }, [settings]);
 
   const handleSave = () => {
-    setUserSettings(localSettings);
+    updateSettings(localSettings);
     navigate(-1);
   };
 
@@ -71,11 +66,15 @@ export default function TimeLocationSettings() {
         city: location.city,
       }));
 
-      // Show success message with detection method
+      // One translatable string (single key with {{city}}, {{country}}, {{method}})
       const methodText = location.method === 'gps' ? 'GPS' : 'IP-based';
       setLocationStatus({
         type: 'success',
-        message: `${t('onboarding.locationDetected', { city: location.city, country: location.country })} (${methodText})`,
+        message: t('onboarding.locationDetectedWithMethod', {
+          city: location.city,
+          country: location.country,
+          method: methodText,
+        }),
       });
     } catch (error) {
       const errorMessage =
@@ -92,27 +91,19 @@ export default function TimeLocationSettings() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="sticky top-0 z-50 w-full border-b bg-background px-4 py-3">
-        <div className="mx-auto flex max-w-md items-center gap-3">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate(-1)}
-            className="h-8 w-8">
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <h1 className="text-lg font-semibold">
-            {t('settings.timeLocationSettings')}
-          </h1>
-        </div>
-      </div>
+      <AppHeader showBackButton={true} title={t('settings.timeLocationSettings')} />
 
       {/* Content */}
-      <div className="mx-auto max-w-md space-y-6 p-4">
+      <div className="max-w-md mx-auto px-5 py-6 space-y-6">
         {/* Time Format */}
-        <div className="space-y-2">
-          <Label>{t('settings.timeFormat')}</Label>
-          <div className="grid grid-cols-3 gap-2">
+        <div className="space-y-3">
+          <div className="space-y-1">
+            <Label>{t('settings.timeFormat')}</Label>
+            <p className="text-sm text-muted-foreground">
+              {t('settings.timeFormatDesc')}
+            </p>
+          </div>
+          <div className="grid grid-cols-3 gap-3">
             <Button
               type="button"
               variant={
@@ -143,8 +134,6 @@ export default function TimeLocationSettings() {
           </div>
         </div>
 
-        <Separator />
-
         {/* Location Section */}
         <div className="space-y-4">
           <div className="flex items-center gap-2">
@@ -153,7 +142,7 @@ export default function TimeLocationSettings() {
           </div>
 
           {/* Location Name */}
-          <div className="space-y-2">
+          <div className="space-y-1">
             <Label htmlFor="location-name">
               {t('settings.locationNameLabel')}
             </Label>
@@ -162,11 +151,12 @@ export default function TimeLocationSettings() {
               placeholder={t('settings.locationNamePlaceholder')}
               value={localSettings.city || ''}
               onChange={(e) => updateSetting('city', e.target.value)}
+              className="bg-card"
             />
           </div>
 
           {/* Latitude */}
-          <div className="space-y-2">
+          <div className="space-y-1">
             <Label htmlFor="latitude">{t('settings.latitudeLabel')}</Label>
             <Input
               id="latitude"
@@ -177,11 +167,12 @@ export default function TimeLocationSettings() {
               onChange={(e) =>
                 updateSetting('latitude', parseFloat(e.target.value) || 0)
               }
+              className="bg-card"
             />
           </div>
 
           {/* Longitude */}
-          <div className="space-y-2">
+          <div className="space-y-1">
             <Label htmlFor="longitude">{t('settings.longitudeLabel')}</Label>
             <Input
               id="longitude"
@@ -192,6 +183,7 @@ export default function TimeLocationSettings() {
               onChange={(e) =>
                 updateSetting('longitude', parseFloat(e.target.value) || 0)
               }
+              className="bg-card"
             />
           </div>
 
