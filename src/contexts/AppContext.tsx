@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, FC, ReactNode, useCallback } from 'react';
 import { UserSettings } from '@/types';
 import { DEFAULT_SETTINGS } from '@/constants/defaultSettings';
 
@@ -37,7 +37,7 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 const APP_SETTINGS_KEY = 'muajjin-settings';
 
-export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const AppProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [settings, setSettings] = useState<AppSettings>(() => {
     if (typeof window === 'undefined') {
       return defaultAppSettings;
