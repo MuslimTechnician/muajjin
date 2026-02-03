@@ -205,6 +205,7 @@ const Index = () => {
                 <div key={containerId} className="animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: `${index * 100}ms` }}>
                   <CurrentPrayerContainer
                     allPrayers={salatTimes}
+                    prohibitedTimes={prohibitedTimes}
                     timeFormat={settings.timeFormat}
                   />
                 </div>
