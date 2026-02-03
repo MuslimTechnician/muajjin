@@ -11,6 +11,11 @@ const config: CapacitorConfig = {
     buildOptions: {
       signingType: 'apksigner'
     }
+  },
+  plugins: {
+    EdgeToEdge: {
+      backgroundColor: '#ffffff'
+    }
   }
 };
 

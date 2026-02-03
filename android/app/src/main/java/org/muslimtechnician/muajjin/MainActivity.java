@@ -1,13 +1,9 @@
 package org.muslimtechnician.muajjin;
 
 import android.os.Bundle;
-import android.graphics.Insets;
-import androidx.core.view.WindowCompat;
-import androidx.core.view.WindowInsetsControllerCompat;
-import android.view.View;
-import android.view.WindowManager;
-import androidx.core.view.WindowInsetsCompat;
+import android.webkit.WebView;
 
+import com.getcapacitor.Bridge;
 import com.getcapacitor.BridgeActivity;
 
 public class MainActivity extends BridgeActivity {
@@ -15,29 +11,18 @@ public class MainActivity extends BridgeActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Enable edge-to-edge display
-        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+        // Edge-to-edge and status bar colors handled by @capawesome/capacitor-android-edge-to-edge-support plugin
+        // Configured in capacitor.config.ts
 
-        // Set status bar content to dark for light backgrounds
-        WindowInsetsControllerCompat controller = WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
-        if (controller != null) {
-            controller.setAppearanceLightStatusBars(true);
-            controller.setAppearanceLightNavigationBars(true);
+        // Hide scrollbars in Capacitor WebView
+        Bridge bridge = this.getBridge();
+        if (bridge != null) {
+            WebView webView = bridge.getWebView();
+            if (webView != null) {
+                webView.setVerticalScrollBarEnabled(false);
+                webView.setHorizontalScrollBarEnabled(false);
+            }
         }
-
-        // Handle window insets (status bar, navigation bar)
-        View decorView = getWindow().getDecorView();
-        decorView.setOnApplyWindowInsetsListener((view, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
-
-        // Enable hardware acceleration for smoother scrolling
-        getWindow().setFlags(
-            WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
-            WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED
-        );
     }
 
     @Override

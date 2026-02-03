@@ -1,8 +1,39 @@
 import { useEffect, useRef } from 'react';
 import { App } from '@capacitor/app';
+import { useTheme } from 'next-themes';
+import { Capacitor } from '@capacitor/core';
+import { EdgeToEdge } from '@capawesome/capacitor-android-edge-to-edge-support';
+import { StatusBar, Style } from '@capacitor/status-bar';
 
 export function CapacitorApp({ children }: { children: React.ReactNode }) {
   const isInitializedRef = useRef(false);
+  const { theme, resolvedTheme } = useTheme();
+
+  // Handle status bar color based on theme (Android only)
+  useEffect(() => {
+    const updateStatusBarColor = async () => {
+      // Only run on native Android
+      if (!Capacitor.isNativePlatform() || Capacitor.getPlatform() !== 'android') {
+        return;
+      }
+
+      // Determine current theme (resolves "system" to "light" or "dark")
+      const currentTheme = theme === 'system' ? resolvedTheme : theme;
+
+      // Set status bar color based on theme
+      const color = currentTheme === 'dark' ? '#1d283a' : '#ffffff';
+      const style = currentTheme === 'dark' ? Style.Dark : Style.Light;
+
+      try {
+        await EdgeToEdge.setBackgroundColor({ color });
+        await StatusBar.setStyle({ style });
+      } catch (error) {
+        console.error('Failed to set status bar color/style:', error);
+      }
+    };
+
+    updateStatusBarColor();
+  }, [theme, resolvedTheme]);
 
   useEffect(() => {
     // Only set up once

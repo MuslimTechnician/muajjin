@@ -90,22 +90,12 @@
     -ms-user-select: none;
   }
 
-  /* Safe area support for notched devices (iPhone, Android) */
-  html {
-    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-  }
-
-  /* Hide scrollbar globally while keeping scrolling functionality */
+  /* Hide scrollbar - all browsers */
   * {
-    scrollbar-width: none;  /* Firefox */
-    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;
   }
-
-  /* Chrome, Safari, Opera */
-  ::-webkit-scrollbar {
-    width: 0px;
-    height: 0px;
-    background: transparent;
+  *::-webkit-scrollbar {
+    display: none;
   }
 
   /* RTL Support */
