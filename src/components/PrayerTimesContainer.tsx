@@ -3,6 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { formatTime } from '@/utils/timeUtils';
 import { useTranslation } from '@/contexts/TranslationContext';
 import { getCurrentSalat } from '@/utils/timeUtils';
+import { useCallback, useEffect, useState } from 'react';
 
 interface PrayerTimesContainerProps {
   salats: PrayerTime[];
@@ -11,7 +12,31 @@ interface PrayerTimesContainerProps {
 
 export function PrayerTimesContainer({ salats, timeFormat = 'system' }: PrayerTimesContainerProps) {
   const { t } = useTranslation();
-  const currentPrayer = getCurrentSalat(salats);
+  const [currentPrayer, setCurrentPrayer] = useState<PrayerTime | null>(null);
+
+  const isSamePrayer = (a: PrayerTime | null, b: PrayerTime | null) => {
+    if (!a || !b) return a === b;
+    return (
+      a.id === b.id &&
+      a.start === b.start &&
+      a.end === b.end &&
+      a.jamaah === b.jamaah
+    );
+  };
+
+  const updateCurrentPrayer = useCallback(() => {
+    if (salats.length === 0) return;
+    const nextCurrent = getCurrentSalat(salats);
+    setCurrentPrayer((prev) =>
+      isSamePrayer(prev, nextCurrent) ? prev : nextCurrent,
+    );
+  }, [salats]);
+
+  useEffect(() => {
+    updateCurrentPrayer();
+    const timer = setInterval(updateCurrentPrayer, 1000);
+    return () => clearInterval(timer);
+  }, [updateCurrentPrayer]);
 
   return (
     <Card className="overflow-hidden">
