@@ -1,6 +1,5 @@
-
-import { LocalPrayerTimes } from "@/services/prayerTimesLocal";
-import { PrayerTime, ProhibitedTime } from "@/types";
+import { LocalPrayerTimes } from '@/services/prayerTimesLocal';
+import { PrayerTime, ProhibitedTime } from '@/types';
 
 // Cache for translation function to avoid circular imports
 let translationFunction: ((key: string) => string) | null = null;
@@ -23,17 +22,17 @@ export function getSystemTimeFormat(): '12h' | '24h' {
     const formatter = new Intl.DateTimeFormat(undefined, {
       hour: 'numeric',
       minute: 'numeric',
-      hour12: false // Let the system decide
+      hour12: false, // Let the system decide
     });
 
     const parts = formatter.formatToParts(new Date(2021, 0, 1, 13));
-    const hasDayPeriod = parts.some(part => part.type === 'dayPeriod');
+    const hasDayPeriod = parts.some((part) => part.type === 'dayPeriod');
 
     // If the formatter doesn't use dayPeriod for 13:00, it's 24h format
     // But we need to check if hour12 is actually being used
     const formatterWith12h = new Intl.DateTimeFormat(undefined, {
       hour: 'numeric',
-      hour12: true
+      hour12: true,
     });
     const formattedWith12h = formatterWith12h.format(new Date(2021, 0, 1, 13));
 
@@ -41,7 +40,7 @@ export function getSystemTimeFormat(): '12h' | '24h' {
     // If system shows "13", it's 24h format
     const formatterAuto = new Intl.DateTimeFormat(undefined, {
       hour: 'numeric',
-      hour12: true
+      hour12: true,
     });
     const formattedAuto = formatterAuto.format(new Date(2021, 0, 1, 13));
 
@@ -51,7 +50,7 @@ export function getSystemTimeFormat(): '12h' | '24h' {
     }
 
     // Check if the hour is shown as 13 (24h) or 1 (12h)
-    const hourPart = parts.find(p => p.type === 'hour');
+    const hourPart = parts.find((p) => p.type === 'hour');
     if (hourPart && hourPart.value === '13') {
       return '24h';
     }
@@ -59,7 +58,7 @@ export function getSystemTimeFormat(): '12h' | '24h' {
     // Fallback: try formatting and check for day period
     const testFormatter = new Intl.DateTimeFormat(undefined, {
       hour: 'numeric',
-      minute: 'numeric'
+      minute: 'numeric',
     });
     const testFormatted = testFormatter.format(new Date(2021, 0, 1, 13));
 
@@ -80,7 +79,9 @@ export function getSystemTimeFormat(): '12h' | '24h' {
  * Resolve the actual time format ('12h' or '24h') from user preference
  * If user selected 'system', detect system preference
  */
-export function resolveTimeFormat(format: 'system' | '12h' | '24h'): '12h' | '24h' {
+export function resolveTimeFormat(
+  format: 'system' | '12h' | '24h',
+): '12h' | '24h' {
   if (format === 'system') {
     return getSystemTimeFormat();
   }
@@ -88,7 +89,10 @@ export function resolveTimeFormat(format: 'system' | '12h' | '24h'): '12h' | '24
 }
 
 // Format time from 24h format to 12h or 24h format based on preference
-export function formatTime(time: string, format: 'system' | '12h' | '24h' = 'system'): string {
+export function formatTime(
+  time: string,
+  format: 'system' | '12h' | '24h' = 'system',
+): string {
   if (!time || typeof time !== 'string') {
     return '--:--';
   }
@@ -129,7 +133,7 @@ export function adjustTime(time: string, minutesAdjustment: number): string {
     return '--:--';
   }
 
-  const [hours, minutes] = parts.map(part => parseInt(part, 10));
+  const [hours, minutes] = parts.map((part) => parseInt(part, 10));
 
   if (isNaN(hours) || isNaN(minutes) || isNaN(minutesAdjustment)) {
     return time; // Return original time if adjustment fails
@@ -157,8 +161,12 @@ export function getCurrentSalat(salatTimes: PrayerTime[]): PrayerTime | null {
     const currentSalat = salatTimes[i];
     const nextSalat = salatTimes[i + 1] || salatTimes[0]; // Loop back to first salat if needed
 
-    const [startHours, startMinutes] = currentSalat.start.split(':').map(Number);
-    const [endHours, endMinutes] = (currentSalat.end || nextSalat.start).split(':').map(Number);
+    const [startHours, startMinutes] = currentSalat.start
+      .split(':')
+      .map(Number);
+    const [endHours, endMinutes] = (currentSalat.end || nextSalat.start)
+      .split(':')
+      .map(Number);
 
     // Convert to minutes for easier comparison
     const startTotalMinutes = startHours * 60 + startMinutes;
@@ -167,11 +175,17 @@ export function getCurrentSalat(salatTimes: PrayerTime[]): PrayerTime | null {
 
     // Handle day wraparound for Isha (end time can be "earlier" than start time)
     if (currentSalat.id === 'isha' && endTotalMinutes < startTotalMinutes) {
-      if (currentTotalMinutes >= startTotalMinutes || currentTotalMinutes < endTotalMinutes) {
+      if (
+        currentTotalMinutes >= startTotalMinutes ||
+        currentTotalMinutes < endTotalMinutes
+      ) {
         return currentSalat;
       }
     } else {
-      if (currentTotalMinutes >= startTotalMinutes && currentTotalMinutes < endTotalMinutes) {
+      if (
+        currentTotalMinutes >= startTotalMinutes &&
+        currentTotalMinutes < endTotalMinutes
+      ) {
         return currentSalat;
       }
     }
@@ -191,7 +205,7 @@ export function getNextSalat(salatTimes: PrayerTime[]): PrayerTime | null {
   const sortedSalats = [...salatTimes].sort((a, b) => {
     const [aHours, aMinutes] = a.start.split(':').map(Number);
     const [bHours, bMinutes] = b.start.split(':').map(Number);
-    return (aHours * 60 + aMinutes) - (bHours * 60 + bMinutes);
+    return aHours * 60 + aMinutes - (bHours * 60 + bMinutes);
   });
 
   // Find the next salat
@@ -209,30 +223,34 @@ export function getNextSalat(salatTimes: PrayerTime[]): PrayerTime | null {
 }
 
 // Get prohibited salat times with start and end ranges
-export function getProhibitedTimes(prayerTimes: LocalPrayerTimes): ProhibitedTime[] {
+export function getProhibitedTimes(
+  prayerTimes: LocalPrayerTimes,
+): ProhibitedTime[] {
   const prohibitedTimes: ProhibitedTime[] = [
     {
       name: t('prohibited.shuruq'),
       start: prayerTimes.Shuruq, // When Fajr ends
-      end: adjustTime(prayerTimes.Shuruq, 15) // 15 minutes after Shuruq
+      end: adjustTime(prayerTimes.Shuruq, 14), // 15 minutes after Shuruq
     },
     {
       name: t('prohibited.zawal'),
-      start: adjustTime(prayerTimes.Dhuhr, -15), // 15 minutes before Dhuhr
-      end: prayerTimes.Dhuhr // Until Dhuhr starts
+      start: adjustTime(prayerTimes.Dhuhr, -4), // 5 minutes before Dhuhr
+      end: prayerTimes.Dhuhr, // Until Dhuhr starts
     },
     {
       name: t('prohibited.ghurub'),
-      start: adjustTime(prayerTimes.Maghrib, -5), // 5 minutes before Maghrib
-      end: prayerTimes.Maghrib // Until Maghrib starts
-    }
+      start: adjustTime(prayerTimes.Maghrib, -14), // 15 minutes before Maghrib
+      end: prayerTimes.Maghrib, // Until Maghrib starts
+    },
   ];
 
   return prohibitedTimes;
 }
 
 // Format current time
-export function getCurrentTimeFormatted(format: 'system' | '12h' | '24h' = 'system'): string {
+export function getCurrentTimeFormatted(
+  format: 'system' | '12h' | '24h' = 'system',
+): string {
   const now = new Date();
 
   // Resolve the actual format (handle 'system' option)
@@ -264,14 +282,14 @@ export function formatGregorianDate(date: Date): string {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
-    day: 'numeric'
+    day: 'numeric',
   }).format(date);
 }
 
 // Get day name only (e.g., "Mon")
 export function getDayName(date: Date, short: boolean = true): string {
   const weekday = new Intl.DateTimeFormat('en-US', {
-    weekday: short ? 'short' : 'long'
+    weekday: short ? 'short' : 'long',
   }).format(date);
   return weekday;
 }
@@ -281,6 +299,6 @@ export function formatGregorianDateShort(date: Date): string {
   return new Intl.DateTimeFormat('en-US', {
     year: 'numeric',
     month: 'short',
-    day: 'numeric'
+    day: 'numeric',
   }).format(date);
 }

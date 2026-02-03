@@ -1,18 +1,32 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { useTranslation } from '@/contexts/TranslationContext';
-import { PrayerTime } from '@/types';
-import { formatTime, getCurrentSalat, getNextSalat } from '@/utils/timeUtils';
+import { PrayerTime, ProhibitedTime } from '@/types';
+import {
+  adjustTime,
+  formatTime,
+  getCurrentSalat,
+  getNextSalat,
+} from '@/utils/timeUtils';
 import { Clock } from 'lucide-react';
-import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
+import {
+  Fragment,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 interface CurrentPrayerContainerProps {
   allPrayers: PrayerTime[];
+  prohibitedTimes?: ProhibitedTime[];
   timeFormat?: 'system' | '12h' | '24h';
 }
 
 export function CurrentPrayerContainer({
   allPrayers,
+  prohibitedTimes = [],
   timeFormat = 'system',
 }: CurrentPrayerContainerProps) {
   const { t } = useTranslation();
@@ -22,7 +36,13 @@ export function CurrentPrayerContainer({
     remainingTime: string;
     progressPercent: number;
     countdownLine: string;
-  }>({ remainingTime: '', progressPercent: 0, countdownLine: '' });
+    isProhibited: boolean;
+  }>({
+    remainingTime: '',
+    progressPercent: 0,
+    countdownLine: '',
+    isProhibited: false,
+  });
   const [isUiReady, setIsUiReady] = useState(false);
   const isUiReadyRef = useRef(false);
 
@@ -32,6 +52,22 @@ export function CurrentPrayerContainer({
     d.setHours(h || 0, m || 0, 0, 0);
     return d;
   };
+
+  const timeToMinutes = (time: string) => {
+    const [h, m] = time.split(':').map(Number);
+    return (h || 0) * 60 + (m || 0);
+  };
+
+  const isTimeInRange = useCallback((now: Date, start: string, end: string) => {
+    const nowMinutes = now.getHours() * 60 + now.getMinutes();
+    const startMinutes = timeToMinutes(start);
+    const endMinutes = timeToMinutes(end);
+
+    if (endMinutes < startMinutes) {
+      return nowMinutes >= startMinutes || nowMinutes <= endMinutes;
+    }
+    return nowMinutes >= startMinutes && nowMinutes <= endMinutes;
+  }, []);
 
   const isSamePrayer = (a: PrayerTime | null, b: PrayerTime | null) => {
     if (!a || !b) return a === b;
@@ -50,11 +86,39 @@ export function CurrentPrayerContainer({
       setCurrentPrayer((prev) =>
         isSamePrayer(prev, nextCurrent) ? prev : nextCurrent,
       );
-      setNextPrayer((prev) =>
-        isSamePrayer(prev, nextNext) ? prev : nextNext,
-      );
+      setNextPrayer((prev) => (isSamePrayer(prev, nextNext) ? prev : nextNext));
     }
   }, [allPrayers]);
+
+  const derivedProhibitedTimes = useMemo<ProhibitedTime[]>(() => {
+    if (allPrayers.length === 0) return [];
+    const fajr = allPrayers.find((p) => p.id === 'fajr');
+    const dhuhr = allPrayers.find((p) => p.id === 'dhuhr');
+    const maghrib = allPrayers.find((p) => p.id === 'maghrib');
+
+    if (!fajr?.end || !dhuhr?.start || !maghrib?.start) return [];
+
+    return [
+      {
+        name: 'shuruq',
+        start: fajr.end,
+        end: adjustTime(fajr.end, 15),
+      },
+      {
+        name: 'zawal',
+        start: adjustTime(dhuhr.start, -15),
+        end: dhuhr.start,
+      },
+      {
+        name: 'ghurub',
+        start: adjustTime(maghrib.start, -5),
+        end: maghrib.start,
+      },
+    ];
+  }, [allPrayers]);
+
+  const effectiveProhibitedTimes =
+    prohibitedTimes.length > 0 ? prohibitedTimes : derivedProhibitedTimes;
 
   // Recalculate current/next salat every 30 seconds and on mount
   useEffect(() => {
@@ -186,22 +250,34 @@ export function CurrentPrayerContainer({
       remainingTime = `${hours < 1 ? '' : `${hours}:`}${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
     }
 
+    const isProhibited = effectiveProhibitedTimes.some((time) =>
+      isTimeInRange(now, time.start, time.end),
+    );
+
     setMetrics((prev) => {
       if (
         prev.remainingTime === remainingTime &&
         prev.progressPercent === progressPercent &&
-        prev.countdownLine === countdownLine
+        prev.countdownLine === countdownLine &&
+        prev.isProhibited === isProhibited
       ) {
         return prev;
       }
-      return { remainingTime, progressPercent, countdownLine };
+      return { remainingTime, progressPercent, countdownLine, isProhibited };
     });
 
     if (!isUiReadyRef.current) {
       isUiReadyRef.current = true;
       setIsUiReady(true);
     }
-  }, [currentPrayer, nextPrayer, t, updatePrayerState]);
+  }, [
+    currentPrayer,
+    isTimeInRange,
+    nextPrayer,
+    effectiveProhibitedTimes,
+    t,
+    updatePrayerState,
+  ]);
 
   // Reset UI readiness when current prayer changes
   useEffect(() => {
@@ -275,7 +351,7 @@ export function CurrentPrayerContainer({
           <div className="h-1.5 w-full overflow-hidden rounded-full bg-primary/10">
             <Progress
               value={metrics.progressPercent}
-              variant="glow"
+              // variant={metrics.isProhibited ? 'danger' : 'glow'}
               className="h-full"
             />
           </div>
