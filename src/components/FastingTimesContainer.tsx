@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { formatTime } from '@/utils/timeUtils';
 import { useTranslation } from '@/contexts/TranslationContext';
+import { formatTime } from '@/utils/timeUtils';
 import { MoonStar } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface FastingTimesContainerProps {
   suhoorTime: string;
@@ -13,14 +13,16 @@ interface FastingTimesContainerProps {
 export function FastingTimesContainer({
   suhoorTime,
   iftarTime,
-  timeFormat = 'system'
+  timeFormat = 'system',
 }: FastingTimesContainerProps) {
   const { t } = useTranslation();
   const [countdown, setCountdown] = useState<string>('');
   const [nextEventName, setNextEventName] = useState<string>('');
 
   // Function to calculate time difference in hours, minutes, seconds for saum times
-  const calculateTimeDifference = (targetTime: string): { hours: number; minutes: number; seconds: number } | null => {
+  const calculateTimeDifference = (
+    targetTime: string,
+  ): { hours: number; minutes: number; seconds: number } | null => {
     const now = new Date();
     const [targetHours, targetMinutes] = targetTime.split(':').map(Number);
 
@@ -56,7 +58,8 @@ export function FastingTimesContainer({
       const [suhoorHours, suhoorMinutes] = suhoorTime.split(':').map(Number);
       const [iftarHours, iftarMinutes] = iftarTime.split(':').map(Number);
 
-      const currentTotalSeconds = currentHours * 3600 + currentMinutes * 60 + currentSeconds;
+      const currentTotalSeconds =
+        currentHours * 3600 + currentMinutes * 60 + currentSeconds;
       const suhoorTotalSeconds = suhoorHours * 3600 + suhoorMinutes * 60;
       const iftarTotalSeconds = iftarHours * 3600 + iftarMinutes * 60;
 
@@ -82,7 +85,9 @@ export function FastingTimesContainer({
 
       if (difference) {
         const { hours, minutes, seconds } = difference;
-        setCountdown(`${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`);
+        setCountdown(
+          `${hours < 1 ? '' : `${hours}:`}${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`,
+        );
         setNextEventName(eventName);
       } else {
         setCountdown('--:--:--');
@@ -102,23 +107,35 @@ export function FastingTimesContainer({
 
   return (
     <Card>
-      <CardContent className="p-4 space-y-3">
+      <CardContent className="space-y-3 p-4">
         <div className="flex items-center gap-2">
-          <MoonStar className="w-5 h-5 text-primary" />
+          <MoonStar className="h-5 w-5 text-primary" />
           <h3 className="font-bold">{t('saum.title')}</h3>
         </div>
         <div className="grid grid-cols-3 divide-x divide-border">
-          <div className="text-center px-2">
-            <p className="text-xs text-muted-foreground">{t('saum.suhoorEnds')}</p>
-            <p className="text-lg font-bold">{formatTime(suhoorTime, timeFormat)}</p>
+          <div className="px-2 text-center">
+            <p className="text-xs text-muted-foreground">
+              {t('saum.suhoorEnds')}
+            </p>
+            <p className="text-lg font-bold">
+              {formatTime(suhoorTime, timeFormat)}
+            </p>
           </div>
-          <div className="text-center px-2">
-            <p className="text-xs text-muted-foreground">{t('saum.iftarStarts')}</p>
-            <p className="text-lg font-bold">{formatTime(iftarTime, timeFormat)}</p>
+          <div className="px-2 text-center">
+            <p className="text-xs text-muted-foreground">
+              {t('saum.iftarStarts')}
+            </p>
+            <p className="text-lg font-bold">
+              {formatTime(iftarTime, timeFormat)}
+            </p>
           </div>
-          <div className="text-center px-2">
-            <p className="text-xs text-muted-foreground">{nextEventName || t('saum.nextMeal')}</p>
-            <p className="text-lg font-bold text-primary font-mono">{countdown}</p>
+          <div className="px-2 text-center">
+            <p className="text-xs text-muted-foreground">
+              {nextEventName || t('saum.nextMeal')}
+            </p>
+            <p className="font-mono text-lg font-bold text-primary">
+              {countdown}
+            </p>
           </div>
         </div>
       </CardContent>

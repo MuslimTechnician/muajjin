@@ -1,17 +1,20 @@
-import { useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import { useTranslation } from '@/contexts/TranslationContext';
 import { PrayerTime } from '@/types';
 import { formatTime, getCurrentSalat, getNextSalat } from '@/utils/timeUtils';
-import { useTranslation } from '@/contexts/TranslationContext';
 import { Clock } from 'lucide-react';
+import { Fragment, useEffect, useState } from 'react';
 
 interface CurrentPrayerContainerProps {
   allPrayers: PrayerTime[];
   timeFormat?: 'system' | '12h' | '24h';
 }
 
-export function CurrentPrayerContainer({ allPrayers, timeFormat = 'system' }: CurrentPrayerContainerProps) {
+export function CurrentPrayerContainer({
+  allPrayers,
+  timeFormat = 'system',
+}: CurrentPrayerContainerProps) {
   const { t } = useTranslation();
   const [currentPrayer, setCurrentPrayer] = useState<PrayerTime | null>(null);
   const [nextPrayer, setNextPrayer] = useState<PrayerTime | null>(null);
@@ -50,7 +53,9 @@ export function CurrentPrayerContainer({ allPrayers, timeFormat = 'system' }: Cu
       if (currentPrayer) {
         const now = new Date();
         const startTime = parseTimeToDate(currentPrayer.start);
-        const jamaahDateTime = currentPrayer.jamaah ? parseTimeToDate(currentPrayer.jamaah) : startTime;
+        const jamaahDateTime = currentPrayer.jamaah
+          ? parseTimeToDate(currentPrayer.jamaah)
+          : startTime;
 
         // For Isha, end time (Fajr) should be TOMORROW's date
         // Isha crosses midnight: starts today evening, ends tomorrow morning
@@ -120,10 +125,15 @@ export function CurrentPrayerContainer({ allPrayers, timeFormat = 'system' }: Cu
         }
 
         // One translatable string (same pattern as all UI: single key with {{param}})
-        const targetLabel = timeUntilJamaah > 0
-          ? (currentPrayer.jamaah ? t('salatTimes.jamaah') : t('salatTimes.end'))
-          : t('salatTimes.end');
-        setCountdownLine(t('salatTimes.remainingToTarget', { target: targetLabel }));
+        const targetLabel =
+          timeUntilJamaah > 0
+            ? currentPrayer.jamaah
+              ? t('salatTimes.jamaah')
+              : t('salatTimes.end')
+            : t('salatTimes.end');
+        setCountdownLine(
+          t('salatTimes.remainingToTarget', { target: targetLabel }),
+        );
 
         const remaining = targetTime.getTime() - now.getTime();
         const elapsed = now.getTime() - startTime.getTime();
@@ -139,14 +149,18 @@ export function CurrentPrayerContainer({ allPrayers, timeFormat = 'system' }: Cu
           const hours = Math.floor(passedSeconds / 3600);
           const minutes = Math.floor((passedSeconds % 3600) / 60);
           const seconds = passedSeconds % 60;
-          setRemainingTime(`-${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`);
+          setRemainingTime(
+            `-${hours < 1 ? '' : `${hours}:`}${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`,
+          );
         } else {
           // Time remaining
           const remainingSeconds = Math.floor(remaining / 1000);
           const hours = Math.floor(remainingSeconds / 3600);
           const minutes = Math.floor((remainingSeconds % 3600) / 60);
           const seconds = remainingSeconds % 60;
-          setRemainingTime(`${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`);
+          setRemainingTime(
+            `${hours < 1 ? '' : `${hours}:`}${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`,
+          );
         }
       }
     }, 1000);
@@ -160,48 +174,89 @@ export function CurrentPrayerContainer({ allPrayers, timeFormat = 'system' }: Cu
 
   return (
     <Card className="shadow-lg">
-      <CardContent className="p-6 space-y-4">
+      <CardContent className="space-y-4 p-6">
         <div className="flex items-start justify-between">
           <div className="text-left">
-            <h2 className="text-3xl font-bold text-primary uppercase">
+            <h2 className="text-3xl font-bold uppercase text-primary">
               {currentPrayer.name}
             </h2>
-            <p className="text-sm text-muted-foreground">{t('salatTimes.current')}</p>
-          </div>
-          <div className="text-right">
-            <div className="flex items-center justify-end gap-2 text-2xl font-bold text-primary">
-              <Clock className="w-5 h-5" />
-              {remainingTime}
-            </div>
-            <p className="text-xs text-muted-foreground uppercase tracking-wider">
-              {countdownLine}
+            <p className="text-sm text-muted-foreground">
+              {t('salatTimes.current')}
             </p>
+          </div>
+
+          <div className="text-right">
+            {!currentPrayer.jamaah ? (
+              <div className="gap-2 text-2xl font-bold text-primary">
+                {currentPrayer.end
+                  ? formatTime(currentPrayer.end, timeFormat)
+                  : 'N/A'}
+                <p className="text-xs text-muted-foreground">
+                  {t('salatTimes.end')}
+                </p>
+              </div>
+            ) : (
+              <Fragment>
+                <div className="flex items-center justify-end gap-2 text-2xl font-bold text-primary">
+                  <Clock className="h-5 w-5" />
+                  {remainingTime}
+                </div>
+                <p className="text-xs uppercase tracking-wider text-muted-foreground">
+                  {countdownLine}
+                </p>
+              </Fragment>
+            )}
           </div>
         </div>
 
         {/* Progress Bar */}
         <div className="relative">
-          <div className="h-1.5 w-full bg-primary/10 rounded-full overflow-hidden">
-            <Progress value={progressPercent} variant="glow" className="h-full" />
+          <div className="h-1.5 w-full overflow-hidden rounded-full bg-primary/10">
+            <Progress
+              value={progressPercent}
+              variant="glow"
+              className="h-full"
+            />
           </div>
         </div>
 
         {/* Times Grid */}
         <div className="grid grid-cols-2 gap-3">
-          {currentPrayer.jamaah && (
-            <div className="p-3 rounded-lg bg-primary/5 border border-primary/20">
-              <p className="text-xs text-muted-foreground">{t('salatTimes.jamaah')}</p>
-              <p className="text-xl font-bold">
-                {formatTime(currentPrayer.jamaah, timeFormat)}
+          {currentPrayer.jamaah ? (
+            <Fragment>
+              <div className="rounded-lg border border-primary/20 bg-primary/5 p-3">
+                <p className="text-xs text-muted-foreground">
+                  {t('salatTimes.jamaah')}
+                </p>
+                <p className="text-xl font-bold">
+                  {formatTime(currentPrayer.jamaah, timeFormat)}
+                </p>
+              </div>
+
+              <div className="rounded-lg border border-primary/20 bg-primary/5 p-3">
+                <p className="text-xs text-muted-foreground">
+                  {t('salatTimes.end')}
+                </p>
+
+                <p className="text-xl font-bold">
+                  {currentPrayer.end
+                    ? formatTime(currentPrayer.end, timeFormat)
+                    : 'N/A'}
+                </p>
+              </div>
+            </Fragment>
+          ) : (
+            <div className="col-span-2">
+              <p className="mb-2 flex items-center justify-center gap-2 text-xl font-bold text-primary">
+                <Clock className="h-5 w-5" />
+                {remainingTime}
+              </p>
+
+              <p className="text-xs uppercase tracking-wider text-muted-foreground">
+                {countdownLine}
               </p>
             </div>
           )}
-          <div className="p-3 rounded-lg bg-primary/5 border border-primary/20">
-            <p className="text-xs text-muted-foreground">{t('salatTimes.end')}</p>
-            <p className="text-xl font-bold">
-              {currentPrayer.end ? formatTime(currentPrayer.end, timeFormat) : 'N/A'}
-            </p>
-          </div>
         </div>
       </CardContent>
     </Card>
