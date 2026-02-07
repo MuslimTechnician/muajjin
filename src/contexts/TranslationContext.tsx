@@ -1,8 +1,19 @@
-import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
-import { TranslationState, TranslationStrings, StoredTranslation } from '@/types/translation';
-import enTemplate from '@/i18n/template-en.json';
-import { setTranslationFunction } from '@/utils/timeUtils';
 import { toast } from '@/components/ui/use-toast';
+import enTemplate from '@/i18n/template-en.json';
+import {
+  StoredTranslation,
+  TranslationFile,
+  TranslationState,
+} from '@/types/translation';
+import { setTranslationFunction } from '@/utils/timeUtils';
+import {
+  createContext,
+  ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 
 const TRANSLATION_STORAGE_KEY = 'muajjin-translations';
 const ACTIVE_TRANSLATION_KEY = 'muajjin-active-translation';
@@ -12,7 +23,7 @@ const FONT_FAMILY_NAME = 'MuajjinCustomFont';
 // Built-in translations (ships with the app)
 const BUILTIN_TRANSLATIONS: Record<string, StoredTranslation> = {
   en: {
-    ...enTemplate,
+    ...(enTemplate as unknown as TranslationFile),
     id: 'en',
     importedAt: new Date().toISOString(),
   },
@@ -30,7 +41,11 @@ interface TranslationContextType {
   activeTranslation: StoredTranslation | null;
   setActiveTranslation: (id: string | null) => void;
   importedTranslations: Record<string, StoredTranslation>;
-  importTranslation: (translation: any) => { success: boolean; error?: string; id?: string };
+  importTranslation: (translation: any) => {
+    success: boolean;
+    error?: string;
+    id?: string;
+  };
   deleteTranslation: (id: string) => void;
   direction: 'ltr' | 'rtl';
   mounted: boolean;
@@ -39,7 +54,9 @@ interface TranslationContextType {
   customFont: StoredFont | null;
 }
 
-const TranslationContext = createContext<TranslationContextType | undefined>(undefined);
+const TranslationContext = createContext<TranslationContextType | undefined>(
+  undefined,
+);
 
 // Helper function to get nested value from object using dot notation
 function getNestedValue(obj: any, key: string): string | undefined {
@@ -53,7 +70,10 @@ function getNestedValue(obj: any, key: string): string | undefined {
 }
 
 // Replace {{placeholder}} with actual values
-function interpolate(template: string, params?: Record<string, string | number>): string {
+function interpolate(
+  template: string,
+  params?: Record<string, string | number>,
+): string {
   if (!params) return template;
 
   return template.replace(/\{\{(\w+)\}\}/g, (match, key) => {
@@ -68,7 +88,7 @@ function interpolate(template: string, params?: Record<string, string | number>)
 export function TranslationProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<TranslationState>({
     activeTranslationId: null,
-    translations: {}
+    translations: {},
   });
   const [mounted, setMounted] = useState(false);
   const [customFont, setCustomFont] = useState<StoredFont | null>(null);
@@ -82,7 +102,7 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
 
       setState({
         activeTranslationId: activeId || null,
-        translations: storedTranslations ? JSON.parse(storedTranslations) : {}
+        translations: storedTranslations ? JSON.parse(storedTranslations) : {},
       });
 
       if (storedFont) {
@@ -101,9 +121,15 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (mounted) {
       try {
-        localStorage.setItem(TRANSLATION_STORAGE_KEY, JSON.stringify(state.translations));
+        localStorage.setItem(
+          TRANSLATION_STORAGE_KEY,
+          JSON.stringify(state.translations),
+        );
         if (state.activeTranslationId) {
-          localStorage.setItem(ACTIVE_TRANSLATION_KEY, state.activeTranslationId);
+          localStorage.setItem(
+            ACTIVE_TRANSLATION_KEY,
+            state.activeTranslationId,
+          );
         } else {
           localStorage.removeItem(ACTIVE_TRANSLATION_KEY);
         }
@@ -115,33 +141,37 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
 
   // Get active translation (check both built-in and user-imported)
   const activeTranslation = state.activeTranslationId
-    ? (state.translations[state.activeTranslationId] || BUILTIN_TRANSLATIONS[state.activeTranslationId])
+    ? state.translations[state.activeTranslationId] ||
+      BUILTIN_TRANSLATIONS[state.activeTranslationId]
     : null;
 
   const direction = activeTranslation?.meta.direction || 'ltr';
 
   // Translation function
-  const t = useCallback((key: string, params?: Record<string, string | number>): string => {
-    let translated: string | undefined;
+  const t = useCallback(
+    (key: string, params?: Record<string, string | number>): string => {
+      let translated: string | undefined;
 
-    // Try active translation first
-    if (activeTranslation) {
-      translated = getNestedValue(activeTranslation.translations, key);
-    }
+      // Try active translation first
+      if (activeTranslation) {
+        translated = getNestedValue(activeTranslation.translations, key);
+      }
 
-    // Fallback to English template
-    if (!translated) {
-      translated = getNestedValue(enTemplate.translations, key);
-    }
+      // Fallback to English template
+      if (!translated) {
+        translated = getNestedValue(enTemplate.translations, key);
+      }
 
-    // If still no translation, return key itself
-    if (!translated) {
-      return key;
-    }
+      // If still no translation, return key itself
+      if (!translated) {
+        return key;
+      }
 
-    // Interpolate params
-    return interpolate(translated, params);
-  }, [activeTranslation]);
+      // Interpolate params
+      return interpolate(translated, params);
+    },
+    [activeTranslation],
+  );
 
   // Helper to get translated salat name
   const getSalatName = (salat: string): string => {
@@ -155,10 +185,12 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
   }, [t]);
 
   const setActiveTranslation = (id: string | null) => {
-    setState(prev => ({ ...prev, activeTranslationId: id }));
+    setState((prev) => ({ ...prev, activeTranslationId: id }));
   };
 
-  const importTranslation = (translation: any): { success: boolean; error?: string; id?: string } => {
+  const importTranslation = (
+    translation: any,
+  ): { success: boolean; error?: string; id?: string } => {
     try {
       // Validate structure
       if (!translation.meta || !translation.translations) {
@@ -171,7 +203,10 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
 
       // Check if direction is valid
       if (!['ltr', 'rtl'].includes(translation.meta.direction)) {
-        return { success: false, error: 'Invalid direction. Must be "ltr" or "rtl"' };
+        return {
+          success: false,
+          error: 'Invalid direction. Must be "ltr" or "rtl"',
+        };
       }
 
       // Generate unique ID
@@ -180,15 +215,15 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
       const newTranslation: StoredTranslation = {
         ...translation,
         id,
-        importedAt: new Date().toISOString()
+        importedAt: new Date().toISOString(),
       };
 
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
         translations: {
           ...prev.translations,
-          [id]: newTranslation
-        }
+          [id]: newTranslation,
+        },
       }));
 
       return { success: true, id };
@@ -198,14 +233,15 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
   };
 
   const deleteTranslation = (id: string) => {
-    setState(prev => {
+    setState((prev) => {
       const newTranslations = { ...prev.translations };
       delete newTranslations[id];
 
       return {
         ...prev,
         translations: newTranslations,
-        activeTranslationId: prev.activeTranslationId === id ? null : prev.activeTranslationId
+        activeTranslationId:
+          prev.activeTranslationId === id ? null : prev.activeTranslationId,
       };
     });
   };
@@ -265,64 +301,72 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
   }, [t]);
 
   // Upload and set custom font
-  const uploadFont = useCallback(async (file: File): Promise<boolean> => {
-    try {
-      // Validate file name must be exactly "customfont.woff2"
-      if (file.name !== 'customfont.woff2') {
-        throw new Error('Font file must be named exactly "customfont.woff2"');
+  const uploadFont = useCallback(
+    async (file: File): Promise<boolean> => {
+      try {
+        // Validate file name must be exactly "customfont.woff2"
+        if (file.name !== 'customfont.woff2') {
+          throw new Error('Font file must be named exactly "customfont.woff2"');
+        }
+
+        // Validate file type
+        if (!file.name.endsWith('.woff2')) {
+          throw new Error(
+            'Invalid font file. Only .woff2 files are supported.',
+          );
+        }
+
+        // Check file size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+          throw new Error('Font file too large. Maximum size is 5MB.');
+        }
+
+        // Convert to base64
+        const reader = new FileReader();
+        const base64Promise = new Promise<string>((resolve, reject) => {
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = () => reject(reader.error);
+          reader.readAsDataURL(file);
+        });
+
+        const base64 = await base64Promise;
+
+        // Remove previous font
+        removeFont();
+
+        // Create new font data
+        const fontData: StoredFont = {
+          name: file.name,
+          data: base64,
+          timestamp: Date.now(),
+        };
+
+        // Store in localStorage
+        localStorage.setItem(CUSTOM_FONT_KEY, JSON.stringify(fontData));
+
+        setCustomFont(fontData);
+
+        toast({
+          title: t('settings.fontUploaded'),
+          description: t('settings.fontUploadedDesc'),
+        });
+
+        return true;
+      } catch (error) {
+        console.error('Failed to upload font:', error);
+        toast({
+          title: t('errors.fontUploadFailed'),
+          description:
+            error instanceof Error
+              ? error.message
+              : t('common.unknownError') || 'Unknown error',
+          variant: 'destructive',
+        });
+        return false;
       }
-
-      // Validate file type
-      if (!file.name.endsWith('.woff2')) {
-        throw new Error('Invalid font file. Only .woff2 files are supported.');
-      }
-
-      // Check file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        throw new Error('Font file too large. Maximum size is 5MB.');
-      }
-
-      // Convert to base64
-      const reader = new FileReader();
-      const base64Promise = new Promise<string>((resolve, reject) => {
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = () => reject(reader.error);
-        reader.readAsDataURL(file);
-      });
-
-      const base64 = await base64Promise;
-
-      // Remove previous font
-      removeFont();
-
-      // Create new font data
-      const fontData: StoredFont = {
-        name: file.name,
-        data: base64,
-        timestamp: Date.now()
-      };
-
-      // Store in localStorage
-      localStorage.setItem(CUSTOM_FONT_KEY, JSON.stringify(fontData));
-
-      setCustomFont(fontData);
-
-      toast({
-        title: t('settings.fontUploaded'),
-        description: t('settings.fontUploadedDesc'),
-      });
-
-      return true;
-    } catch (error) {
-      console.error('Failed to upload font:', error);
-      toast({
-        title: t('errors.fontUploadFailed'),
-        description: error instanceof Error ? error.message : t('common.unknownError') || 'Unknown error',
-        variant: "destructive",
-      });
-      return false;
-    }
-  }, [removeFont, t]);
+    },
+    [removeFont, t],
+  );
 
   return (
     <TranslationContext.Provider
@@ -338,17 +382,14 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
         mounted,
         uploadFont,
         removeFont,
-        customFont
-      }}
-    >
+        customFont,
+      }}>
       {!mounted ? (
-        <div className="flex items-center justify-center min-h-screen">
+        <div className="flex min-h-screen items-center justify-center">
           <div className="animate-pulse">Loading...</div>
         </div>
       ) : (
-        <div dir={direction}>
-          {children}
-        </div>
+        <div dir={direction}>{children}</div>
       )}
     </TranslationContext.Provider>
   );

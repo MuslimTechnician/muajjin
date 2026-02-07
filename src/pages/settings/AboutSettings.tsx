@@ -1,13 +1,12 @@
+import { AppHeader } from '@/components/AppHeader';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useTranslation } from '@/contexts/TranslationContext';
+import { requestUpdateCheck } from '@/services/updateEvents';
 import { Calendar, MapPin, Moon, Sunset } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import packageInfo from '../../../package.json';
-import { AppHeader } from '@/components/AppHeader';
 
 export default function AboutSettings() {
-  const navigate = useNavigate();
   const { t } = useTranslation();
 
   return (
@@ -16,7 +15,7 @@ export default function AboutSettings() {
       <AppHeader showBackButton={true} title={t('aboutPage.title')} />
 
       {/* Content */}
-      <div className="max-w-md mx-auto px-5 py-6 space-y-4">
+      <div className="mx-auto max-w-md space-y-4 px-5 py-6">
         {/* App Info Card */}
         <Card className="border bg-muted/30 shadow-sm">
           <CardContent className="space-y-4 p-6 text-center">
@@ -38,10 +37,18 @@ export default function AboutSettings() {
             </div>
 
             {/* Version */}
-            <div className="flex items-center justify-center">
+            <div className="flex flex-col items-center justify-center gap-3">
               <span className="text-xs text-muted-foreground">
                 v{packageInfo.version || '1.0.0'}
               </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  requestUpdateCheck({ force: true, notifyUpToDate: true })
+                }>
+                {t('aboutPage.checkForUpdate')}
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -138,7 +145,7 @@ export default function AboutSettings() {
             href="https://t.me/MuslimTechnician"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-xs text-primary hover:underline inline-block">
+            className="inline-block text-xs text-primary hover:underline">
             {t('aboutPage.credits')}
           </a>
         </div>

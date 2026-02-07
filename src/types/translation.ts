@@ -133,6 +133,40 @@ export interface TranslationStrings {
     locationDenied: string;
     invalidFile: string;
   };
+  update: {
+    availableTitle: string;
+    availableDescription: string;
+    download: string;
+    ignore: string;
+    upToDateTitle: string;
+    upToDateDescription: string;
+    offlineTitle: string;
+    offlineDescription: string;
+    checkFailedTitle: string;
+    checkFailedDescription: string;
+  };
+  aboutPage: {
+    title: string;
+    appName: string;
+    tagline: string;
+    checkForUpdate: string;
+    features: {
+      salatTimes: string;
+      salatTimesDesc: string;
+      hijriCalendar: string;
+      hijriCalendarDesc: string;
+      location: string;
+      locationDesc: string;
+      saum: string;
+      saumDesc: string;
+    };
+    calculationMethods: string;
+    calculationMethodsDesc: string;
+    builtWith: string;
+    builtWithDesc: string;
+    madeWithLove: string;
+    credits: string;
+  };
 }
 
 export interface TranslationFile {
