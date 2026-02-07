@@ -197,7 +197,7 @@
         "calculationMethodsDesc": "Different regions follow different calculation methods:",
         "calculationMethodsList1": "Select the calculation method that is followed in your region",
         "calculationMethodsList2": "Choose the appropriate Madhab for Asr salat time calculation",
-        "calculationMethodsList3": "Adjust the Hijri date if needed to match local moon sighting",
+      "calculationMethodsList3": "Adjust the Hijri date if needed to match local moon sighting",
         "jamaahTimes": "Jama'ah Times",
         "jamaahTimesDesc": "Set the Jama'ah salat times for your local mosque:",
         "jamaahTimesList1": "Enter the exact time for each salat's Jama'ah",
@@ -239,6 +239,18 @@
       "fileRequired": "Please select a translation file",
       "fontUploadFailed": "Failed to upload font"
     },
+    "update": {
+      "availableTitle": "Update available",
+      "availableDescription": "A new version (v{{latestVersion}}) is available. You are on v{{currentVersion}}.",
+      "download": "Download",
+      "ignore": "Ignore",
+      "upToDateTitle": "You're up to date",
+      "upToDateDescription": "You’re running the latest version (v{{currentVersion}}).",
+      "offlineTitle": "No internet connection",
+      "offlineDescription": "Connect to the internet and try again.",
+      "checkFailedTitle": "Couldn’t check for updates",
+      "checkFailedDescription": "Please try again in a moment."
+    },
     "notFound": {
       "title": "404",
       "message": "Oops! Page not found",
@@ -248,6 +260,7 @@
       "title": "About",
       "appName": "Muajjin",
       "tagline": "Your Salat Times Companion",
+      "checkForUpdate": "Check for update",
       "features": {
         "salatTimes": "Salat Times",
         "salatTimesDesc": "Accurate & local",
