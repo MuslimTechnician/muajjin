@@ -164,7 +164,9 @@ export function UpdateChecker() {
             onClick={handleDownload}
             disabled={!releaseInfo.downloadUrl && !releaseInfo.releaseUrl}
             className="focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0">
-            {t('update.download')}
+            {t('update.download', {
+              latestVersion: releaseInfo.latestVersion,
+            })}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

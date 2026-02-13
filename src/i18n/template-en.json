@@ -197,7 +197,7 @@
         "calculationMethodsDesc": "Different regions follow different calculation methods:",
         "calculationMethodsList1": "Select the calculation method that is followed in your region",
         "calculationMethodsList2": "Choose the appropriate Madhab for Asr salat time calculation",
-      "calculationMethodsList3": "Adjust the Hijri date if needed to match local moon sighting",
+        "calculationMethodsList3": "Adjust the Hijri date if needed to match local moon sighting",
         "jamaahTimes": "Jama'ah Times",
         "jamaahTimesDesc": "Set the Jama'ah salat times for your local mosque:",
         "jamaahTimesList1": "Enter the exact time for each salat's Jama'ah",
@@ -242,7 +242,7 @@
     "update": {
       "availableTitle": "Update available",
       "availableDescription": "A new version (v{{latestVersion}}) is available. You are on v{{currentVersion}}.",
-      "download": "Download",
+      "download": "Download (v{{latestVersion}})",
       "ignore": "Ignore",
       "upToDateTitle": "You're up to date",
       "upToDateDescription": "You’re running the latest version (v{{currentVersion}}).",

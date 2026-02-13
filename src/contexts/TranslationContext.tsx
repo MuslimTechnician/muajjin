@@ -1,5 +1,6 @@
 import { toast } from '@/components/ui/use-toast';
 import enTemplate from '@/i18n/template-en.json';
+import bnTemplate from '@/i18n/template-bn.json';
 import {
   StoredTranslation,
   TranslationFile,
@@ -25,6 +26,11 @@ const BUILTIN_TRANSLATIONS: Record<string, StoredTranslation> = {
   en: {
     ...(enTemplate as unknown as TranslationFile),
     id: 'en',
+    importedAt: new Date().toISOString(),
+  },
+  bn: {
+    ...(bnTemplate as unknown as TranslationFile),
+    id: 'bn',
     importedAt: new Date().toISOString(),
   },
 };

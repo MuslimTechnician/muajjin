@@ -127,6 +127,12 @@ export default function TranslationSettings() {
                   {t('settings.englishDefault')}
                 </div>
               </SelectItem>
+              <SelectItem value="bn">
+                <div className="flex items-center gap-2">
+                  <Globe className="h-4 w-4" />
+                  বাংলা (Bangla)
+                </div>
+              </SelectItem>
               {importedTranslationsList.map((translation) => (
                 <SelectItem key={translation.id} value={translation.id}>
                   <div className="flex items-center gap-2">
