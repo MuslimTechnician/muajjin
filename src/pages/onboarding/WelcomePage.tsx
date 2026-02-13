@@ -1,15 +1,30 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useTranslation } from '@/contexts/TranslationContext';
-import { Calendar, MapPin, Moon, Sunrise, Upload } from 'lucide-react';
+import { Calendar, FileText, Globe, MapPin, Moon, Sunrise, Upload } from 'lucide-react';
 import { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 export default function WelcomePage() {
   const navigate = useNavigate();
-  const { t, importTranslation, setActiveTranslation } = useTranslation();
+  const {
+    t,
+    activeTranslation,
+    importedTranslations,
+    importTranslation,
+    setActiveTranslation,
+  } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const importedTranslationsList = Object.values(importedTranslations);
 
   const handleFileImport = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -98,24 +113,63 @@ export default function WelcomePage() {
         {/* Features Grid */}
         <Card className="shadow-lg">
           <CardContent className="p-6">
-              <div className="grid grid-cols-2 gap-4">
-                {features.map((feature, index) => {
-                  const Icon = feature.icon;
-                  return (
-                    <div
-                      key={index}
-                      className="text-center space-y-2">
-                      <div className={`w-12 h-12 mx-auto rounded-xl ${feature.iconBg} flex items-center justify-center`}>
-                        <Icon className={`w-6 h-6 ${feature.iconColor}`} />
-                      </div>
-                      <h3 className="font-semibold text-sm">{feature.title}</h3>
-                      <p className="text-xs text-muted-foreground">{feature.description}</p>
+            <div className="grid grid-cols-2 gap-4">
+              {features.map((feature, index) => {
+                const Icon = feature.icon;
+                return (
+                  <div
+                    key={index}
+                    className="text-center space-y-2">
+                    <div className={`w-12 h-12 mx-auto rounded-xl ${feature.iconBg} flex items-center justify-center`}>
+                      <Icon className={`w-6 h-6 ${feature.iconColor}`} />
                     </div>
-                  );
-                })}
+                    <h3 className="font-semibold text-sm">{feature.title}</h3>
+                    <p className="text-xs text-muted-foreground">{feature.description}</p>
+                  </div>
+                );
+              })}
             </div>
           </CardContent>
         </Card>
+
+        {/* Language Selection */}
+        <div className="space-y-3">
+          <Label className="text-sm font-medium">{t('settings.selectActiveLanguage')}</Label>
+          <Select
+            value={activeTranslation?.id || 'en'}
+            onValueChange={(value) =>
+              setActiveTranslation(value === 'en' ? null : value)
+            }>
+            <SelectTrigger>
+              <SelectValue placeholder={t('settings.selectLanguageOption')} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="en">
+                <div className="flex items-center gap-2">
+                  <Globe className="h-4 w-4" />
+                  {t('settings.englishDefault')}
+                </div>
+              </SelectItem>
+              <SelectItem value="bn">
+                <div className="flex items-center gap-2">
+                  <Globe className="h-4 w-4" />
+                  বাংলা (Bangla)
+                </div>
+              </SelectItem>
+              {importedTranslationsList.map((translation) => (
+                <SelectItem key={translation.id} value={translation.id}>
+                  <div className="flex items-center gap-2">
+                    <FileText className="h-4 w-4" />
+                    {translation.meta.languageName}
+                    <span className="ml-1 text-xs text-muted-foreground">
+                      ({translation.meta.direction})
+                    </span>
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
         {/* Translation Import */}
         <Button
