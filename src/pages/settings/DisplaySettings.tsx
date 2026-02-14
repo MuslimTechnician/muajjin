@@ -5,8 +5,10 @@ import { useLocalStorage } from '@/hooks/useLocalStorage';
 import {
   closestCenter,
   DndContext,
+  DragEndEvent,
   KeyboardSensor,
-  PointerSensor,
+  MouseSensor,
+  TouchSensor,
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
@@ -79,7 +81,8 @@ function SortableContainer({
           <div
             {...attributes}
             {...listeners}
-            className="cursor-grab active:cursor-grabbing">
+            className="cursor-grab active:cursor-grabbing"
+            style={{ touchAction: 'none' }}>
             <GripVertical size={18} className="text-muted-foreground" />
           </div>
           <span className="text-sm font-medium">{label}</span>
@@ -132,27 +135,40 @@ export default function DisplaySettings() {
   };
 
   const sensors = useSensors(
-    useSensor(PointerSensor, {
+    useSensor(MouseSensor, {
       activationConstraint: {
         distance: 8,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 150,
+        tolerance: 8,
       },
     }),
     useSensor(KeyboardSensor),
   );
 
-  const handleDragEnd = (event: any) => {
+  const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
-    if (active.id !== over.id) {
-      const oldIndex = containerOrder.indexOf(active.id);
-      const newIndex = containerOrder.indexOf(over.id);
-
-      const newOrder = [...containerOrder];
-      newOrder.splice(oldIndex, 1);
-      newOrder.splice(newIndex, 0, active.id);
-
-      setContainerOrder(newOrder);
+    if (!over || active.id === over.id) {
+      return;
     }
+
+    const activeId = String(active.id);
+    const overId = String(over.id);
+    const oldIndex = containerOrder.indexOf(activeId);
+    const newIndex = containerOrder.indexOf(overId);
+    if (oldIndex === -1 || newIndex === -1) {
+      return;
+    }
+
+    const newOrder = [...containerOrder];
+    newOrder.splice(oldIndex, 1);
+    newOrder.splice(newIndex, 0, activeId);
+
+    setContainerOrder(newOrder);
   };
 
   const handleToggleContainer = (containerId: string) => {
