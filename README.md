@@ -5,7 +5,7 @@
 <h1 align="center">Muajjin</h1>
 
 <p align="center">
-  A modern Islamic prayer times application
+Open source, privacy-focused, offline-first Salat & Saum times companion.
 </p>
 
 <p align="center">
@@ -20,16 +20,16 @@
 
 ## Overview
 
-**Muajjin** is a lightweight, privacy-friendly Islamic prayer times app built with modern web technologies and packaged as a native Android application using Capacitor.
+**Muajjin** is a lightweight, privacy-friendly Islamic Salat & Saum times app built with modern web technologies and packaged as a native Android application using Capacitor.
 
-Prayer times are calculated locally on the device—no tracking, no remote APIs required.
+Times are calculated locally on the device—no tracking, no remote APIs required.
 
 ## Philosophy
 
 This app is designed with a **minimal feature philosophy**. The focus is intentionally narrow:
 
-- ✅ Prayer times
-- ✅ Fasting times (Suhoor/Iftar)
+- ✅ Salat times
+- ✅ Saum times (Suhoor/Iftar)
 
 Any additional features beyond these core functions will **not** be implemented. The goal is to keep the app simple, lightweight, and focused on its essential purpose.
 
@@ -37,12 +37,12 @@ Any additional features beyond these core functions will **not** be implemented.
 
 ## Features
 
-- 🕌 Accurate prayer time calculation based on location  
-- 📍 Automatic GPS location with IP-based fallback  
-- ⏰ Current prayer highlighting and next prayer countdown  
-- 🌙 Suhoor and Iftar times for Ramadan  
-- 📅 Hijri date display  
-- 🎨 Automatic light and dark theme support  
+- 🕌 Accurate Salat time calculation based on location
+- 📍 Automatic GPS location with IP-based fallback
+- ⏰ Current Salat highlighting and next Salat countdown
+- 🌙 Suhoor and Iftar times for Saum
+- 📅 Hijri date display
+- 🎨 Automatic light and dark theme support
 - 📱 Native Android app via Capacitor  
 
 
@@ -128,7 +128,7 @@ android/app/build/outputs/apk/
 
 Contributions are welcome! However, please note that this project follows a **minimal feature philosophy**.
 
-Before proposing or implementing any new features, please **open a discussion** first to talk about it. Features that fall outside the core scope (prayer times and fasting times) will not be accepted.
+Before proposing or implementing any new features, please **open a discussion** first to talk about it. Features that fall outside the core scope (Salat times and Saum times) will not be accepted.
 
 Bug fixes, performance improvements, and localization/translation contributions are always appreciated.
 
