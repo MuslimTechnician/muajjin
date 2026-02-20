@@ -31,10 +31,9 @@ export function UpdateChecker() {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [releaseInfo, setReleaseInfo] = useState<ReleaseInfo | null>(null);
-  const [ignoredVersion, setIgnoredVersion] = useLocalStorage<string | null>(
-    IGNORED_RELEASE_KEY,
-    null,
-  );
+  const [ignoredVersion, setIgnoredVersion] = useLocalStorage<
+    string | null
+  >(IGNORED_RELEASE_KEY, null);
   const isCheckingRef = useRef(false);
 
   const currentVersion = packageInfo.version || '0.0.0';
@@ -131,7 +130,8 @@ export function UpdateChecker() {
   };
 
   const handleDownload = () => {
-    const target = releaseInfo?.downloadUrl || releaseInfo?.releaseUrl || null;
+    const target =
+      releaseInfo?.downloadUrl || releaseInfo?.releaseUrl || null;
     if (target) {
       window.open(target, '_blank', 'noopener,noreferrer');
     }

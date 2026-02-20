@@ -100,6 +100,9 @@ bun run android:build
 
 # Release APK (optimized, smaller)
 bun run android:release
+
+# GitHub Release APK (includes in-app update checker)
+bun run android:release:github
 ```
 
 **APK Output Directory**
@@ -107,6 +110,15 @@ bun run android:release
 ```
 android/app/build/outputs/apk/
 ```
+
+### Build Modes (Update Checker)
+
+- Default builds (web/Play/F-Droid): no GitHub update checker is bundled. Use:
+  - `bun run build` (web bundle)
+  - `bun run android:build` or `bun run android:release`
+- GitHub release builds (include update checker + dialog):
+  - `bun run android:build:github`
+  - `bun run android:release:github`
 
 </details>
 
