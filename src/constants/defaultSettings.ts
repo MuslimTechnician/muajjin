@@ -20,10 +20,10 @@ export const DEFAULT_SETTINGS: UserSettings = {
 
   // Location
   manualLocation: true, // Always use manual location
-  city: 'Dhaka', // Fallback (will be set in onboarding)
-  country: 'Bangladesh', // Fallback (will be set in onboarding)
-  latitude: 23.8103, // Dhaka fallback (will be set in onboarding)
-  longitude: 90.4125, // Dhaka fallback (will be set in onboarding)
+  city: 'Makkah', // Fallback (will be set in onboarding)
+  country: 'Saudi Arabia', // Fallback (will be set in onboarding)
+  latitude: 21.3891, // Makkah fallback (will be set in onboarding)
+  longitude: 39.8579, // Makkah fallback (will be set in onboarding)
 
   // Display
   timeFormat: 'system' // Auto-detect from system settings
@@ -68,8 +68,8 @@ export const FALLBACK_SETTINGS: UserSettings = {
   hijriAdjustment: 0,
   hijriDateChangeAtMaghrib: true,
   manualLocation: true,
-  city: 'Dhaka',
-  country: 'Bangladesh',
-  latitude: 23.8103,
-  longitude: 90.4125
+  city: 'Makkah',
+  country: 'Saudi Arabia',
+  latitude: 21.3891,
+  longitude: 39.8579
 };

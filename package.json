@@ -17,7 +17,8 @@
     "android:build": "bun run build && bunx cap sync android && cd android && ./gradlew assembleDebug",
     "android:build:github": "bun run build:github && bunx cap sync android && cd android && ./gradlew assembleDebug",
     "android:release": "bun run build && bunx cap sync android && cd android && ./gradlew assembleRelease",
-    "android:release:github": "bun run build:github && bunx cap sync android && cd android && ./gradlew assembleRelease"
+    "android:release:github": "bun run build:github && bunx cap sync android && cd android && ./gradlew assembleRelease",
+    "android:bundle": "bun run build && bunx cap sync android && cd android && ./gradlew bundleRelease"
   },
   "dependencies": {
     "@capacitor/android": "^8.0.1",

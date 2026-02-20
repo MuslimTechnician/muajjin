@@ -1,0 +1,82 @@
+Muajjin is a comprehensive Islamic Salat times application designed for Muslims worldwide. It provides accurate Salat times based on your location, along with Hijri dates and Suhoor and Iftar times.
+
+## Key Features
+
+Accurate Salat Times
+• Location-based Salat time calculation
+• Support for 12+ calculation methods, including:
+  - Umm al-Qura University, Makkah
+  - University of Islamic Sciences, Karachi
+  - Muslim World League
+  - Egyptian General Authority of Survey
+  - and more
+• Shafi'i and Hanafi options for Asr Salat
+
+Hijri Calendar
+• Accurate Islamic (Hijri) dates
+• Automatic date change at Maghrib
+• Manual adjustment for local moon sighting
+
+Saum Times
+• Suhoor end countdown
+• Iftar start countdown
+• Adjustable Suhoor and Iftar times
+
+Prohibited Salat Times
+• Shuruq (sunrise) display
+• Ghurub (sunset) display
+• Zawal indicator
+
+Jama'ah Times
+• Custom congregation times for each Salat
+• Countdown to Jama'ah
+• Clear distinction between Salat start and Jama'ah time
+
+Location Support
+• Automatic GPS detection
+• IP-based fallback
+• Manual latitude/longitude entry
+• City and country display
+
+Appearance
+• Light and dark mode
+• System theme support
+
+Language Support
+• English and Bangla (বাংলা)
+• RTL language support
+• Custom translation file import
+• Custom font upload
+
+Privacy Focused
+• No accounts required
+• No tracking or analytics
+• No ads
+• All data stored locally
+• Open source and transparent
+
+## Why Muajjin
+
+• Works offline after location setup
+• Minimal permissions (location only)
+• Lightweight and efficient
+• Clean, modern interface
+• Regular updates
+
+## Salat Time Calculation
+
+Muajjin uses the Adhan library for Salat time calculations. Times are determined based on your location, selected calculation method, chosen Madhab, elevation, timezone, and astronomical data.
+
+## Hijri Calendar
+
+Hijri dates follow the Umm al-Qura calendar system used in Saudi Arabia. The Islamic date changes at Maghrib in accordance with Islamic tradition.
+
+## Permissions
+
+Location Permission: Used only to calculate accurate Salat times. Location data is never shared with third parties.
+
+## Source Code
+
+Source code is available at: https://github.com/muslimtechnician/muajjin
+
+Made with ❤️ for the Muslim Ummah
