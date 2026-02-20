@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:github": "vite --mode github",
     "build": "vite build",
+    "build:github": "vite build --mode github",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
@@ -13,7 +15,9 @@
     "cap:open:android": "bunx cap open android",
     "sync:android": "bunx cap sync android",
     "android:build": "bun run build && bunx cap sync android && cd android && ./gradlew assembleDebug",
-    "android:release": "bun run build && bunx cap sync android && cd android && ./gradlew assembleRelease"
+    "android:build:github": "bun run build:github && bunx cap sync android && cd android && ./gradlew assembleDebug",
+    "android:release": "bun run build && bunx cap sync android && cd android && ./gradlew assembleRelease",
+    "android:release:github": "bun run build:github && bunx cap sync android && cd android && ./gradlew assembleRelease"
   },
   "dependencies": {
     "@capacitor/android": "^8.0.1",
