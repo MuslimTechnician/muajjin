@@ -27,8 +27,8 @@ export function calculatePrayerTimesLocally(
   settings: UserSettings
 ): LocalPrayerTimes {
   // Get coordinates from settings
-  const latitude = settings.latitude || 23.81; // Default: Dhaka
-  const longitude = settings.longitude || 90.41;
+  const latitude = settings.latitude || 21.3891; // Default: Makkah
+  const longitude = settings.longitude || 39.8579;
 
   // Create coordinates using adhan Coordinates class
   const coordinates = new Coordinates(latitude, longitude);

@@ -161,10 +161,6 @@
 -keep interface javax.** { *; }
 -dontwarn javax.**
 
-# Keep Google Play Services
--keep class com.google.android.gms.** { *; }
--dontwarn com.google.android.gms.**
-
 # ============================================
 # Geolocation Plugin
 # ============================================
