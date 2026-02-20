@@ -4,7 +4,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { CapacitorApp } from './components/CapacitorApp';
-import { UpdateChecker } from './components/UpdateChecker';
+import { UpdateChecker } from '@/features/update';
 import { RouteGuard } from './components/layout/RouteGuard';
 import { AppProvider } from './contexts/AppContext';
 import HomePage from './pages/HomePage';

@@ -2,7 +2,7 @@ import { AppHeader } from '@/components/AppHeader';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useTranslation } from '@/contexts/TranslationContext';
-import { requestUpdateCheck } from '@/services/updateEvents';
+import { requestUpdateCheck, UPDATE_ENABLED } from '@/features/update';
 import { Calendar, MapPin, Moon, Sunset } from 'lucide-react';
 import packageInfo from '../../../package.json';
 
@@ -41,14 +41,16 @@ export default function AboutSettings() {
               <span className="text-xs text-muted-foreground">
                 v{packageInfo.version || '1.0.0'}
               </span>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() =>
-                  requestUpdateCheck({ force: true, notifyUpToDate: true })
-                }>
-                {t('aboutPage.checkForUpdate')}
-              </Button>
+              {UPDATE_ENABLED && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() =>
+                    requestUpdateCheck({ force: true, notifyUpToDate: true })
+                  }>
+                  {t('aboutPage.checkForUpdate')}
+                </Button>
+              )}
             </div>
           </CardContent>
         </Card>
