@@ -1,5 +1,7 @@
 include ':app'
 include ':capacitor-cordova-android-plugins'
 project(':capacitor-cordova-android-plugins').projectDir = new File('./capacitor-cordova-android-plugins/')
+include ':muajjin-native-geolocation'
+project(':muajjin-native-geolocation').projectDir = new File('../native-geolocation-plugin/android')
 
 apply from: 'capacitor.settings.gradle'

@@ -3,7 +3,7 @@
  * Provides automatic location detection using GPS and IP-based methods
  */
 
-import { Geolocation, Position } from '@capacitor/geolocation';
+import { NativeGeolocation, Position } from '@/plugins/native-geolocation';
 import { Capacitor } from '@capacitor/core';
 
 export interface LocationResult {
@@ -30,9 +30,9 @@ async function getLocationByGPS(): Promise<Omit<LocationResult, 'method'>> {
     const isNative = Capacitor.isNativePlatform();
 
     if (isNative) {
-      // Use Capacitor Geolocation for native apps
+      // Use Native Geolocation for native apps
       // Request permissions first
-      const permissionResult = await Geolocation.requestPermissions();
+      const permissionResult = await NativeGeolocation.requestPermissions();
 
       if (
         permissionResult.location === 'denied' ||
@@ -47,7 +47,7 @@ async function getLocationByGPS(): Promise<Omit<LocationResult, 'method'>> {
       }
 
       // Get current position
-      const position: Position = await Geolocation.getCurrentPosition({
+      const position: Position = await NativeGeolocation.getCurrentPosition({
         enableHighAccuracy: true,
         timeout: 15000,
         maximumAge: 0,
