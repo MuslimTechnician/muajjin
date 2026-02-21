@@ -43,8 +43,7 @@ Any additional features beyond these core functions will **not** be implemented.
 - 🌙 Suhoor and Iftar times for Saum
 - 📅 Hijri date display
 - 🎨 Automatic light and dark theme support
-- 📱 Native Android app via Capacitor  
-
+- 📱 Native Android app via Capacitor
 
 ---
 
@@ -54,7 +53,7 @@ Any additional features beyond these core functions will **not** be implemented.
 
 ```bash
 bun install
-````
+```
 
 ### Development
 

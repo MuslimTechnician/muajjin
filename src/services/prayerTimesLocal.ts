@@ -3,8 +3,8 @@ import {
   Coordinates,
   CalculationMethod,
   Madhab as AdhanMadhab,
-} from "adhan";
-import { UserSettings } from "@/types";
+} from 'adhan';
+import { UserSettings } from '@/types';
 
 export interface LocalPrayerTimes {
   Fajr: string;
@@ -24,7 +24,7 @@ export interface LocalPrayerTimes {
  */
 export function calculatePrayerTimesLocally(
   date: Date,
-  settings: UserSettings
+  settings: UserSettings,
 ): LocalPrayerTimes {
   // Get coordinates from settings
   const latitude = settings.latitude || 21.3891; // Default: Makkah
@@ -39,7 +39,8 @@ export function calculatePrayerTimesLocally(
   // Set madhab using adhan Madhab enum
   // 0 = Shafi'i, Maliki, Hanbali (default)
   // 1 = Hanafi (Asr is later)
-  params.madhab = settings.madhab === 1 ? AdhanMadhab.Hanafi : AdhanMadhab.Shafi;
+  params.madhab =
+    settings.madhab === 1 ? AdhanMadhab.Hanafi : AdhanMadhab.Shafi;
 
   // Calculate prayer times using adhan PrayerTimes class
   const prayerTimes = new PrayerTimes(coordinates, date, params);
@@ -62,7 +63,10 @@ export function calculatePrayerTimesLocally(
  */
 function getCalculationMethod(methodId: number) {
   // Type-safe method mapping using adhan CalculationMethod
-  const methods: Record<number, ReturnType<typeof CalculationMethod[keyof typeof CalculationMethod]>> = {
+  const methods: Record<
+    number,
+    ReturnType<(typeof CalculationMethod)[keyof typeof CalculationMethod]>
+  > = {
     1: CalculationMethod.Karachi(),
     2: CalculationMethod.NorthAmerica(),
     3: CalculationMethod.MuslimWorldLeague(),
@@ -84,8 +88,8 @@ function getCalculationMethod(methodId: number) {
  * Format Date object to "HH:MM" string (24-hour format)
  */
 function formatTime(date: Date): string {
-  const hours = String(date.getHours()).padStart(2, "0");
-  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
   return `${hours}:${minutes}`;
 }
 
@@ -128,5 +132,5 @@ export const CALCULATION_METHOD_KEYS: Record<number, string> = {
  */
 export const MADHABS = [
   { id: 0, name: "Shafi'i, Maliki, Hanbali" },
-  { id: 1, name: "Hanafi" },
+  { id: 1, name: 'Hanafi' },
 ];

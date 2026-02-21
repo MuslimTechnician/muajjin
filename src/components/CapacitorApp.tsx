@@ -13,7 +13,10 @@ export function CapacitorApp({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const updateStatusBarColor = async () => {
       // Only run on native Android
-      if (!Capacitor.isNativePlatform() || Capacitor.getPlatform() !== 'android') {
+      if (
+        !Capacitor.isNativePlatform() ||
+        Capacitor.getPlatform() !== 'android'
+      ) {
         return;
       }
 
@@ -72,7 +75,7 @@ export function CapacitorApp({ children }: { children: React.ReactNode }) {
 
     // Cleanup listener on unmount
     return () => {
-      handlerPromise.then(handler => {
+      handlerPromise.then((handler) => {
         if (handler) {
           handler.remove();
         }

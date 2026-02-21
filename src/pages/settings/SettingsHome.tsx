@@ -1,6 +1,6 @@
+import { SettingsPageLayout } from '@/components/settings/SettingsPageLayout';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { AppHeader } from '@/components/AppHeader';
 import { useTranslation } from '@/contexts/TranslationContext';
 import {
   CalendarDays,
@@ -78,31 +78,27 @@ export default function SettingsHome() {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <AppHeader showBackButton={true} title={t('settings.title')} />
-
-      {/* Settings Categories */}
-      <div className="max-w-md mx-auto px-5 py-6 space-y-3">
-        {settingsCategories.map((category) => {
-          const Icon = category.icon;
-          return (
-            <Card
-              key={category.id}
-              className="p-3 cursor-pointer hover:bg-accent/50 transition-colors"
-              onClick={() => navigate(category.route)}
-            >
-              <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-xl ${category.bgColor} flex items-center justify-center`}>
-                  <Icon className={`w-5 h-5 ${category.color}`} />
-                </div>
-                <span className="flex-1 font-semibold">{category.label}</span>
-                <ChevronRight className="w-5 h-5 text-muted-foreground" />
+    <SettingsPageLayout
+      title={t('settings.title')}
+      contentClassName="max-w-md mx-auto px-5 py-6 space-y-3">
+      {settingsCategories.map((category) => {
+        const Icon = category.icon;
+        return (
+          <Card
+            key={category.id}
+            className="cursor-pointer p-3 transition-colors hover:bg-accent/50"
+            onClick={() => navigate(category.route)}>
+            <div className="flex items-center gap-3">
+              <div
+                className={`h-10 w-10 rounded-xl ${category.bgColor} flex items-center justify-center`}>
+                <Icon className={`h-5 w-5 ${category.color}`} />
               </div>
-            </Card>
-          );
-        })}
-      </div>
-    </div>
+              <span className="flex-1 font-semibold">{category.label}</span>
+              <ChevronRight className="h-5 w-5 text-muted-foreground" />
+            </div>
+          </Card>
+        );
+      })}
+    </SettingsPageLayout>
   );
 }

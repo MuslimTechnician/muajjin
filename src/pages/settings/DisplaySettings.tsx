@@ -1,5 +1,8 @@
+import { SettingsPageLayout } from '@/components/settings/SettingsPageLayout';
+import { SettingsSaveButton } from '@/components/settings/SettingsSaveButton';
+import { SettingsSection } from '@/components/settings/SettingsSection';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
+import { SelectionButtonGroup } from '@/components/ui/SelectionButtonGroup';
 import { Switch } from '@/components/ui/switch';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import {
@@ -28,7 +31,6 @@ import { useTranslation } from '@/contexts/TranslationContext';
 import { EContainerType } from '@/types/enums';
 import { Monitor, Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
-import { AppHeader } from '@/components/AppHeader';
 
 const CONTAINER_LABELS: Record<string, string> = {
   [EContainerType.DateTime]: 'Date & Time',
@@ -193,150 +195,120 @@ export default function DisplaySettings() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <AppHeader showBackButton={true} title={t('settings.displaySettings')} />
+    <SettingsPageLayout
+      title={t('settings.displaySettings')}
+      contentClassName="max-w-md mx-auto px-5 py-6 space-y-6">
+      {/* Theme */}
+      <SettingsSection
+        title={t('settings.theme')}
+        description={t('settings.themeDesc')}>
+        <SelectionButtonGroup
+          value={theme as 'light' | 'dark' | 'system'}
+          onChange={(value) => setTheme(value)}
+          options={[
+            {
+              value: 'light',
+              icon: <Sun className="mr-2 h-4 w-4" />,
+              label: t('settings.light'),
+              disabled: !mounted,
+            },
+            {
+              value: 'dark',
+              icon: <Moon className="mr-2 h-4 w-4" />,
+              label: t('settings.dark'),
+              disabled: !mounted,
+            },
+            {
+              value: 'system',
+              icon: <Monitor className="mr-2 h-4 w-4" />,
+              label: t('settings.system'),
+              disabled: !mounted,
+            },
+          ]}
+        />
+      </SettingsSection>
 
-      {/* Content */}
-      <div className="max-w-md mx-auto px-5 py-6 space-y-6">
-        {/* Theme */}
-        <div className="space-y-3">
-          <div className="space-y-1">
-            <Label>{t('settings.theme')}</Label>
-            <p className="text-sm text-muted-foreground">
-              {t('settings.themeDesc')}
-            </p>
-          </div>
+      {/* Custom Font */}
+      <SettingsSection
+        title={t('settings.customFont')}
+        description={t('settings.uploadFontDesc')}>
+        {hasCustomFont ? (
+          <div className="flex items-center justify-between rounded-lg border bg-card p-4">
+            <div className="flex items-center gap-2">
+              <Check className="h-4 w-4 text-green-600" />
 
-          <div className="grid grid-cols-3 gap-3">
-            <Button
-              type="button"
-              variant={theme === 'light' ? 'default' : 'outline'}
-              onClick={() => setTheme('light')}
-              className="w-full"
-              disabled={!mounted}>
-              <Sun className="mr-2 h-4 w-4" />
-              {t('settings.light')}
-            </Button>
-
-            <Button
-              type="button"
-              variant={theme === 'dark' ? 'default' : 'outline'}
-              onClick={() => setTheme('dark')}
-              className="w-full"
-              disabled={!mounted}>
-              <Moon className="mr-2 h-4 w-4" />
-              {t('settings.dark')}
-            </Button>
-
-            <Button
-              type="button"
-              variant={theme === 'system' ? 'default' : 'outline'}
-              onClick={() => setTheme('system')}
-              className="w-full"
-              disabled={!mounted}>
-              <Monitor className="mr-2 h-4 w-4" />
-              {t('settings.system')}
-            </Button>
-          </div>
-        </div>
-
-        {/* Custom Font */}
-        <div className="space-y-3">
-          <div className="space-y-1">
-            <Label>{t('settings.customFont')}</Label>
-            <p className="text-sm text-muted-foreground">
-              {t('settings.uploadFontDesc')}
-            </p>
-          </div>
-
-          {hasCustomFont ? (
-            <div className="flex items-center justify-between rounded-lg border bg-card p-4">
-              <div className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-green-600" />
-
-                <span className="text-sm font-medium">
-                  {t('settings.currentFont')}: customfont.woff2
-                </span>
-              </div>
-
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={removeFont}
-                className="gap-1">
-                <Trash2 className="h-4 w-4" />
-                {t('settings.removeFont')}
-              </Button>
+              <span className="text-sm font-medium">
+                {t('settings.currentFont')}: customfont.woff2
+              </span>
             </div>
-          ) : (
-            <div className="space-y-3">
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".woff2"
-                onChange={handleFontUpload}
-                className="hidden"
-              />
 
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full gap-2"
-                onClick={() => fileInputRef.current?.click()}>
-                <Upload className="h-4 w-4" />
-                {t('settings.uploadFont')}
-              </Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={removeFont}
+              className="gap-1">
+              <Trash2 className="h-4 w-4" />
+              {t('settings.removeFont')}
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".woff2"
+              onChange={handleFontUpload}
+              className="hidden"
+            />
 
-              <p className="text-center text-xs text-muted-foreground">
-                {t('settings.fontFileName')}
-              </p>
-            </div>
-          )}
-        </div>
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full gap-2"
+              onClick={() => fileInputRef.current?.click()}>
+              <Upload className="h-4 w-4" />
+              {t('settings.uploadFont')}
+            </Button>
 
-        {/* Home Screen Layout */}
-        <div className="space-y-3">
-          <div className="space-y-1">
-            <Label>{t('settings.homeScreenLayout')}</Label>
-            <p className="text-sm text-muted-foreground">
-              {t('settings.homeScreenLayoutDesc')}
+            <p className="text-center text-xs text-muted-foreground">
+              {t('settings.fontFileName')}
             </p>
           </div>
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-            modifiers={[restrictToVerticalAxis]}>
-            <SortableContext
-              items={containerOrder}
-              strategy={verticalListSortingStrategy}>
-              <div className="space-y-2">
-                {containerOrder.map((containerId) => (
-                  <SortableContainer
-                    key={containerId}
-                    id={containerId}
-                    label={
-                      t(CONTAINER_LABEL_KEYS[containerId]) ||
-                      CONTAINER_LABELS[containerId] ||
-                      containerId
-                    }
-                    isVisible={visibleContainers[containerId] ?? true}
-                    onToggle={handleToggleContainer}
-                  />
-                ))}
-              </div>
-            </SortableContext>
-          </DndContext>
-        </div>
+        )}
+      </SettingsSection>
 
-        {/* Save Button */}
-        <div className="pt-4">
-          <Button onClick={() => navigate(-1)} className="w-full" size="lg">
-            {t('common.save')}
-          </Button>
-        </div>
-      </div>
-    </div>
+      {/* Home Screen Layout */}
+      <SettingsSection
+        title={t('settings.homeScreenLayout')}
+        description={t('settings.homeScreenLayoutDesc')}>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+          modifiers={[restrictToVerticalAxis]}>
+          <SortableContext
+            items={containerOrder}
+            strategy={verticalListSortingStrategy}>
+            <div className="space-y-2">
+              {containerOrder.map((containerId) => (
+                <SortableContainer
+                  key={containerId}
+                  id={containerId}
+                  label={
+                    t(CONTAINER_LABEL_KEYS[containerId]) ||
+                    CONTAINER_LABELS[containerId] ||
+                    containerId
+                  }
+                  isVisible={visibleContainers[containerId] ?? true}
+                  onToggle={handleToggleContainer}
+                />
+              ))}
+            </div>
+          </SortableContext>
+        </DndContext>
+      </SettingsSection>
+
+      <SettingsSaveButton onClick={() => navigate(-1)} />
+    </SettingsPageLayout>
   );
 }

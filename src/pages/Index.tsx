@@ -27,7 +27,10 @@ function migrateSettings(settings: UserSettings): Partial<UserSettings> {
   const migrated: Partial<UserSettings> = {};
 
   // Legacy sehriAdjustment → suhoorAdjustment
-  if ((settings as any).sehriAdjustment !== undefined && settings.suhoorAdjustment === undefined) {
+  if (
+    (settings as any).sehriAdjustment !== undefined &&
+    settings.suhoorAdjustment === undefined
+  ) {
     migrated.suhoorAdjustment = (settings as any).sehriAdjustment;
   }
 
@@ -81,58 +84,61 @@ const Index = () => {
     }
   }, [settings, updateSettings]);
 
-  const loadSalatTimes = useCallback((settings: UserSettings) => {
-    setIsLoading(true);
+  const loadSalatTimes = useCallback(
+    (settings: UserSettings) => {
+      setIsLoading(true);
 
-    // Calculate salat times locally using adhan library (no API call!)
-    const timings = calculatePrayerTimesLocally(new Date(), settings);
+      // Calculate salat times locally using adhan library (no API call!)
+      const timings = calculatePrayerTimesLocally(new Date(), settings);
 
-    // Create salat times array with jamaah times from settings
-    const salats: PrayerTime[] = [
-      {
-        id: 'fajr',
-        name: getSalatName('Fajr'),
-        start: timings.Fajr,
-        end: timings.Shuruq,
-        jamaah: settings.jamaahTimes.Fajr,
-      },
-      {
-        id: 'dhuhr',
-        name: getSalatName('Dhuhr'),
-        start: timings.Dhuhr,
-        end: timings.Asr,
-        jamaah: settings.jamaahTimes.Dhuhr,
-      },
-      {
-        id: 'asr',
-        name: getSalatName('Asr'),
-        start: timings.Asr,
-        end: timings.Maghrib,
-        jamaah: settings.jamaahTimes.Asr,
-      },
-      {
-        id: 'maghrib',
-        name: getSalatName('Maghrib'),
-        start: timings.Maghrib,
-        end: timings.Isha,
-        jamaah: settings.jamaahTimes.Maghrib,
-      },
-      {
-        id: 'isha',
-        name: getSalatName('Isha'),
-        start: timings.Isha,
-        end: timings.Fajr,
-        jamaah: settings.jamaahTimes.Isha,
-      },
-    ];
+      // Create salat times array with jamaah times from settings
+      const salats: PrayerTime[] = [
+        {
+          id: 'fajr',
+          name: getSalatName('Fajr'),
+          start: timings.Fajr,
+          end: timings.Shuruq,
+          jamaah: settings.jamaahTimes.Fajr,
+        },
+        {
+          id: 'dhuhr',
+          name: getSalatName('Dhuhr'),
+          start: timings.Dhuhr,
+          end: timings.Asr,
+          jamaah: settings.jamaahTimes.Dhuhr,
+        },
+        {
+          id: 'asr',
+          name: getSalatName('Asr'),
+          start: timings.Asr,
+          end: timings.Maghrib,
+          jamaah: settings.jamaahTimes.Asr,
+        },
+        {
+          id: 'maghrib',
+          name: getSalatName('Maghrib'),
+          start: timings.Maghrib,
+          end: timings.Isha,
+          jamaah: settings.jamaahTimes.Maghrib,
+        },
+        {
+          id: 'isha',
+          name: getSalatName('Isha'),
+          start: timings.Isha,
+          end: timings.Fajr,
+          jamaah: settings.jamaahTimes.Isha,
+        },
+      ];
 
-    setSalatTimes(salats);
-    setSuhoorTime(adjustTime(timings.Fajr, settings.suhoorAdjustment));
-    setIftarTime(adjustTime(timings.Maghrib, settings.iftarAdjustment));
-    setLastCalculatedDate(new Date().toDateString());
+      setSalatTimes(salats);
+      setSuhoorTime(adjustTime(timings.Fajr, settings.suhoorAdjustment));
+      setIftarTime(adjustTime(timings.Maghrib, settings.iftarAdjustment));
+      setLastCalculatedDate(new Date().toDateString());
 
-    setIsLoading(false);
-  }, [getSalatName]); // getSalatName changes with translations, so recreate when it changes
+      setIsLoading(false);
+    },
+    [getSalatName],
+  ); // getSalatName changes with translations, so recreate when it changes
 
   // Load salat times on component mount and when translation changes
   useEffect(() => {
@@ -183,12 +189,13 @@ const Index = () => {
           switch (containerId) {
             case EContainerType.DateTime:
               return (
-                <div key={containerId} className="animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: `${index * 100}ms` }}>
+                <div
+                  key={containerId}
+                  className="duration-500 animate-in fade-in slide-in-from-bottom-4"
+                  style={{ animationDelay: `${index * 100}ms` }}>
                   <DateTimeContainer
                     hijriAdjustment={settings.hijriAdjustment}
-                    hijriDateChangeAtMaghrib={
-                      settings.hijriDateChangeAtMaghrib
-                    }
+                    hijriDateChangeAtMaghrib={settings.hijriDateChangeAtMaghrib}
                     maghribTime={
                       salatTimes.find((p) => p.id === 'maghrib')?.start
                     }
@@ -202,7 +209,10 @@ const Index = () => {
               );
             case EContainerType.CurrentSalat:
               return (
-                <div key={containerId} className="animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: `${index * 100}ms` }}>
+                <div
+                  key={containerId}
+                  className="duration-500 animate-in fade-in slide-in-from-bottom-4"
+                  style={{ animationDelay: `${index * 100}ms` }}>
                   <CurrentPrayerContainer
                     allPrayers={salatTimes}
                     prohibitedTimes={prohibitedTimes}
@@ -212,7 +222,10 @@ const Index = () => {
               );
             case EContainerType.NextSalat:
               return (
-                <div key={containerId} className="animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: `${index * 100}ms` }}>
+                <div
+                  key={containerId}
+                  className="duration-500 animate-in fade-in slide-in-from-bottom-4"
+                  style={{ animationDelay: `${index * 100}ms` }}>
                   <NextPrayerContainer
                     allPrayers={salatTimes}
                     timeFormat={settings.timeFormat}
@@ -221,7 +234,10 @@ const Index = () => {
               );
             case EContainerType.SalatTimes:
               return (
-                <div key={containerId} className="animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: `${index * 100}ms` }}>
+                <div
+                  key={containerId}
+                  className="duration-500 animate-in fade-in slide-in-from-bottom-4"
+                  style={{ animationDelay: `${index * 100}ms` }}>
                   <PrayerTimesContainer
                     salats={salatTimes}
                     timeFormat={settings.timeFormat}
@@ -230,7 +246,10 @@ const Index = () => {
               );
             case EContainerType.ProhibitedTimes:
               return (
-                <div key={containerId} className="animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: `${index * 100}ms` }}>
+                <div
+                  key={containerId}
+                  className="duration-500 animate-in fade-in slide-in-from-bottom-4"
+                  style={{ animationDelay: `${index * 100}ms` }}>
                   <ProhibitedTimesContainer
                     prohibitedTimes={prohibitedTimes}
                     timeFormat={settings.timeFormat}
@@ -239,7 +258,10 @@ const Index = () => {
               );
             case EContainerType.SaumTimes:
               return (
-                <div key={containerId} className="animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: `${index * 100}ms` }}>
+                <div
+                  key={containerId}
+                  className="duration-500 animate-in fade-in slide-in-from-bottom-4"
+                  style={{ animationDelay: `${index * 100}ms` }}>
                   <FastingTimesContainer
                     suhoorTime={suhoorTime}
                     iftarTime={iftarTime}
@@ -258,13 +280,19 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Main Content */}
-      <div className="mx-auto max-w-md px-5 py-6 space-y-6">
+      <div className="mx-auto max-w-md space-y-6 px-5 py-6">
         {isLoading || !mounted ? (
-          <div className="flex h-[60vh] flex-col items-center justify-center animate-pulse">
+          <div className="flex h-[60vh] animate-pulse flex-col items-center justify-center">
             <div className="flex flex-col items-center gap-4">
-              <div className="h-12 w-12 rounded-full bg-secondary animate-bounce" style={{ animationDelay: '0ms' }}></div>
-              <div className="h-4 w-32 rounded bg-secondary" style={{ animationDelay: '150ms' }}></div>
-              <div className="h-3 w-24 rounded bg-secondary" style={{ animationDelay: '300ms' }}></div>
+              <div
+                className="h-12 w-12 animate-bounce rounded-full bg-secondary"
+                style={{ animationDelay: '0ms' }}></div>
+              <div
+                className="h-4 w-32 rounded bg-secondary"
+                style={{ animationDelay: '150ms' }}></div>
+              <div
+                className="h-3 w-24 rounded bg-secondary"
+                style={{ animationDelay: '300ms' }}></div>
             </div>
           </div>
         ) : (

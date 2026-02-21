@@ -1,58 +1,18 @@
+import { OnboardingPageLayout } from '@/components/onboarding/OnboardingPageLayout';
+import { OnboardingStepHeader } from '@/components/onboarding/OnboardingStepHeader';
+import { ActiveLanguageSelect } from '@/components/translation/ActiveLanguageSelect';
+import { TranslationImportControl } from '@/components/translation/TranslationImportControl';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { useTranslation } from '@/contexts/TranslationContext';
-import { Calendar, FileText, Globe, MapPin, Moon, Sunrise, Upload } from 'lucide-react';
-import { useRef } from 'react';
+import { ArrowUpRight, Calendar, MapPin, Moon, Sunrise } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
 
 export default function WelcomePage() {
   const navigate = useNavigate();
-  const {
-    t,
-    activeTranslation,
-    importedTranslations,
-    importTranslation,
-    setActiveTranslation,
-  } = useTranslation();
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { t, activeTranslation, importedTranslations, setActiveTranslation } =
+    useTranslation();
   const importedTranslationsList = Object.values(importedTranslations);
-
-  const handleFileImport = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const json = JSON.parse(e.target?.result as string);
-        const result = importTranslation(json);
-
-        if (result.success && result.id) {
-          // Auto-apply the newly imported translation
-          setActiveTranslation(result.id);
-          toast.success(t('settings.importSuccess'));
-          // Reset file input
-          if (fileInputRef.current) {
-            fileInputRef.current.value = '';
-          }
-        } else {
-          toast.error(result.error || t('settings.importError'));
-        }
-      } catch (error) {
-        toast.error(t('errors.invalidFile'));
-      }
-    };
-    reader.readAsText(file);
-  };
 
   const features = [
     {
@@ -86,133 +46,81 @@ export default function WelcomePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Content - same width/padding as dashboard and settings */}
-      <div className="mx-auto max-w-md px-5 py-6 space-y-6">
-        {/* App Logo */}
-        <div className="flex justify-center">
-          <div className="mx-auto flex h-20 w-20 items-center justify-center">
-            <img
-              src="/icon.png"
-              alt={t('aboutPage.appName')}
-              className="h-full w-full object-contain"
-            />
-          </div>
+    <OnboardingPageLayout currentStep={1}>
+      {/* App Logo */}
+      <div className="flex justify-center">
+        <div className="mx-auto flex h-20 w-20 items-center justify-center">
+          <img
+            src="/icon.png"
+            alt={t('aboutPage.appName')}
+            className="h-full w-full object-contain"
+          />
         </div>
+      </div>
 
-          {/* Title */}
-          <div className="text-center space-y-2">
-            <h1 className="text-3xl font-bold tracking-tight">
-              {t('onboarding.welcome')}
-            </h1>
-            <p className="text-base text-muted-foreground">
-              {t('onboarding.subtitle')}
-            </p>
-          </div>
+      <OnboardingStepHeader
+        title={t('onboarding.welcome')}
+        description={t('onboarding.subtitle')}
+      />
 
-        {/* Features Grid */}
-        <Card className="shadow-lg">
-          <CardContent className="p-6">
-            <div className="grid grid-cols-2 gap-4">
-              {features.map((feature, index) => {
-                const Icon = feature.icon;
-                return (
+      {/* Features Grid */}
+      <Card className="shadow-lg">
+        <CardContent className="p-6">
+          <div className="grid grid-cols-2 gap-4">
+            {features.map((feature, index) => {
+              const Icon = feature.icon;
+              return (
+                <div key={index} className="space-y-2 text-center">
                   <div
-                    key={index}
-                    className="text-center space-y-2">
-                    <div className={`w-12 h-12 mx-auto rounded-xl ${feature.iconBg} flex items-center justify-center`}>
-                      <Icon className={`w-6 h-6 ${feature.iconColor}`} />
-                    </div>
-                    <h3 className="font-semibold text-sm">{feature.title}</h3>
-                    <p className="text-xs text-muted-foreground">{feature.description}</p>
+                    className={`mx-auto h-12 w-12 rounded-xl ${feature.iconBg} flex items-center justify-center`}>
+                    <Icon className={`h-6 w-6 ${feature.iconColor}`} />
                   </div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Language Selection */}
-        <div className="space-y-3">
-          <Label className="text-sm font-medium">{t('settings.selectActiveLanguage')}</Label>
-          <Select
-            value={activeTranslation?.id || 'en'}
-            onValueChange={(value) =>
-              setActiveTranslation(value === 'en' ? null : value)
-            }>
-            <SelectTrigger>
-              <SelectValue placeholder={t('settings.selectLanguageOption')} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="en">
-                <div className="flex items-center gap-2">
-                  <Globe className="h-4 w-4" />
-                  {t('settings.englishDefault')}
+                  <h3 className="text-sm font-semibold">{feature.title}</h3>
+                  <p className="text-xs text-muted-foreground">
+                    {feature.description}
+                  </p>
                 </div>
-              </SelectItem>
-              <SelectItem value="bn">
-                <div className="flex items-center gap-2">
-                  <Globe className="h-4 w-4" />
-                  বাংলা (Bangla)
-                </div>
-              </SelectItem>
-              {importedTranslationsList.map((translation) => (
-                <SelectItem key={translation.id} value={translation.id}>
-                  <div className="flex items-center gap-2">
-                    <FileText className="h-4 w-4" />
-                    {translation.meta.languageName}
-                    <span className="ml-1 text-xs text-muted-foreground">
-                      ({translation.meta.direction})
-                    </span>
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
 
-        {/* Translation Import */}
-        <Button
-          variant="outline"
-          onClick={() => fileInputRef.current?.click()}
-          className="w-full">
-          <Upload className="w-4 h-4 mr-2" />
-          {t('settings.importTranslation')}
-        </Button>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".json"
-          onChange={handleFileImport}
-          className="hidden"
-        />
+      {/* Language Selection */}
+      <ActiveLanguageSelect
+        value={activeTranslation?.id || 'en'}
+        importedTranslations={importedTranslationsList}
+        onValueChange={(value) =>
+          setActiveTranslation(value === 'en' ? null : value)
+        }
+        sectionClassName="space-y-3"
+        labelClassName="text-sm font-medium"
+      />
 
-        {/* Translation import help text (after import button) */}
-        <a
-          href="https://github.com/MuslimTechnician/muajjin/discussions/1"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mx-auto text-center text-xs text-muted-foreground text-primary hover:underline block">
-          {t('onboarding.translationImportDescriptionWithLearnMore')}
-        </a>
+      <TranslationImportControl
+        buttonLabel={t('settings.importTranslation')}
+        requireIdForSuccess={true}
+        onImported={(id) => setActiveTranslation(id)}
+        helper={
+          <a
+            href="https://github.com/MuslimTechnician/muajjin/discussions/1"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mx-auto block text-center text-xs text-primary hover:underline">
+            {t('onboarding.translationImportDescriptionWithLearnMore')}{' '}
+            <ArrowUpRight className="inline h-4 w-4" />
+          </a>
+        }
+        helperPosition="after"
+      />
 
-        {/* Get Started Button */}
-        <Button
-          onClick={() => navigate('/onboarding/location', { replace: true })}
-          size="lg"
-          className="w-full">
-          {t('onboarding.getStarted')}
-        </Button>
-      </div>
-
-      {/* Progress indicator - same width/padding as content */}
-      <div className="mx-auto max-w-md px-5 py-4">
-        <div className="flex justify-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-primary" />
-          <div className="w-2 h-2 rounded-full bg-muted" />
-          <div className="w-2 h-2 rounded-full bg-muted" />
-        </div>
-      </div>
-    </div>
+      {/* Get Started Button */}
+      <Button
+        onClick={() => navigate('/onboarding/location', { replace: true })}
+        size="lg"
+        className="w-full">
+        {t('onboarding.getStarted')}
+      </Button>
+    </OnboardingPageLayout>
   );
 }

@@ -1,19 +1,22 @@
+import { LabeledInputField } from '@/components/form/LabeledInputField';
+import { LocationAutoDetectButton } from '@/components/location/LocationAutoDetectButton';
+import {
+  LocationStatus,
+  LocationStatusAlert,
+} from '@/components/location/LocationStatusAlert';
+import { SettingsPageLayout } from '@/components/settings/SettingsPageLayout';
+import { SettingsSaveButton } from '@/components/settings/SettingsSaveButton';
+import { SettingsSection } from '@/components/settings/SettingsSection';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { SelectionButtonGroup } from '@/components/ui/SelectionButtonGroup';
 import { Label } from '@/components/ui/label';
+import { useApp } from '@/contexts/AppContext';
 import { useTranslation } from '@/contexts/TranslationContext';
 import { detectLocation, LocationResult } from '@/services/locationService';
 import { UserSettings } from '@/types';
-import {
-  AlertCircle,
-  CheckCircle2,
-  Loader2,
-  MapPin,
-} from 'lucide-react';
-import { AppHeader } from '@/components/AppHeader';
+import { MapPin } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useApp } from '@/contexts/AppContext';
 
 export default function TimeLocationSettings() {
   const navigate = useNavigate();
@@ -23,10 +26,9 @@ export default function TimeLocationSettings() {
     ...settings,
   });
   const [isDetecting, setIsDetecting] = useState(false);
-  const [locationStatus, setLocationStatus] = useState<{
-    type: 'success' | 'error' | 'info';
-    message: string;
-  } | null>(null);
+  const [locationStatus, setLocationStatus] = useState<LocationStatus | null>(
+    null,
+  );
 
   useEffect(() => {
     setLocalSettings({ ...settings });
@@ -89,155 +91,80 @@ export default function TimeLocationSettings() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <AppHeader showBackButton={true} title={t('settings.timeLocationSettings')} />
+    <SettingsPageLayout
+      title={t('settings.timeLocationSettings')}
+      contentClassName="max-w-md mx-auto px-5 py-6 space-y-6">
+      {/* Time Format */}
+      <SettingsSection
+        title={t('settings.timeFormat')}
+        description={t('settings.timeFormatDesc')}>
+        <SelectionButtonGroup
+          value={localSettings.timeFormat}
+          onChange={(value) => updateSetting('timeFormat', value)}
+          options={[
+            { value: '24h', label: t('settings.24hour') },
+            { value: '12h', label: t('settings.12hour') },
+            { value: 'system', label: t('settings.system') },
+          ]}
+        />
+      </SettingsSection>
 
-      {/* Content */}
-      <div className="max-w-md mx-auto px-5 py-6 space-y-6">
-        {/* Time Format */}
-        <div className="space-y-3">
-          <div className="space-y-1">
-            <Label>{t('settings.timeFormat')}</Label>
-            <p className="text-sm text-muted-foreground">
-              {t('settings.timeFormatDesc')}
-            </p>
-          </div>
-          <div className="grid grid-cols-3 gap-3">
-            <Button
-              type="button"
-              variant={
-                localSettings.timeFormat === '24h' ? 'default' : 'outline'
-              }
-              onClick={() => updateSetting('timeFormat', '24h')}
-              className="w-full">
-              {t('settings.24hour')}
-            </Button>
-            <Button
-              type="button"
-              variant={
-                localSettings.timeFormat === '12h' ? 'default' : 'outline'
-              }
-              onClick={() => updateSetting('timeFormat', '12h')}
-              className="w-full">
-              {t('settings.12hour')}
-            </Button>
-            <Button
-              type="button"
-              variant={
-                localSettings.timeFormat === 'system' ? 'default' : 'outline'
-              }
-              onClick={() => updateSetting('timeFormat', 'system')}
-              className="w-full">
-              {t('settings.system')}
-            </Button>
-          </div>
+      {/* Location Section */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <MapPin className="h-5 w-5 text-muted-foreground" />
+          <Label className="text-base">{t('settings.locationSection')}</Label>
         </div>
 
-        {/* Location Section */}
-        <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <MapPin className="h-5 w-5 text-muted-foreground" />
-            <Label className="text-base">{t('settings.locationSection')}</Label>
-          </div>
+        {/* Location Name */}
+        <LabeledInputField
+          id="location-name"
+          label={t('settings.locationNameLabel')}
+          placeholder={t('settings.locationNamePlaceholder')}
+          value={localSettings.city || ''}
+          onChange={(value) => updateSetting('city', value)}
+          containerClassName="space-y-1"
+        />
 
-          {/* Location Name */}
-          <div className="space-y-1">
-            <Label htmlFor="location-name">
-              {t('settings.locationNameLabel')}
-            </Label>
-            <Input
-              id="location-name"
-              placeholder={t('settings.locationNamePlaceholder')}
-              value={localSettings.city || ''}
-              onChange={(e) => updateSetting('city', e.target.value)}
-              className="bg-card"
-            />
-          </div>
+        {/* Latitude */}
+        <LabeledInputField
+          id="latitude"
+          type="number"
+          step="0.0001"
+          label={t('settings.latitudeLabel')}
+          placeholder={t('settings.latitudePlaceholder')}
+          value={localSettings.latitude || ''}
+          onChange={(value) =>
+            updateSetting('latitude', parseFloat(value) || 0)
+          }
+          containerClassName="space-y-1"
+        />
 
-          {/* Latitude */}
-          <div className="space-y-1">
-            <Label htmlFor="latitude">{t('settings.latitudeLabel')}</Label>
-            <Input
-              id="latitude"
-              type="number"
-              step="0.0001"
-              placeholder={t('settings.latitudePlaceholder')}
-              value={localSettings.latitude || ''}
-              onChange={(e) =>
-                updateSetting('latitude', parseFloat(e.target.value) || 0)
-              }
-              className="bg-card"
-            />
-          </div>
+        {/* Longitude */}
+        <LabeledInputField
+          id="longitude"
+          type="number"
+          step="0.0001"
+          label={t('settings.longitudeLabel')}
+          placeholder={t('settings.longitudePlaceholder')}
+          value={localSettings.longitude || ''}
+          onChange={(value) =>
+            updateSetting('longitude', parseFloat(value) || 0)
+          }
+          containerClassName="space-y-1"
+        />
 
-          {/* Longitude */}
-          <div className="space-y-1">
-            <Label htmlFor="longitude">{t('settings.longitudeLabel')}</Label>
-            <Input
-              id="longitude"
-              type="number"
-              step="0.0001"
-              placeholder={t('settings.longitudePlaceholder')}
-              value={localSettings.longitude || ''}
-              onChange={(e) =>
-                updateSetting('longitude', parseFloat(e.target.value) || 0)
-              }
-              className="bg-card"
-            />
-          </div>
+        {/* Auto Detect Button */}
+        <LocationAutoDetectButton
+          isDetecting={isDetecting}
+          onClick={handleAutoDetect}
+        />
 
-          {/* Auto Detect Button */}
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleAutoDetect}
-            disabled={isDetecting}
-            className="w-full">
-            {isDetecting ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                {t('onboarding.detecting')}
-              </>
-            ) : (
-              <>
-                <MapPin className="mr-2 h-4 w-4" />
-                {t('onboarding.autoDetect')}
-              </>
-            )}
-          </Button>
-
-          {/* Status Message */}
-          {locationStatus && (
-            <div
-              className={`flex items-start gap-2 rounded-md border p-3 ${
-                locationStatus.type === 'success'
-                  ? 'border-green-200 bg-green-50 text-green-800 dark:border-green-800 dark:bg-green-950 dark:text-green-200'
-                  : locationStatus.type === 'error'
-                    ? 'border-red-200 bg-red-50 text-red-800 dark:border-red-800 dark:bg-red-950 dark:text-red-200'
-                    : 'border-blue-200 bg-blue-50 text-blue-800 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-200'
-              }`}>
-              {locationStatus.type === 'success' && (
-                <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0" />
-              )}
-              {locationStatus.type === 'error' && (
-                <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
-              )}
-              {locationStatus.type === 'info' && (
-                <Loader2 className="mt-0.5 h-4 w-4 flex-shrink-0 animate-spin" />
-              )}
-              <p className="text-sm">{locationStatus.message}</p>
-            </div>
-          )}
-        </div>
-
-        {/* Save Button */}
-        <div className="pt-4">
-          <Button onClick={handleSave} className="w-full" size="lg">
-            {t('common.save')}
-          </Button>
-        </div>
+        {/* Status Message */}
+        <LocationStatusAlert status={locationStatus} mode="settings" />
       </div>
-    </div>
+
+      <SettingsSaveButton onClick={handleSave} />
+    </SettingsPageLayout>
   );
 }

@@ -61,6 +61,8 @@ export interface TranslationStrings {
     asrCalculation: string;
     hijriAdjustment: string;
     hijriDateChangeAtMaghrib: string;
+    hijriCalendarInfoTitle: string;
+    hijriCalendarInfoDesc: string;
     suhoorAdjustment: string;
     iftarAdjustment: string;
     theme: string;

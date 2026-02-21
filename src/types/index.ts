@@ -1,4 +1,3 @@
-
 export interface PrayerTime {
   id: string; // Salat ID (e.g., 'fajr', 'dhuhr') - untranslated key for logic
   name: string; // Translated display name (e.g., 'Fajr', 'الفجر')

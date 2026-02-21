@@ -1,8 +1,7 @@
-import { PrayerTime } from '@/types';
-import { Card, CardContent } from '@/components/ui/card';
-import { formatTime } from '@/utils/timeUtils';
+import { Card } from '@/components/ui/card';
 import { useTranslation } from '@/contexts/TranslationContext';
-import { getCurrentSalat } from '@/utils/timeUtils';
+import { PrayerTime } from '@/types';
+import { formatTime, getCurrentSalat } from '@/utils/timeUtils';
 import { useCallback, useEffect, useState } from 'react';
 
 interface PrayerTimesContainerProps {
@@ -10,7 +9,10 @@ interface PrayerTimesContainerProps {
   timeFormat?: 'system' | '12h' | '24h';
 }
 
-export function PrayerTimesContainer({ salats, timeFormat = 'system' }: PrayerTimesContainerProps) {
+export function PrayerTimesContainer({
+  salats,
+  timeFormat = 'system',
+}: PrayerTimesContainerProps) {
   const { t } = useTranslation();
   const [currentPrayer, setCurrentPrayer] = useState<PrayerTime | null>(null);
 
@@ -41,8 +43,8 @@ export function PrayerTimesContainer({ salats, timeFormat = 'system' }: PrayerTi
   return (
     <Card className="overflow-hidden">
       {/* Table Header */}
-      <div className="grid grid-cols-4 gap-2 p-3 bg-muted/30 text-xs uppercase tracking-wider text-muted-foreground font-semibold">
-        <div className="text-left pl-2">{t('salatTimes.salat')}</div>
+      <div className="grid grid-cols-4 gap-2 bg-muted/30 p-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+        <div className="pl-2 text-left">{t('salatTimes.salat')}</div>
         <div className="text-center">{t('salatTimes.start')}</div>
         <div className="text-center">{t('salatTimes.jamaah')}</div>
         <div className="text-center">{t('salatTimes.end')}</div>
@@ -57,20 +59,24 @@ export function PrayerTimesContainer({ salats, timeFormat = 'system' }: PrayerTi
             <div
               key={salat.name}
               className={`grid grid-cols-4 gap-2 p-3 ${
-                isCurrent ? 'bg-primary/5 border-l-4 border-l-primary' : ''
+                isCurrent && 'border-l-4 border-l-primary bg-primary/5'
               }`}>
-              <div className={`text-left font-bold ${isCurrent ? 'text-primary' : ''}`}>
+              <p
+                className={`text-left font-bold ${isCurrent && 'text-primary'}`}>
                 {salat.name}
-              </div>
-              <div className={`text-center ${isCurrent ? 'font-medium' : ''}`}>
+              </p>
+
+              <p className={`text-center ${isCurrent && 'font-medium'}`}>
                 {formatTime(salat.start, timeFormat)}
-              </div>
-              <div className="text-center text-primary font-semibold">
+              </p>
+
+              <p className="text-center font-semibold text-primary">
                 {salat.jamaah ? formatTime(jamaahTime, timeFormat) : '—'}
-              </div>
-              <div className="text-center">
+              </p>
+
+              <p className="text-center">
                 {salat.end ? formatTime(salat.end, timeFormat) : '—'}
-              </div>
+              </p>
             </div>
           );
         })}

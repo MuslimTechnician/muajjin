@@ -5,18 +5,18 @@ const config: CapacitorConfig = {
   appName: 'Muajjin',
   webDir: 'dist',
   server: {
-    androidScheme: 'https'
+    androidScheme: 'https',
   },
   android: {
     buildOptions: {
-      signingType: 'apksigner'
-    }
+      signingType: 'apksigner',
+    },
   },
   plugins: {
     EdgeToEdge: {
-      backgroundColor: '#ffffff'
-    }
-  }
+      backgroundColor: '#ffffff',
+    },
+  },
 };
 
 export default config;

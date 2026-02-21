@@ -1,12 +1,18 @@
+import { LabeledInputField } from '@/components/form/LabeledInputField';
+import { LocationAutoDetectButton } from '@/components/location/LocationAutoDetectButton';
+import {
+  LocationStatus,
+  LocationStatusAlert,
+} from '@/components/location/LocationStatusAlert';
+import { OnboardingPageLayout } from '@/components/onboarding/OnboardingPageLayout';
+import { OnboardingStepHeader } from '@/components/onboarding/OnboardingStepHeader';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { ONBOARDING_DEFAULTS } from '@/constants/defaultSettings';
+import { useApp } from '@/contexts/AppContext';
 import { useTranslation } from '@/contexts/TranslationContext';
 import { detectLocation, LocationResult } from '@/services/locationService';
-import { useApp } from '@/contexts/AppContext';
-import { AlertCircle, CheckCircle2, Info, Loader2, MapPin } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -26,10 +32,9 @@ export default function LocationSetupPage() {
     longitude: 0,
   });
   const [isDetecting, setIsDetecting] = useState(false);
-  const [locationStatus, setLocationStatus] = useState<{
-    type: 'success' | 'error' | 'info';
-    message: string;
-  } | null>(null);
+  const [locationStatus, setLocationStatus] = useState<LocationStatus | null>(
+    null,
+  );
 
   const handleAutoDetect = async () => {
     setIsDetecting(true);
@@ -86,156 +91,85 @@ export default function LocationSetupPage() {
     navigate('/onboarding/settings', { replace: true });
   };
 
-  const getStatusIcon = () => {
-    if (!locationStatus) return null;
-
-    switch (locationStatus.type) {
-      case 'success':
-        return <CheckCircle2 className="w-5 h-5 text-green-500" />;
-      case 'error':
-        return <AlertCircle className="w-5 h-5 text-destructive" />;
-      case 'info':
-        return <Info className="w-5 h-5 text-blue-500" />;
-    }
-  };
-
-  const getStatusBgColor = () => {
-    if (!locationStatus) return '';
-
-    switch (locationStatus.type) {
-      case 'success':
-        return 'bg-green-500/10 text-green-700 dark:text-green-400';
-      case 'error':
-        return 'bg-destructive/10 text-destructive';
-      case 'info':
-        return 'bg-blue-500/10 text-blue-700 dark:text-blue-400';
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-background">
-      {/* Content - same width/padding as dashboard and settings */}
-      <div className="mx-auto max-w-md px-5 py-6 space-y-6">
-        {/* Icon */}
-        <div className="flex justify-center">
-          <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
-            <MapPin className="w-10 h-10 text-primary" />
+    <OnboardingPageLayout currentStep={2}>
+      <OnboardingStepHeader
+        title={t('onboarding.setLocation')}
+        description={t('onboarding.setLocationDesc')}
+        icon={<MapPin className="h-10 w-10 text-primary" />}
+      />
+
+      <Card className="shadow-lg">
+        <CardContent className="space-y-4 p-6">
+          {/* Form */}
+          <div className="space-y-4">
+            {/* Location Name */}
+            <LabeledInputField
+              id="location-name"
+              label={t('onboarding.locationName')}
+              placeholder={t('onboarding.locationPlaceholder')}
+              value={location.city}
+              onChange={(value) => setLocation({ ...location, city: value })}
+              containerClassName="space-y-2"
+            />
+
+            <div className="grid grid-cols-2 gap-3">
+              {/* Latitude */}
+              <LabeledInputField
+                id="latitude"
+                type="number"
+                step="0.0001"
+                label={t('onboarding.latitude')}
+                placeholder={t('onboarding.latitudePlaceholder')}
+                value={location.latitude || ''}
+                onChange={(value) =>
+                  setLocation({
+                    ...location,
+                    latitude: parseFloat(value) || 0,
+                  })
+                }
+                containerClassName="space-y-2"
+              />
+
+              {/* Longitude */}
+              <LabeledInputField
+                id="longitude"
+                type="number"
+                step="0.0001"
+                label={t('onboarding.longitude')}
+                placeholder={t('onboarding.longitudePlaceholder')}
+                value={location.longitude || ''}
+                onChange={(value) =>
+                  setLocation({
+                    ...location,
+                    longitude: parseFloat(value) || 0,
+                  })
+                }
+                containerClassName="space-y-2"
+              />
+            </div>
+
+            {/* Auto Detect Button */}
+            <LocationAutoDetectButton
+              variant="secondary"
+              isDetecting={isDetecting}
+              onClick={handleAutoDetect}
+            />
+
+            {/* Status Message */}
+            <LocationStatusAlert status={locationStatus} mode="onboarding" />
           </div>
-        </div>
+        </CardContent>
+      </Card>
 
-        {/* Title */}
-        <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight">{t('onboarding.setLocation')}</h1>
-          <p className="text-base text-muted-foreground">
-            {t('onboarding.setLocationDesc')}
-          </p>
-        </div>
-
-        <Card className="shadow-lg">
-            <CardContent className="p-6 space-y-4">
-              {/* Form */}
-              <div className="space-y-4">
-                {/* Location Name */}
-                <div className="space-y-2">
-                  <Label htmlFor="location-name">{t('onboarding.locationName')}</Label>
-                  <Input
-                    id="location-name"
-                    placeholder={t('onboarding.locationPlaceholder')}
-                    value={location.city}
-                    onChange={(e) => setLocation({ ...location, city: e.target.value })}
-                    className="bg-card"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  {/* Latitude */}
-                  <div className="space-y-2">
-                    <Label htmlFor="latitude">{t('onboarding.latitude')}</Label>
-                    <Input
-                      id="latitude"
-                      type="number"
-                      step="0.0001"
-                      placeholder={t('onboarding.latitudePlaceholder')}
-                      value={location.latitude || ''}
-                      onChange={(e) =>
-                        setLocation({
-                          ...location,
-                          latitude: parseFloat(e.target.value) || 0,
-                        })
-                      }
-                      className="bg-card"
-                    />
-                  </div>
-
-                  {/* Longitude */}
-                  <div className="space-y-2">
-                    <Label htmlFor="longitude">{t('onboarding.longitude')}</Label>
-                    <Input
-                      id="longitude"
-                      type="number"
-                      step="0.0001"
-                      placeholder={t('onboarding.longitudePlaceholder')}
-                      value={location.longitude || ''}
-                      onChange={(e) =>
-                        setLocation({
-                          ...location,
-                          longitude: parseFloat(e.target.value) || 0,
-                        })
-                      }
-                      className="bg-card"
-                    />
-                  </div>
-                </div>
-
-                {/* Auto Detect Button */}
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={handleAutoDetect}
-                  disabled={isDetecting}
-                  className="w-full">
-                  {isDetecting ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      {t('onboarding.detecting')}
-                    </>
-                  ) : (
-                    <>
-                      <MapPin className="w-4 h-4 mr-2" />
-                      {t('onboarding.autoDetect')}
-                    </>
-                  )}
-                </Button>
-
-                {/* Status Message */}
-                {locationStatus && (
-                  <div className={`flex items-center gap-2 p-3 rounded-lg ${getStatusBgColor()}`}>
-                    {getStatusIcon()}
-                    <span className="text-sm font-medium">{locationStatus.message}</span>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-        {/* Continue Button - outside card for better reachability */}
-        <Button
-          onClick={handleContinue}
-          size="lg"
-          className="w-full"
-          disabled={!location.city}>
-          {t('onboarding.continue')}
-        </Button>
-      </div>
-
-      {/* Progress indicator - same width/padding as content */}
-      <div className="mx-auto max-w-md px-5 py-4">
-        <div className="flex justify-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-primary" />
-          <div className="w-2 h-2 rounded-full bg-primary" />
-          <div className="w-2 h-2 rounded-full bg-muted" />
-        </div>
-      </div>
-    </div>
+      {/* Continue Button - outside card for better reachability */}
+      <Button
+        onClick={handleContinue}
+        size="lg"
+        className="w-full"
+        disabled={!location.city}>
+        {t('onboarding.continue')}
+      </Button>
+    </OnboardingPageLayout>
   );
 }

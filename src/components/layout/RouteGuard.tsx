@@ -34,4 +34,3 @@ export const RouteGuard: FC<RouteGuardProps> = ({
 
   return <>{children}</>;
 };
-

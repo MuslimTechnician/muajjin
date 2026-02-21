@@ -54,7 +54,7 @@ export function DateTimeContainer({
           new Date(),
           hijriAdjustment,
           maghribTime,
-          hijriDateChangeAtMaghrib
+          hijriDateChangeAtMaghrib,
         );
         setHijriDate(hijri);
         setLastCalculatedDate(today);
@@ -68,10 +68,15 @@ export function DateTimeContainer({
     const timer = setInterval(updateHijriDate, 60000);
 
     return () => clearInterval(timer);
-  }, [hijriAdjustment, hijriDateChangeAtMaghrib, maghribTime, lastCalculatedDate]);
+  }, [
+    hijriAdjustment,
+    hijriDateChangeAtMaghrib,
+    maghribTime,
+    lastCalculatedDate,
+  ]);
 
   return (
-    <div className="text-center space-y-3">
+    <div className="space-y-3 text-center">
       {/* Large Clock Time */}
       <div className="text-5xl font-bold tracking-tighter text-primary">
         {currentTime.split(':').slice(0, 2).join(':')}
@@ -80,14 +85,14 @@ export function DateTimeContainer({
       {/* Date Row */}
       <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
         <span>{formatGregorianDateShort(new Date())}</span>
-        <span className="w-1 h-1 rounded-full bg-muted-foreground" />
+        <span className="h-1 w-1 rounded-full bg-muted-foreground" />
         <span>{formatHijriDateLocal(hijriDate)}</span>
       </div>
 
       {/* Location Badge */}
       {location && (
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold uppercase tracking-wider">
-          <MapPin className="w-3 h-3" />
+        <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
+          <MapPin className="h-3 w-3" />
           {location.city}
         </div>
       )}

@@ -9,6 +9,7 @@
     "build": "vite build",
     "build:github": "vite build --mode github",
     "build:dev": "vite build --mode development",
+    "format": "prettier --write .",
     "lint": "eslint .",
     "preview": "vite preview",
     "cap:sync": "bunx cap sync",
