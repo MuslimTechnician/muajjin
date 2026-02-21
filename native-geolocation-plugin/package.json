@@ -1,0 +1,21 @@
+{
+  "name": "@muajjin/native-geolocation",
+  "version": "1.0.0",
+  "description": "Native geolocation plugin without Google Play Services dependency",
+  "main": "dist/plugin.js",
+  "types": "dist/definitions.d.ts",
+  "capacitor": {
+    "android": {
+      "src": "android"
+    }
+  },
+  "keywords": [
+    "capacitor",
+    "plugin",
+    "geolocation",
+    "native",
+    "android"
+  ],
+  "author": "Muajjin",
+  "license": "MIT"
+}

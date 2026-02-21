@@ -32,9 +32,11 @@
     <!-- Permissions -->
 
     <!-- Location Permissions -->
+    <!-- NOTE: ACCESS_BACKGROUND_LOCATION is NOT needed - location is only requested
+         when user explicitly clicks "Auto Detect" button in onboarding or settings.
+         No background services or foreground tracking exist. -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
 
     <!-- Internet Permission -->
     <uses-permission android:name="android.permission.INTERNET" />
