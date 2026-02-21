@@ -1,7 +1,17 @@
-
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
 import { Separator } from '@/components/ui/separator';
 import { useTranslation } from '@/contexts/TranslationContext';
 
@@ -23,10 +33,14 @@ export function AboutSection() {
 
         <Accordion type="single" collapsible className="w-full">
           <AccordionItem value="salat-times">
-            <AccordionTrigger>{t('about.sections.salatTimes')}</AccordionTrigger>
+            <AccordionTrigger>
+              {t('about.sections.salatTimes')}
+            </AccordionTrigger>
             <AccordionContent>
-              <p className="text-sm mb-2">{t('about.sections.salatTimesDesc')}</p>
-              <ul className="list-disc list-inside text-sm space-y-1">
+              <p className="mb-2 text-sm">
+                {t('about.sections.salatTimesDesc')}
+              </p>
+              <ul className="list-inside list-disc space-y-1 text-sm">
                 <li>{t('about.sections.salatTimesList1')}</li>
                 <li>{t('about.sections.salatTimesList2')}</li>
                 <li>{t('about.sections.salatTimesList3')}</li>
@@ -37,8 +51,8 @@ export function AboutSection() {
           <AccordionItem value="location">
             <AccordionTrigger>{t('about.sections.location')}</AccordionTrigger>
             <AccordionContent>
-              <p className="text-sm mb-2">{t('about.sections.locationDesc')}</p>
-              <ul className="list-disc list-inside text-sm space-y-1">
+              <p className="mb-2 text-sm">{t('about.sections.locationDesc')}</p>
+              <ul className="list-inside list-disc space-y-1 text-sm">
                 <li>{t('about.sections.locationList1')}</li>
                 <li>{t('about.sections.locationList2')}</li>
               </ul>
@@ -46,10 +60,14 @@ export function AboutSection() {
           </AccordionItem>
 
           <AccordionItem value="calculation-methods">
-            <AccordionTrigger>{t('about.sections.calculationMethods')}</AccordionTrigger>
+            <AccordionTrigger>
+              {t('about.sections.calculationMethods')}
+            </AccordionTrigger>
             <AccordionContent>
-              <p className="text-sm mb-2">{t('about.sections.calculationMethodsDesc')}</p>
-              <ul className="list-disc list-inside text-sm space-y-1">
+              <p className="mb-2 text-sm">
+                {t('about.sections.calculationMethodsDesc')}
+              </p>
+              <ul className="list-inside list-disc space-y-1 text-sm">
                 <li>{t('about.sections.calculationMethodsList1')}</li>
                 <li>{t('about.sections.calculationMethodsList2')}</li>
                 <li>{t('about.sections.calculationMethodsList3')}</li>
@@ -58,10 +76,14 @@ export function AboutSection() {
           </AccordionItem>
 
           <AccordionItem value="jamaah-times">
-            <AccordionTrigger>{t('about.sections.jamaahTimes')}</AccordionTrigger>
+            <AccordionTrigger>
+              {t('about.sections.jamaahTimes')}
+            </AccordionTrigger>
             <AccordionContent>
-              <p className="text-sm mb-2">{t('about.sections.jamaahTimesDesc')}</p>
-              <ul className="list-disc list-inside text-sm space-y-1">
+              <p className="mb-2 text-sm">
+                {t('about.sections.jamaahTimesDesc')}
+              </p>
+              <ul className="list-inside list-disc space-y-1 text-sm">
                 <li>{t('about.sections.jamaahTimesList1')}</li>
                 <li>{t('about.sections.jamaahTimesList2')}</li>
               </ul>

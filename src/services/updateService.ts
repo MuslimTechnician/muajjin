@@ -17,7 +17,10 @@ const parseVersion = (version: string) =>
     .map((part) => Number.parseInt(part, 10))
     .filter((part) => Number.isFinite(part));
 
-export const isNewerVersion = (currentVersion: string, latestVersion: string) => {
+export const isNewerVersion = (
+  currentVersion: string,
+  latestVersion: string,
+) => {
   const currentParts = parseVersion(currentVersion);
   const latestParts = parseVersion(latestVersion);
   const maxLength = Math.max(currentParts.length, latestParts.length);

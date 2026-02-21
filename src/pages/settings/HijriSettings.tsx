@@ -1,12 +1,14 @@
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
+import { HijriAdjustmentSelector } from '@/components/HijriAdjustmentSelector';
+import { HijriCalendarInfoCard } from '@/components/HijriCalendarInfoCard';
+import { SettingsPageLayout } from '@/components/settings/SettingsPageLayout';
+import { SettingsSaveButton } from '@/components/settings/SettingsSaveButton';
+import { SettingsSection } from '@/components/settings/SettingsSection';
 import { Switch } from '@/components/ui/switch';
+import { useApp } from '@/contexts/AppContext';
 import { useTranslation } from '@/contexts/TranslationContext';
 import { UserSettings } from '@/types';
-import { AppHeader } from '@/components/AppHeader';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useApp } from '@/contexts/AppContext';
 
 export default function HijriSettings() {
   const navigate = useNavigate();
@@ -25,75 +27,43 @@ export default function HijriSettings() {
     navigate(-1);
   };
 
-  const adjustmentOptions = [-3, -2, -1, 0, 1, 2, 3];
-
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <AppHeader showBackButton={true} title={t('settings.hijriSettings')} />
+    <SettingsPageLayout title={t('settings.hijriSettings')}>
+      {/* Adjust Hijri Date */}
+      <HijriAdjustmentSelector
+        value={localSettings.hijriAdjustment}
+        onChange={(value) =>
+          setLocalSettings((prev) => ({
+            ...prev,
+            hijriAdjustment: value,
+          }))
+        }
+      />
 
-      {/* Content */}
-      <div className="max-w-md mx-auto px-5 py-6 space-y-6">
-        {/* Adjust Hijri Date */}
-        <div className="space-y-3">
-          <div className="space-y-1">
-            <Label>{t('settings.hijriAdjustment')}</Label>
-            <p className="text-sm text-muted-foreground">
-              {t('settings.hijriAdjustmentDesc')}
-            </p>
-          </div>
-          <div className="flex gap-2 flex-wrap">
-            {adjustmentOptions.map((value) => (
-              <Button
-                key={value}
-                type="button"
-                variant={
-                  localSettings.hijriAdjustment === value
-                    ? 'default'
-                    : 'outline'
-                }
-                onClick={() =>
-                  setLocalSettings((prev) => ({
-                    ...prev,
-                    hijriAdjustment: value,
-                  }))
-                }
-                className="flex-1 min-w-[60px]">
-                {value > 0 ? `+${value}` : value}
-              </Button>
-            ))}
-          </div>
+      {/* Change Hijri Date at Maghrib */}
+      <SettingsSection
+        title={t('settings.hijriDateChangeAtMaghrib')}
+        description={t('settings.hijriDateChangeAtMaghribDesc')}>
+        <div className="flex items-center justify-between rounded-lg border border-border bg-card p-4">
+          <span className="font-medium">
+            {t('settings.useMaghribForDateChange')}
+          </span>
+          <Switch
+            checked={localSettings.hijriDateChangeAtMaghrib}
+            onCheckedChange={(checked) =>
+              setLocalSettings((prev) => ({
+                ...prev,
+                hijriDateChangeAtMaghrib: checked,
+              }))
+            }
+          />
         </div>
+      </SettingsSection>
 
-        {/* Change Hijri Date at Maghrib */}
-        <div className="space-y-3">
-          <div className="space-y-1">
-            <Label>{t('settings.hijriDateChangeAtMaghrib')}</Label>
-            <p className="text-sm text-muted-foreground">
-              {t('settings.hijriDateChangeAtMaghribDesc')}
-            </p>
-          </div>
-          <div className="flex items-center justify-between p-4 rounded-lg bg-card border border-border">
-            <span className="font-medium">{t('settings.useMaghribForDateChange')}</span>
-            <Switch
-              checked={localSettings.hijriDateChangeAtMaghrib}
-              onCheckedChange={(checked) =>
-                setLocalSettings((prev) => ({
-                  ...prev,
-                  hijriDateChangeAtMaghrib: checked,
-                }))
-              }
-            />
-          </div>
-        </div>
+      {/* Hijri Calendar Info */}
+      <HijriCalendarInfoCard />
 
-        {/* Save Button */}
-        <div className="pt-4">
-          <Button onClick={handleSave} className="w-full" size="lg">
-            {t('common.save')}
-          </Button>
-        </div>
-      </div>
-    </div>
+      <SettingsSaveButton onClick={handleSave} />
+    </SettingsPageLayout>
   );
 }

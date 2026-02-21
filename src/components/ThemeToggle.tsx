@@ -1,7 +1,7 @@
-import { Button } from "@/components/ui/button";
-import { Moon, Sun, Monitor } from "lucide-react";
-import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
+import { Button } from '@/components/ui/button';
+import { Moon, Sun, Monitor } from 'lucide-react';
+import { useTheme } from 'next-themes';
+import { useEffect, useState } from 'react';
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
@@ -20,28 +20,27 @@ export function ThemeToggle() {
         size="icon"
         disabled
         aria-label="Toggle theme"
-        className="h-9 w-9"
-      >
+        className="h-9 w-9">
         <Sun className="h-5 w-5" />
       </Button>
     );
   }
 
   const cycleTheme = () => {
-    if (theme === "light") {
-      setTheme("dark");
-    } else if (theme === "dark") {
-      setTheme("system");
+    if (theme === 'light') {
+      setTheme('dark');
+    } else if (theme === 'dark') {
+      setTheme('system');
     } else {
-      setTheme("light");
+      setTheme('light');
     }
   };
 
   // Show icon based on theme mode, not resolved theme
   // System mode should always show Monitor icon
   const getIcon = () => {
-    if (theme === "light") return <Sun className="h-5 w-5" />;
-    if (theme === "dark") return <Moon className="h-5 w-5" />;
+    if (theme === 'light') return <Sun className="h-5 w-5" />;
+    if (theme === 'dark') return <Moon className="h-5 w-5" />;
     return <Monitor className="h-5 w-5" />;
   };
 
@@ -51,8 +50,7 @@ export function ThemeToggle() {
       size="icon"
       onClick={cycleTheme}
       aria-label="Toggle theme"
-      className="h-9 w-9"
-    >
+      className="h-9 w-9">
       {getIcon()}
     </Button>
   );

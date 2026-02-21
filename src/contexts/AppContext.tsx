@@ -1,4 +1,12 @@
-import { createContext, useContext, useState, useEffect, FC, ReactNode, useCallback } from 'react';
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  FC,
+  ReactNode,
+  useCallback,
+} from 'react';
 import { UserSettings } from '@/types';
 import { DEFAULT_SETTINGS } from '@/constants/defaultSettings';
 
@@ -22,7 +30,12 @@ const defaultAppSettings: AppSettings = {
     { id: 'currentSalat', name: 'Current Salat', visible: true, order: 1 },
     { id: 'nextSalat', name: 'Next Salat', visible: true, order: 2 },
     { id: 'salatTimes', name: 'Salat Times', visible: true, order: 3 },
-    { id: 'prohibitedTimes', name: 'Prohibited Times', visible: true, order: 4 },
+    {
+      id: 'prohibitedTimes',
+      name: 'Prohibited Times',
+      visible: true,
+      order: 4,
+    },
     { id: 'saumTimes', name: 'Saum Times', visible: true, order: 5 },
   ],
 };

@@ -34,11 +34,15 @@ async function getLocationByGPS(): Promise<Omit<LocationResult, 'method'>> {
       // Request permissions first
       const permissionResult = await Geolocation.requestPermissions();
 
-      if (permissionResult.location === 'denied' || permissionResult.coarseLocation === 'denied') {
+      if (
+        permissionResult.location === 'denied' ||
+        permissionResult.coarseLocation === 'denied'
+      ) {
         throw {
-          message: 'Location permission denied. Please enable location access in app settings.',
+          message:
+            'Location permission denied. Please enable location access in app settings.',
           type: 'gps',
-          code: 1
+          code: 1,
         } as LocationError;
       }
 
@@ -46,7 +50,7 @@ async function getLocationByGPS(): Promise<Omit<LocationResult, 'method'>> {
       const position: Position = await Geolocation.getCurrentPosition({
         enableHighAccuracy: true,
         timeout: 15000,
-        maximumAge: 0
+        maximumAge: 0,
       });
 
       const { latitude, longitude } = position.coords;
@@ -58,7 +62,7 @@ async function getLocationByGPS(): Promise<Omit<LocationResult, 'method'>> {
           latitude,
           longitude,
           city: address.city || 'Unknown',
-          country: address.country || 'Unknown'
+          country: address.country || 'Unknown',
         };
       } catch (geocodingError) {
         // If geocoding fails, still return coordinates
@@ -66,7 +70,7 @@ async function getLocationByGPS(): Promise<Omit<LocationResult, 'method'>> {
           latitude,
           longitude,
           city: 'Unknown',
-          country: 'Unknown'
+          country: 'Unknown',
         };
       }
     } else {
@@ -87,7 +91,7 @@ async function getLocationByGPS(): Promise<Omit<LocationResult, 'method'>> {
       throw {
         message: error.message || 'Unable to retrieve location',
         code: error.code,
-        type: 'gps'
+        type: 'gps',
       } as LocationError;
     }
   }
@@ -101,7 +105,7 @@ async function getLocationByBrowser(): Promise<Omit<LocationResult, 'method'>> {
     if (!navigator.geolocation) {
       reject({
         message: 'Geolocation is not supported by your browser',
-        type: 'gps'
+        type: 'gps',
       } as LocationError);
       return;
     }
@@ -110,7 +114,7 @@ async function getLocationByBrowser(): Promise<Omit<LocationResult, 'method'>> {
     const options = {
       enableHighAccuracy: true,
       timeout: 15000,
-      maximumAge: 0
+      maximumAge: 0,
     };
 
     navigator.geolocation.getCurrentPosition(
@@ -124,7 +128,7 @@ async function getLocationByBrowser(): Promise<Omit<LocationResult, 'method'>> {
             latitude,
             longitude,
             city: address.city || 'Unknown',
-            country: address.country || 'Unknown'
+            country: address.country || 'Unknown',
           });
         } catch (geocodingError) {
           // If geocoding fails, still return coordinates
@@ -132,7 +136,7 @@ async function getLocationByBrowser(): Promise<Omit<LocationResult, 'method'>> {
             latitude,
             longitude,
             city: 'Unknown',
-            country: 'Unknown'
+            country: 'Unknown',
           });
         }
       },
@@ -141,7 +145,8 @@ async function getLocationByBrowser(): Promise<Omit<LocationResult, 'method'>> {
 
         switch (error.code) {
           case error.PERMISSION_DENIED:
-            errorMessage = 'Location permission denied. Please enable location access.';
+            errorMessage =
+              'Location permission denied. Please enable location access.';
             break;
           case error.POSITION_UNAVAILABLE:
             errorMessage = 'Location information unavailable.';
@@ -154,10 +159,10 @@ async function getLocationByBrowser(): Promise<Omit<LocationResult, 'method'>> {
         reject({
           message: errorMessage,
           code: error.code,
-          type: 'gps'
+          type: 'gps',
         } as LocationError);
       },
-      options
+      options,
     );
   });
 }
@@ -170,7 +175,9 @@ async function getLocationByBrowser(): Promise<Omit<LocationResult, 'method'>> {
 async function getLocationByIP(): Promise<Omit<LocationResult, 'method'>> {
   try {
     // Try ip-api.com first (higher rate limit, but HTTP only)
-    const response = await fetch('http://ip-api.com/json/?fields=status,message,country,countryCode,city,lat,lon');
+    const response = await fetch(
+      'http://ip-api.com/json/?fields=status,message,country,countryCode,city,lat,lon',
+    );
 
     if (!response.ok) {
       throw new Error(`IP API returned ${response.status}`);
@@ -186,7 +193,7 @@ async function getLocationByIP(): Promise<Omit<LocationResult, 'method'>> {
       latitude: data.lat || 0,
       longitude: data.lon || 0,
       city: data.city || 'Unknown',
-      country: data.country || 'Unknown'
+      country: data.country || 'Unknown',
     };
   } catch (ipApiError) {
     try {
@@ -207,12 +214,13 @@ async function getLocationByIP(): Promise<Omit<LocationResult, 'method'>> {
         latitude: data.latitude || 0,
         longitude: data.longitude || 0,
         city: data.city || 'Unknown',
-        country: data.country || 'Unknown'
+        country: data.country || 'Unknown',
       };
     } catch (fallbackError) {
       throw {
-        message: 'All IP geolocation methods failed. Please enter location manually.',
-        type: 'ip'
+        message:
+          'All IP geolocation methods failed. Please enter location manually.',
+        type: 'ip',
       } as LocationError;
     }
   }
@@ -228,16 +236,16 @@ async function getLocationByIP(): Promise<Omit<LocationResult, 'method'>> {
  */
 async function reverseGeocode(
   latitude: number,
-  longitude: number
+  longitude: number,
 ): Promise<{ city: string; country: string }> {
   try {
     const response = await fetch(
       `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&accept-language=en`,
       {
         headers: {
-          'User-Agent': 'Muajjin-Prayer-Times-App' // Required by Nominatim policy
-        }
-      }
+          'User-Agent': 'Muajjin-Prayer-Times-App', // Required by Nominatim policy
+        },
+      },
     );
 
     if (!response.ok) {
@@ -263,12 +271,12 @@ async function reverseGeocode(
 
     return {
       city,
-      country
+      country,
     };
   } catch (error) {
     throw {
       message: 'Failed to get location name from coordinates.',
-      type: 'geocoding'
+      type: 'geocoding',
     } as LocationError;
   }
 }
@@ -286,7 +294,7 @@ export async function detectLocation(): Promise<LocationResult> {
 
     return {
       ...gpsLocation,
-      method: 'gps'
+      method: 'gps',
     };
   } catch (gpsError) {
     const error = gpsError as LocationError;
@@ -297,12 +305,12 @@ export async function detectLocation(): Promise<LocationResult> {
 
       return {
         ...ipLocation,
-        method: 'ip'
+        method: 'ip',
       };
     } catch (ipError) {
       // Both methods failed
       throw new Error(
-        'Could not detect location automatically. Please enable GPS or check your internet connection, then try again. You can also enter your location manually.'
+        'Could not detect location automatically. Please enable GPS or check your internet connection, then try again. You can also enter your location manually.',
       );
     }
   }
@@ -317,7 +325,7 @@ export async function detectLocation(): Promise<LocationResult> {
  */
 export async function getLocationName(
   latitude: number,
-  longitude: number
+  longitude: number,
 ): Promise<{ city: string; country: string }> {
   return reverseGeocode(latitude, longitude);
 }

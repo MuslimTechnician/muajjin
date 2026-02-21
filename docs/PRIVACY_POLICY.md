@@ -9,18 +9,21 @@ Muajjin is a privacy-focused Islamic Salat times application. We respect your pr
 ## 2. Data Collection
 
 ### 2.1 Location Data
+
 - **Purpose:** To calculate accurate Salat times based on your geographical location
 - **Usage:** Location coordinates (latitude and longitude) are used solely for Salat time calculations
 - **Storage:** All location data is stored locally on your device
 - **Sharing:** We do not share your location with any third parties
 
 ### 2.2 Permissions Requested
+
 - **Location Permission:** Used to:
   - Detect your GPS location for automatic Salat time calculation
   - Provide IP-based location fallback (when GPS is unavailable)
   - Allow manual location entry by users
 
 ### 2.3 No User Accounts
+
 - Muajjin does not require user registration or account creation
 - No personal identifiers (names, emails, phone numbers) are collected
 - No authentication or login required
@@ -28,6 +31,7 @@ Muajjin is a privacy-focused Islamic Salat times application. We respect your pr
 ## 3. Data Storage & Security
 
 ### 3.1 Local Storage
+
 - All app settings and preferences are stored locally on your device
 - No data is transmitted to external servers except for:
   - IP geolocation services (for location detection fallback)
@@ -36,12 +40,14 @@ Muajjin is a privacy-focused Islamic Salat times application. We respect your pr
 ### 3.2 Third-Party Services
 
 **IP Geolocation Services** (fallback when GPS unavailable):
+
 - ip-api.com (HTTP)
 - ipwhois.app (HTTPS)
 - These services receive your IP address to determine approximate location
 - No personal data is shared beyond IP address
 
 **OpenStreetMap Nominatim API:**
+
 - Used to reverse geocode coordinates into city/country names
 - Receives only coordinates (latitude, longitude)
 - No personal data transmitted
@@ -49,11 +55,13 @@ Muajjin is a privacy-focused Islamic Salat times application. We respect your pr
 ## 4. Data Sharing & Selling
 
 ### 4.1 No Data Sharing
+
 - We do not sell, rent, or share your personal data with third parties
 - No data is used for advertising purposes
 - No analytics or tracking services are integrated
 
 ### 4.2 No Third-Party SDKs
+
 - No Google Analytics
 - No Facebook SDK
 - No Firebase Analytics
@@ -62,15 +70,18 @@ Muajjin is a privacy-focused Islamic Salat times application. We respect your pr
 ## 5. User Control & Rights
 
 ### 5.1 Location Control
+
 - You can manually enter your location instead of using GPS
 - Location permission can be revoked at any time in device settings
 - The app functions fully with manual location entry
 
 ### 5.2 Data Deletion
+
 - To delete all app data: Uninstall the app or clear app data in device settings
 - Since all data is stored locally, uninstalling removes all data permanently
 
 ### 5.3 Data Access
+
 - You can view and modify all data within the app's Settings screen
 
 ## 6. Children's Privacy
@@ -99,6 +110,7 @@ Muajjin is a privacy-focused Islamic Salat times application. We respect your pr
 ## 10. Contact Information
 
 For privacy-related inquiries:
+
 - **GitHub Issues:** https://github.com/muslimtechnician/muajjin/issues
 
 ## 11. App Version Information
@@ -116,4 +128,4 @@ For privacy-related inquiries:
 
 ---
 
-*This privacy policy was last updated on February 2026 and applies to version 2.1.0 and later of Muajjin.*
+_This privacy policy was last updated on February 2026 and applies to version 2.1.0 and later of Muajjin._

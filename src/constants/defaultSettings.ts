@@ -26,7 +26,7 @@ export const DEFAULT_SETTINGS: UserSettings = {
   longitude: 39.8579, // Makkah fallback (will be set in onboarding)
 
   // Display
-  timeFormat: 'system' // Auto-detect from system settings
+  timeFormat: 'system', // Auto-detect from system settings
 };
 
 /**
@@ -39,7 +39,7 @@ export const ONBOARDING_DEFAULTS = {
   city: '', // Empty - user must set
   country: 'Bangladesh', // Set by location detection
   latitude: 0, // Empty - user must set
-  longitude: 0 // Empty - user must set
+  longitude: 0, // Empty - user must set
 };
 
 /**
@@ -51,8 +51,8 @@ export const DEFAULT_CONTAINER_ORDER = [
   'nextSalat',
   'salatTimes',
   'prohibitedTimes',
-  'saumTimes'
-] // removed 'as const' from array
+  'saumTimes',
+]; // removed 'as const' from array
 
 /**
  * Combined settings for when user skips onboarding (dev/testing only)
@@ -71,5 +71,5 @@ export const FALLBACK_SETTINGS: UserSettings = {
   city: 'Makkah',
   country: 'Saudi Arabia',
   latitude: 21.3891,
-  longitude: 39.8579
+  longitude: 39.8579,
 };

@@ -23,7 +23,7 @@ const HIJRI_MONTHS = [
   { en: 'Ramadan', ar: 'رمضان' },
   { en: 'Shawwal', ar: 'شوال' },
   { en: "Dhu al-Qi'dah", ar: 'ذو القعدة' },
-  { en: "Dhu al-Hijjah", ar: 'ذو الحجة' }
+  { en: 'Dhu al-Hijjah', ar: 'ذو الحجة' },
 ];
 
 /**
@@ -38,7 +38,7 @@ export function calculateHijriDate(
   gregorianDate: Date,
   adjustment: number = 0,
   maghribTime?: string,
-  changeAtMaghrib: boolean = false
+  changeAtMaghrib: boolean = false,
 ): HijriDateResult {
   let dateToConvert = new Date(gregorianDate);
 
@@ -46,7 +46,8 @@ export function calculateHijriDate(
   if (changeAtMaghrib && maghribTime) {
     const [maghribHours, maghribMinutes] = maghribTime.split(':').map(Number);
     const maghribTotalMinutes = maghribHours * 60 + maghribMinutes;
-    const currentTotalMinutes = dateToConvert.getHours() * 60 + dateToConvert.getMinutes();
+    const currentTotalMinutes =
+      dateToConvert.getHours() * 60 + dateToConvert.getMinutes();
 
     // If current time is AFTER Maghrib, add 1 day (Islamic day starts at Maghrib)
     if (currentTotalMinutes >= maghribTotalMinutes) {
@@ -67,10 +68,10 @@ export function calculateHijriDate(
     month: {
       number: hijri.hm,
       en: HIJRI_MONTHS[monthIndex].en,
-      ar: HIJRI_MONTHS[monthIndex].ar
+      ar: HIJRI_MONTHS[monthIndex].ar,
     },
     year: String(hijri.hy),
-    date: `${String(hijri.hd).padStart(2, '0')}-${String(hijri.hm).padStart(2, '0')}-${hijri.hy}`
+    date: `${String(hijri.hd).padStart(2, '0')}-${String(hijri.hm).padStart(2, '0')}-${hijri.hy}`,
   };
 }
 
@@ -79,7 +80,9 @@ export function calculateHijriDate(
  * @param hijriData - The Hijri date result
  * @returns Formatted string like "27 Rajab 1447"
  */
-export function formatHijriDateLocal(hijriData: HijriDateResult | null): string {
+export function formatHijriDateLocal(
+  hijriData: HijriDateResult | null,
+): string {
   if (!hijriData) {
     return 'Loading Hijri date...';
   }

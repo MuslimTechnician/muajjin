@@ -69,6 +69,8 @@
       "hijriDateChangeAtMaghrib": "Hijri date changes at Maghrib",
       "hijriDateChangeAtMaghribDesc": "Islamic date changes after sunset (Maghrib) instead of midnight",
       "useMaghribForDateChange": "Use Maghrib for date change",
+      "hijriCalendarInfoTitle": "About Hijri date calculation",
+      "hijriCalendarInfoDesc": "This app uses the Umm al-Qura calendar, the official Hijri calendar of Saudi Arabia. It is astronomically calculated and does not directly follow local moon sighting. At the end of each Hijri month (around the 29th or 30th), you may need to adjust the date based on moon sighting in your country.",
       "suhoorAdjustment": "Suhoor Adjustment (minutes)",
       "suhoorAdjustmentDesc": "Adjust Suhoor end time (in minutes)",
       "iftarAdjustment": "Iftar Adjustment (minutes)",
