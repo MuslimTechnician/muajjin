@@ -102,7 +102,8 @@ function SortableContainer({
 export default function DisplaySettings() {
   const navigate = useNavigate();
   const { theme, setTheme, resolvedTheme } = useTheme();
-  const { t, uploadFont, removeFont, customFont } = useTranslation();
+  const { t, uploadFont, removeFont, customFont, activeTranslation } =
+    useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
   // const [userSettings] = useLocalStorage<UserSettings>('muajjin-settings', DEFAULT_SETTINGS);
   const [containerOrder, setContainerOrder] = useLocalStorage<string[]>(
@@ -111,6 +112,26 @@ export default function DisplaySettings() {
   );
   const [mounted, setMounted] = useState(false);
   const hasCustomFont = !!customFont;
+
+  const getCurrentFontInfo = () => {
+    if (hasCustomFont) {
+      return { name: 'customfont.woff2', type: 'custom' as const };
+    }
+    const translationId = activeTranslation?.id;
+    if (
+      !activeTranslation ||
+      translationId === null ||
+      translationId === 'en'
+    ) {
+      return { name: 'Ubuntu-Regular.ttf', type: 'builtin' as const };
+    }
+    if (translationId === 'bn') {
+      return { name: 'NotoSerifBengali.ttf', type: 'builtin' as const };
+    }
+    return { name: t('settings.systemFont'), type: 'system' as const };
+  };
+
+  const currentFont = getCurrentFontInfo();
 
   // Default visible containers - all visible by default
   const defaultVisibleContainers: Record<string, boolean> = {
@@ -236,9 +257,8 @@ export default function DisplaySettings() {
           <div className="flex items-center justify-between rounded-lg border bg-card p-4">
             <div className="flex items-center gap-2">
               <Check className="h-4 w-4 text-green-600" />
-
               <span className="text-sm font-medium">
-                {t('settings.currentFont')}: customfont.woff2
+                {t('settings.currentFont')}: {currentFont.name}
               </span>
             </div>
 
@@ -253,6 +273,18 @@ export default function DisplaySettings() {
           </div>
         ) : (
           <div className="space-y-3">
+            {/* Current font indicator */}
+            <div className="flex items-center gap-2 rounded-md border bg-muted/50 px-3 py-2">
+              <Check className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm text-muted-foreground">
+                {t('settings.currentFont')}: {currentFont.name}
+                {currentFont.type === 'builtin' &&
+                  ` (${t('settings.builtin')})`}
+                {currentFont.type === 'system' &&
+                  ` (${t('settings.systemFont')})`}
+              </span>
+            </div>
+
             <input
               ref={fileInputRef}
               type="file"

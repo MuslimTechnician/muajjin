@@ -21,6 +21,11 @@ const ACTIVE_TRANSLATION_KEY = 'muajjin-active-translation';
 const CUSTOM_FONT_KEY = 'muajjin-custom-font';
 const FONT_FAMILY_NAME = 'MuajjinCustomFont';
 
+const BUILTIN_FONTS: Record<string, string> = {
+  en: '/fonts/Ubuntu-Regular.ttf',
+  bn: '/fonts/NotoSerifBengali.ttf',
+};
+
 // Built-in translations (ships with the app)
 const BUILTIN_TRANSLATIONS: Record<string, StoredTranslation> = {
   en: {
@@ -271,12 +276,94 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  // Apply font after mounted and when customFont changes
+  // Load built-in font based on language
+  const loadBuiltinFont = useCallback(async (language: string) => {
+    try {
+      const fontPath = BUILTIN_FONTS[language];
+      if (!fontPath) {
+        return;
+      }
+
+      const fontFamily = `MuajjinBuiltinFont-${language}`;
+      const fontFace = new FontFace(fontFamily, `url(${fontPath})`);
+      const loadedFont = await fontFace.load();
+
+      // Remove previous built-in fonts
+      for (const font of document.fonts) {
+        if (
+          font.family.startsWith('MuajjinBuiltinFont-') &&
+          font.family !== fontFamily
+        ) {
+          document.fonts.delete(font);
+        }
+      }
+
+      // Add new font
+      document.fonts.add(loadedFont);
+
+      // Apply to root element
+      document.documentElement.style.fontFamily = `'${fontFamily}', system-ui, -apple-system, sans-serif`;
+    } catch (error) {}
+  }, []);
+
+  // Reset to system fonts
+  const resetToSystemFonts = useCallback(() => {
+    try {
+      // Remove all custom and built-in fonts
+      for (const font of document.fonts) {
+        if (
+          font.family === FONT_FAMILY_NAME ||
+          font.family.startsWith('MuajjinBuiltinFont-')
+        ) {
+          document.fonts.delete(font);
+        }
+      }
+
+      // Reset document font family to default
+      document.documentElement.style.fontFamily = '';
+    } catch (error) {}
+  }, []);
+
+  // Apply font based on priority: custom > built-in by language > system
   useEffect(() => {
-    if (mounted && customFont) {
-      applyFont(customFont);
-    }
-  }, [mounted, customFont, applyFont]);
+    if (!mounted) return;
+
+    const applyFontByPriority = async () => {
+      // Priority 1: Custom font (highest)
+      if (customFont) {
+        await applyFont(customFont);
+        return;
+      }
+
+      // Priority 2: Built-in font based on language
+      // English is represented by null (default language), Bengali by 'bn'
+      const translationId = state.activeTranslationId;
+
+      if (translationId === null || translationId === 'en') {
+        // English (default)
+        await loadBuiltinFont('en');
+        return;
+      }
+
+      if (translationId === 'bn') {
+        // Bengali
+        await loadBuiltinFont('bn');
+        return;
+      }
+
+      // Priority 3: System fonts (fallback for other languages)
+      resetToSystemFonts();
+    };
+
+    applyFontByPriority();
+  }, [
+    mounted,
+    customFont,
+    state.activeTranslationId,
+    applyFont,
+    loadBuiltinFont,
+    resetToSystemFonts,
+  ]);
 
   // Remove custom font
   const removeFont = useCallback(() => {

@@ -132,6 +132,8 @@
       "fontRemoved": "কাস্টম ফন্ট সরানো হয়েছে",
       "fontRemovedDesc": "কাস্টম ফন্ট সরানো হয়েছে। ডিফল্ট ফন্ট ব্যবহার হচ্ছে।",
       "currentFont": "বর্তমান ফন্ট",
+      "builtin": "বিল্ট-ইন",
+      "systemFont": "সিস্টেম ফন্ট",
       "noFontUploaded": "কোনো কাস্টম ফন্ট আপলোড করা হয়নি",
       "fontFileName": "customfont.woff2",
       "translationDeleted": "অনুবাদ মুছে ফেলা হয়েছে",

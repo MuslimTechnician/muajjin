@@ -52,7 +52,7 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Build web assets
-        run: bun run build
+        run: bun run build:github
 
       - name: Sync to Android (Capacitor)
         run: bunx cap sync android
