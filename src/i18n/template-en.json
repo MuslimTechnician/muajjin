@@ -132,6 +132,8 @@
       "fontRemoved": "Custom font removed",
       "fontRemovedDesc": "Custom font has been removed. Using default font.",
       "currentFont": "Current Font",
+      "builtin": "Built-in",
+      "systemFont": "System Font",
       "noFontUploaded": "No custom font uploaded",
       "fontFileName": "customfont.woff2",
       "translationDeleted": "Translation deleted",

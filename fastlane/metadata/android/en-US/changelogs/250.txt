@@ -1,0 +1,5 @@
+• Initial F-Droid release
+• Add built-in fonts: Ubuntu (English) and Noto Serif Bengali
+• Add Hijri calendar information card
+• Enable update checker only for GitHub releases
+• Internal optimizations and stability improvements
