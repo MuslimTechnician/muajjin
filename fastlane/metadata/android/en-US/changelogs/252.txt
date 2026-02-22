@@ -1,0 +1,4 @@
+• Removed Google Play Services
+• Removed background location permission
+• Replaced Capacitor geolocation with native Android `LocationManager`
+• Location access now only on user request
