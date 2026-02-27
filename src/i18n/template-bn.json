@@ -31,7 +31,14 @@
       "end": "শেষ",
       "untilJamaah": "জামাআত পর্যন্ত",
       "untilEnd": "শেষ পর্যন্ত",
-      "remainingToTarget": "{{target}} হতে বাকি"
+      "remainingToTarget": "{{target}} হতে বাকি",
+      "upcomingTitle": "সালাতের ক্যালেন্ডার",
+      "singleDaySubtitle": "নির্বাচিত দিনের সালাতের সময়",
+      "datePickerLabel": "শুরুর তারিখ",
+      "singleDayCompact": "এক দিন",
+      "monthlySubtitle": "{{month}} মাসের সালাতের সময়",
+      "previousMonth": "পূর্বের মাস",
+      "nextMonth": "পরের মাস"
     },
     "saum": {
       "title": "সাওমের সময়সূচি",

@@ -1,10 +1,11 @@
 import { Toaster as Sonner } from '@/components/ui/sonner';
 import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { CapacitorApp } from './components/CapacitorApp';
 import { UpdateChecker } from '@/features/update';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { useEffect } from 'react';
+import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
+import { CapacitorApp } from './components/CapacitorApp';
 import { RouteGuard } from './components/layout/RouteGuard';
 import { AppProvider } from './contexts/AppContext';
 import HomePage from './pages/HomePage';
@@ -21,8 +22,21 @@ import PrayerTimesSettings from './pages/settings/PrayerTimesSettings';
 import SettingsHome from './pages/settings/SettingsHome';
 import TimeLocationSettings from './pages/settings/TimeLocationSettings';
 import TranslationSettings from './pages/settings/TranslationSettings';
+import UpcomingPrayerTimesPage from './pages/UpcomingPrayerTimesPage';
 
 const queryClient = new QueryClient();
+
+const ScrollToTopOnNavigate = () => {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, [pathname]);
+
+  return null;
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -32,6 +46,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <CapacitorApp>
+            <ScrollToTopOnNavigate />
             <UpdateChecker />
             <Routes>
               {/* Onboarding routes - blocked after completion */}
@@ -72,6 +87,11 @@ const App = () => (
                 }>
                 <Route index element={<Index />} />
               </Route>
+
+              <Route
+                path="/upcoming-prayer-times"
+                element={<UpcomingPrayerTimesPage />}
+              />
 
               {/* Settings routes - require onboarding completion */}
               <Route

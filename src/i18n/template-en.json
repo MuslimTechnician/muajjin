@@ -31,7 +31,14 @@
       "end": "End",
       "untilJamaah": "Until Jama'ah",
       "untilEnd": "Until End",
-      "remainingToTarget": "Remaining to {{target}}"
+      "remainingToTarget": "Remaining to {{target}}",
+      "upcomingTitle": "Prayer Calender",
+      "singleDaySubtitle": "Prayer times for selected day",
+      "datePickerLabel": "Start date",
+      "singleDayCompact": "One day",
+      "monthlySubtitle": "Prayer times for {{month}}",
+      "previousMonth": "Previous Month",
+      "nextMonth": "Next Month"
     },
     "saum": {
       "title": "Saum Times",
