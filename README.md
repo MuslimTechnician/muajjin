@@ -72,9 +72,11 @@ bun run build
 ## Android Build
 
 <details>
-<summary><strong>Signing & APK Build</strong></summary>
+<summary><strong>Signing, APK Build, and Reproducible Verification</strong></summary>
 
 ### Keystore Setup
+
+Only required if you want to produce a signed `release` APK yourself.
 
 1. Place your keystore file in:
 
@@ -100,7 +102,7 @@ bun run android:build
 # Release APK (optimized, smaller)
 bun run android:release
 
-# GitHub Release APK (includes in-app update checker)
+# GitHub Release APK (includes update checker)
 bun run android:release:github
 ```
 
@@ -110,14 +112,26 @@ bun run android:release:github
 android/app/build/outputs/apk/
 ```
 
-### Build Modes (Update Checker)
+### Reproducible: Verify a GitHub Release APK (Recommended)
 
-- Default builds (web/Play/F-Droid): no GitHub update checker is bundled. Use:
-  - `bun run build` (web bundle)
-  - `bun run android:build` or `bun run android:release`
-- GitHub release builds (include update checker + dialog):
-  - `bun run android:build:github`
-  - `bun run android:release:github`
+This verifies the published GitHub Release APK matches the source code for the release tag (no keystore needed).
+
+```bash
+git checkout vX.Y.Z
+
+# Optional: build a reproducible APK locally
+bun run reproducible:build -g vX.Y.Z -m github
+
+bun run reproducible:verify -a ~/Downloads/muajjin-X.Y.Z.apk -g vX.Y.Z -m github
+```
+
+GitHub releases include `reproducible-checksums.txt` as a release asset:
+
+```bash
+sha256sum -c reproducible-checksums.txt
+```
+
+**Note**: Your _locally-built_ APK checksum may differ due to signing. Use `reproducible:verify` to compare APK contents.
 
 </details>
 

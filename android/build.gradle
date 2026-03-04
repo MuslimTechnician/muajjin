@@ -16,6 +16,20 @@ buildscript {
 
 apply from: "variables.gradle"
 
+ext.getReproducibleSourceDateEpoch = { Project project ->
+    def rawValue =
+            project.hasProperty('sourceDateEpoch')
+                    ? project.property('sourceDateEpoch')
+                    : System.getenv('SOURCE_DATE_EPOCH')
+
+    def normalized = (rawValue ?: '0').toString().trim()
+    if (!normalized.matches('\\d+')) {
+        normalized = '0'
+    }
+
+    return normalized
+}
+
 allprojects {
     repositories {
         google()
