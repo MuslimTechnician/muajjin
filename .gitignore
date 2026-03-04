@@ -52,3 +52,6 @@ tmp/
 # package-lock.json
 # bun.lockb
 # yarn.lock
+
+reproducible-checksums.txt
+reproducible-checksums-*.txt

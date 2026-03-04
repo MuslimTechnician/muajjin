@@ -1,8 +1,15 @@
 apply plugin: 'com.android.application'
 
+def normalizedEpochValue = rootProject.ext.getReproducibleSourceDateEpoch(project)
+
 android {
     namespace = "org.muslimtechnician.muajjin"
     compileSdk = rootProject.ext.compileSdkVersion
+
+    buildFeatures {
+        buildConfig = true
+    }
+
     defaultConfig {
         applicationId "org.muslimtechnician.muajjin"
         minSdkVersion rootProject.ext.minSdkVersion
@@ -15,6 +22,11 @@ android {
              // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
+        buildConfigField(
+                "long",
+                "BUILD_TIMESTAMP",
+                "${normalizedEpochValue}L"
+        )
     }
 
     def keystorePropertiesFile = rootProject.file("local.properties")
@@ -25,8 +37,8 @@ android {
 
     signingConfigs {
         release {
-            if (keystoreProperties['keystore.file']) {
-                storeFile file(keystoreProperties['keystore.file'])
+        if (keystoreProperties['keystore.file']) {
+            storeFile file(keystoreProperties['keystore.file'])
                 storePassword keystoreProperties['keystore.password']
                 keyAlias keystoreProperties['keystore.key.alias']
                 keyPassword keystoreProperties['keystore.key.password']
@@ -63,6 +75,18 @@ android {
     // Only needed if your app doesn't need multiple languages
     // // Uncomment to only bundle English
     // resourceConfigurations += ['en']
+
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging = false
+        }
+    }
+
+    applicationVariants.all { variant ->
+        variant.outputs.all { output ->
+            outputFileName = "app-release.apk"
+        }
+    }
 }
 
 repositories {
