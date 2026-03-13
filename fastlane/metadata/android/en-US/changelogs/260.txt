@@ -1,0 +1,2 @@
+• Added prayer calendar page
+• Added reproducible builds support for APK verification
