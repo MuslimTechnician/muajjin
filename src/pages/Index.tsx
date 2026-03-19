@@ -90,6 +90,9 @@ const Index = () => {
 
       // Calculate salat times locally using adhan library (no API call!)
       const timings = calculatePrayerTimesLocally(new Date(), settings);
+      const fajrEnd = adjustTime(timings.Shuruq, -1);
+      const dhuhrStart = adjustTime(timings.Dhuhr, 1);
+      const maghribStart = adjustTime(timings.Maghrib, 1);
 
       // Create salat times array with jamaah times from settings
       const salats: PrayerTime[] = [
@@ -97,13 +100,13 @@ const Index = () => {
           id: 'fajr',
           name: getSalatName('Fajr'),
           start: timings.Fajr,
-          end: timings.Shuruq,
+          end: fajrEnd,
           jamaah: settings.jamaahTimes.Fajr,
         },
         {
           id: 'dhuhr',
           name: getSalatName('Dhuhr'),
-          start: timings.Dhuhr,
+          start: dhuhrStart,
           end: timings.Asr,
           jamaah: settings.jamaahTimes.Dhuhr,
         },
@@ -117,7 +120,7 @@ const Index = () => {
         {
           id: 'maghrib',
           name: getSalatName('Maghrib'),
-          start: timings.Maghrib,
+          start: maghribStart,
           end: timings.Isha,
           jamaah: settings.jamaahTimes.Maghrib,
         },
