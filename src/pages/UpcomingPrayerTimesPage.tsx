@@ -6,7 +6,7 @@ import { Switch } from '@/components/ui/switch';
 import { useApp } from '@/contexts/AppContext';
 import { useTranslation } from '@/contexts/TranslationContext';
 import { calculatePrayerTimesLocally } from '@/services/prayerTimesLocal';
-import { formatTime } from '@/utils/timeUtils';
+import { adjustTime, formatTime } from '@/utils/timeUtils';
 import { Calendar } from 'lucide-react';
 import { type PointerEvent, useMemo, useRef, useState } from 'react';
 
@@ -22,14 +22,6 @@ type UpcomingDay = {
   dateLabel: string;
   prayers: UpcomingPrayer[];
 };
-
-const PRAYER_CONFIG = [
-  { id: 'fajr', key: 'Fajr' as const, endKey: 'Shuruq' as const },
-  { id: 'dhuhr', key: 'Dhuhr' as const, endKey: 'Asr' as const },
-  { id: 'asr', key: 'Asr' as const, endKey: 'Maghrib' as const },
-  { id: 'maghrib', key: 'Maghrib' as const, endKey: 'Isha' as const },
-  { id: 'isha', key: 'Isha' as const, endKey: 'Fajr' as const },
-] as const;
 
 const DATE_PICKER_MIN = '1900-01-01';
 const DATE_PICKER_MAX = '2100-12-31';
@@ -124,12 +116,38 @@ const UpcomingPrayerTimesPage = () => {
 
       const timings = calculatePrayerTimesLocally(date, settings);
 
-      const prayers = PRAYER_CONFIG.map(({ id, key, endKey }) => ({
-        id,
-        name: getSalatName(key),
-        start: timings[key],
-        end: timings[endKey],
-      }));
+      const prayers: UpcomingPrayer[] = [
+        {
+          id: 'fajr',
+          name: getSalatName('Fajr'),
+          start: timings.Fajr,
+          end: adjustTime(timings.Shuruq, -1),
+        },
+        {
+          id: 'dhuhr',
+          name: getSalatName('Dhuhr'),
+          start: timings.Dhuhr,
+          end: adjustTime(timings.Asr, -1),
+        },
+        {
+          id: 'asr',
+          name: getSalatName('Asr'),
+          start: timings.Asr,
+          end: adjustTime(timings.Maghrib, -1),
+        },
+        {
+          id: 'maghrib',
+          name: getSalatName('Maghrib'),
+          start: timings.Maghrib,
+          end: adjustTime(timings.Isha, -1),
+        },
+        {
+          id: 'isha',
+          name: getSalatName('Isha'),
+          start: timings.Isha,
+          end: adjustTime(timings.Fajr, -1),
+        },
+      ];
 
       return {
         dateKey: formatDateForInput(date),

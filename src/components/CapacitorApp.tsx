@@ -1,9 +1,9 @@
-import { useEffect, useRef } from 'react';
 import { App } from '@capacitor/app';
-import { useTheme } from 'next-themes';
 import { Capacitor } from '@capacitor/core';
-import { EdgeToEdge } from '@capawesome/capacitor-android-edge-to-edge-support';
 import { StatusBar, Style } from '@capacitor/status-bar';
+import { EdgeToEdge } from '@capawesome/capacitor-android-edge-to-edge-support';
+import { useTheme } from 'next-themes';
+import { useEffect, useRef } from 'react';
 
 export function CapacitorApp({ children }: { children: React.ReactNode }) {
   const isInitializedRef = useRef(false);
@@ -83,5 +83,5 @@ export function CapacitorApp({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  return <>{children}</>;
+  return children;
 }

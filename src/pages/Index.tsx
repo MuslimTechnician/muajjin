@@ -5,7 +5,9 @@ import { NextPrayerContainer } from '@/components/NextPrayerContainer';
 import { PrayerTimesContainer } from '@/components/PrayerTimesContainer';
 import { ProhibitedTimesContainer } from '@/components/ProhibitedTimesContainer';
 import { DEFAULT_CONTAINER_ORDER } from '@/constants/defaultSettings';
+import { useApp } from '@/contexts/AppContext';
 import { useTranslation } from '@/contexts/TranslationContext';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { calculatePrayerTimesLocally } from '@/services/prayerTimesLocal';
 import { PrayerTime, ProhibitedTime, UserSettings } from '@/types';
 import { EContainerType } from '@/types/enums';
@@ -14,9 +16,7 @@ import {
   getProhibitedTimes,
   setTranslationFunction,
 } from '@/utils/timeUtils';
-import { useApp } from '@/contexts/AppContext';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 
 /**
  * Migrate old settings property names and values to the current shape.
@@ -90,9 +90,6 @@ const Index = () => {
 
       // Calculate salat times locally using adhan library (no API call!)
       const timings = calculatePrayerTimesLocally(new Date(), settings);
-      const fajrEnd = adjustTime(timings.Shuruq, -1);
-      const dhuhrStart = adjustTime(timings.Dhuhr, 1);
-      const maghribStart = adjustTime(timings.Maghrib, 1);
 
       // Create salat times array with jamaah times from settings
       const salats: PrayerTime[] = [
@@ -100,35 +97,35 @@ const Index = () => {
           id: 'fajr',
           name: getSalatName('Fajr'),
           start: timings.Fajr,
-          end: fajrEnd,
+          end: adjustTime(timings.Shuruq, -1),
           jamaah: settings.jamaahTimes.Fajr,
         },
         {
           id: 'dhuhr',
           name: getSalatName('Dhuhr'),
-          start: dhuhrStart,
-          end: timings.Asr,
+          start: timings.Dhuhr,
+          end: adjustTime(timings.Asr, -1),
           jamaah: settings.jamaahTimes.Dhuhr,
         },
         {
           id: 'asr',
           name: getSalatName('Asr'),
           start: timings.Asr,
-          end: timings.Maghrib,
+          end: adjustTime(timings.Maghrib, -1),
           jamaah: settings.jamaahTimes.Asr,
         },
         {
           id: 'maghrib',
           name: getSalatName('Maghrib'),
-          start: maghribStart,
-          end: timings.Isha,
+          start: timings.Maghrib,
+          end: adjustTime(timings.Isha, -1),
           jamaah: settings.jamaahTimes.Maghrib,
         },
         {
           id: 'isha',
           name: getSalatName('Isha'),
           start: timings.Isha,
-          end: timings.Fajr,
+          end: adjustTime(timings.Fajr, -1),
           jamaah: settings.jamaahTimes.Isha,
         },
       ];
@@ -182,7 +179,7 @@ const Index = () => {
   // Render containers based on user order
   const renderContainers = () => {
     return (
-      <>
+      <Fragment>
         {containerOrder.map((containerId, index) => {
           // Skip rendering if container is not visible
           if (!visibleContainers[containerId]) {
@@ -276,7 +273,7 @@ const Index = () => {
               return null;
           }
         })}
-      </>
+      </Fragment>
     );
   };
 

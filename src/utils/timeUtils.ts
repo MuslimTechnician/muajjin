@@ -234,13 +234,13 @@ export function getProhibitedTimes(
     },
     {
       name: t('prohibited.zawal'),
-      start: adjustTime(prayerTimes.Dhuhr, -4), // 5 minutes before Dhuhr
-      end: prayerTimes.Dhuhr, // Until Dhuhr starts
+      start: adjustTime(prayerTimes.Dhuhr, -5), // 5 minutes before Dhuhr
+      end: adjustTime(prayerTimes.Dhuhr, -1), // Until Dhuhr starts
     },
     {
       name: t('prohibited.ghurub'),
-      start: adjustTime(prayerTimes.Maghrib, -14), // 15 minutes before Maghrib
-      end: prayerTimes.Maghrib, // Until Maghrib starts
+      start: adjustTime(prayerTimes.Maghrib, -15), // 15 minutes before Maghrib
+      end: adjustTime(prayerTimes.Maghrib, -1), // Until Maghrib starts
     },
   ];
 

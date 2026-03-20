@@ -1,6 +1,6 @@
-import { Navigate } from 'react-router-dom';
 import { useApp } from '@/contexts/AppContext';
 import { FC, ReactNode } from 'react';
+import { Navigate } from 'react-router-dom';
 
 interface RouteGuardProps {
   children: ReactNode;
@@ -32,5 +32,5 @@ export const RouteGuard: FC<RouteGuardProps> = ({
     return <Navigate to={redirectTo} replace />;
   }
 
-  return <>{children}</>;
+  return children;
 };

@@ -1,9 +1,9 @@
-import { Settings, Sun, Moon, Monitor, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
-import { useTheme } from 'next-themes';
 import { useTranslation } from '@/contexts/TranslationContext';
-import { useEffect, useState } from 'react';
+import { ArrowLeft, Monitor, Moon, Settings, Sun } from 'lucide-react';
+import { useTheme } from 'next-themes';
+import { Fragment, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface AppHeaderProps {
   title?: string;
@@ -61,13 +61,13 @@ export function AppHeader({
     <header className="sticky top-0 z-50 border-b border-border bg-card">
       <div className="mx-auto flex max-w-md items-center justify-between px-5 py-2">
         {showBackButton ? (
-          <>
+          <Fragment>
             {/* Back Button */}
             <Button
               variant="ghost"
               size="icon"
               onClick={handleBack}
-              className="h-9 w-9 rounded-full">
+              className="size-9 rounded-full">
               <ArrowLeft className="h-5 w-5" />
             </Button>
 
@@ -77,16 +77,16 @@ export function AppHeader({
             </h1>
 
             {/* Empty div for spacing */}
-            <div className="h-9 w-9" />
-          </>
+            <div className="size-9" />
+          </Fragment>
         ) : (
-          <>
+          <Fragment>
             {/* Theme Toggle */}
             <Button
               variant="ghost"
               size="icon"
               onClick={toggleTheme}
-              className="h-9 w-9 rounded-full">
+              className="size-9 rounded-full">
               {getThemeIcon()}
             </Button>
 
@@ -100,11 +100,11 @@ export function AppHeader({
               variant="ghost"
               size="icon"
               onClick={() => navigate('/settings')}
-              className="h-9 w-9 rounded-full">
+              className="size-9 rounded-full">
               <Settings className="h-5 w-5" />
               <span className="sr-only">{t('settings.title')}</span>
             </Button>
-          </>
+          </Fragment>
         )}
       </div>
     </header>
