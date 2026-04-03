@@ -21,7 +21,7 @@ export function HijriAdjustmentSelector({
   return (
     <div className="space-y-3">
       <div className="space-y-1">
-        <div className="flex items-center gap-2 text-sm font-semibold">
+        <div className="flex items-center justify-center gap-2 text-sm font-semibold">
           {showIcon ? <Moon className="h-4 w-4 text-primary" /> : null}
           <Label>{t('settings.hijriAdjustment')}</Label>
         </div>

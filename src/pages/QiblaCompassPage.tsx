@@ -6,12 +6,7 @@ import { useTranslation } from '@/contexts/TranslationContext';
 import { NativeGeolocation } from '@/plugins/native-geolocation';
 import { Capacitor } from '@capacitor/core';
 import { Coordinates, Qibla } from 'adhan';
-import {
-  Compass,
-  LocateFixed,
-  MapPin,
-  Navigation,
-} from 'lucide-react';
+import { Compass, LocateFixed, MapPin, Navigation } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -322,7 +317,7 @@ export default function QiblaCompassPage() {
     directionDelta === null ? null : getTurnInstruction(directionDelta, t);
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-screen bg-background pb-16">
       <div className="mx-auto max-w-md space-y-6 px-5 py-6">
         <h1 className="text-2xl font-bold tracking-tight">
           {t('qibla.title')}

@@ -80,7 +80,7 @@ const SettingsPage = () => {
   };
 
   return (
-    <div className="mx-auto min-h-screen max-w-md p-4 pb-20">
+    <div className="mx-auto min-h-screen max-w-md p-4 pb-16">
       <div className="mb-6 flex justify-end">
         <ThemeToggle />
       </div>

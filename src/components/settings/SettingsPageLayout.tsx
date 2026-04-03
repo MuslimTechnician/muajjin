@@ -20,11 +20,11 @@ export function SettingsPageLayout({
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-screen bg-background pb-16">
       <div className={contentClassName}>
         <div className="space-y-4">
           {showBackButton ? (
-            <div className="flex items-center gap-3">
+            <div className="flex items-center">
               <Button
                 variant="ghost"
                 size="icon"
@@ -32,7 +32,10 @@ export function SettingsPageLayout({
                 className="size-10 rounded-full">
                 <ArrowLeft className="h-5 w-5" />
               </Button>
-              <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
+              <h1 className="flex-1 text-center text-2xl font-bold tracking-tight">
+                {title}
+              </h1>
+              <div className="size-10" />
             </div>
           ) : (
             <div className="space-y-1">
