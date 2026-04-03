@@ -244,7 +244,11 @@
       "turnLeft": "বামে {{degrees}}° ঘুরুন",
       "bearingOnly": "উত্তর থেকে কিবলা {{degrees}}°",
       "staticBearingLabel": "স্থির নির্দেশনা",
-      "liveGuidanceLabel": "লাইভ নির্দেশনা"
+      "liveGuidanceLabel": "লাইভ নির্দেশনা",
+      "north": "উ",
+      "south": "দ",
+      "east": "পূ",
+      "west": "প"
     },
     "salats": {
       "fajr": "ফজর",

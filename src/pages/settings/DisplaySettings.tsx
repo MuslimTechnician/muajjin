@@ -98,7 +98,8 @@ function SortableContainer({
 
 export default function DisplaySettings() {
   const navigate = useNavigate();
-  const { t, uploadFont, removeFont, customFont, activeTranslation } = useTranslation();
+  const { t, uploadFont, removeFont, customFont, activeTranslation } =
+    useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
   // const [userSettings] = useLocalStorage<UserSettings>('muajjin-settings', DEFAULT_SETTINGS);
   const [containerOrder, setContainerOrder] = useLocalStorage<string[]>(

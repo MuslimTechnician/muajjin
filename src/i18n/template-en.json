@@ -244,7 +244,11 @@
       "turnLeft": "Turn left {{degrees}}°",
       "bearingOnly": "Qibla at {{degrees}}° from north",
       "staticBearingLabel": "Static guidance",
-      "liveGuidanceLabel": "Live guidance"
+      "liveGuidanceLabel": "Live guidance",
+      "north": "N",
+      "south": "S",
+      "east": "E",
+      "west": "W"
     },
     "salats": {
       "fajr": "Fajr",

@@ -52,7 +52,10 @@ export class NativeGeolocationWeb implements NativeGeolocationPlugin {
 
   async getCurrentHeading(): Promise<HeadingResult> {
     return new Promise((resolve, reject) => {
-      if (typeof window === 'undefined' || !('DeviceOrientationEvent' in window)) {
+      if (
+        typeof window === 'undefined' ||
+        !('DeviceOrientationEvent' in window)
+      ) {
         reject(new Error('Compass heading is not supported on this device'));
         return;
       }
@@ -84,11 +87,23 @@ export class NativeGeolocationWeb implements NativeGeolocationPlugin {
 
       const cleanup = () => {
         window.clearTimeout(timeoutId);
-        window.removeEventListener('deviceorientationabsolute', handleOrientation, true);
-        window.removeEventListener('deviceorientation', handleOrientation, true);
+        window.removeEventListener(
+          'deviceorientationabsolute',
+          handleOrientation,
+          true,
+        );
+        window.removeEventListener(
+          'deviceorientation',
+          handleOrientation,
+          true,
+        );
       };
 
-      window.addEventListener('deviceorientationabsolute', handleOrientation, true);
+      window.addEventListener(
+        'deviceorientationabsolute',
+        handleOrientation,
+        true,
+      );
       window.addEventListener('deviceorientation', handleOrientation, true);
     });
   }
