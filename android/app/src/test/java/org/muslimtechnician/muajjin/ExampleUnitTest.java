@@ -1,4 +1,4 @@
-package com.getcapacitor.myapp;
+package org.muslimtechnician.muajjin;
 
 import static org.junit.Assert.*;
 

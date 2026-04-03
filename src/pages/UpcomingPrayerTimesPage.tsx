@@ -163,7 +163,7 @@ const UpcomingPrayerTimesPage = () => {
   }, [getSalatName, monthOffset, settings, singleDayOnly, startDateValue]);
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-screen bg-background pb-16">
       <div className="mx-auto max-w-md space-y-4 px-5 py-6">
         <h1 className="text-2xl font-bold tracking-tight">
           {t('salatTimes.upcomingTitle')}

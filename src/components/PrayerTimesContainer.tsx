@@ -1,11 +1,8 @@
-import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useTranslation } from '@/contexts/TranslationContext';
 import { PrayerTime } from '@/types';
 import { formatTime, getCurrentSalat } from '@/utils/timeUtils';
-import { ChevronRight } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 interface PrayerTimesContainerProps {
   salats: PrayerTime[];
@@ -17,7 +14,6 @@ export function PrayerTimesContainer({
   timeFormat = 'system',
 }: PrayerTimesContainerProps) {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const [currentPrayer, setCurrentPrayer] = useState<PrayerTime | null>(null);
 
   const isSamePrayer = (a: PrayerTime | null, b: PrayerTime | null) => {
@@ -85,16 +81,6 @@ export function PrayerTimesContainer({
               </div>
             );
           })}
-        </div>
-        <div className="flex justify-center border-t border-border bg-muted/20 px-3 py-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="rounded-full bg-primary/10 px-3 font-semibold text-primary hover:bg-primary/20"
-            onClick={() => navigate('/upcoming-prayer-times')}>
-            {t('salatTimes.upcomingTitle')}
-            <ChevronRight className="h-4 w-4" />
-          </Button>
         </div>
       </Card>
     </div>

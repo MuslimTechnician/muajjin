@@ -3,7 +3,7 @@ import { BottomNav } from '@/components/BottomNav';
 
 const HomePage = () => {
   return (
-    <div className="min-h-screen pb-24">
+    <div className="min-h-screen pb-16">
       <Outlet />
       <BottomNav />
     </div>
