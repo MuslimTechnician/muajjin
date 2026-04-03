@@ -29,6 +29,7 @@ export interface UserSettings {
 }
 
 export interface ProhibitedTime {
+  id: 'shuruq' | 'zawal' | 'ghurub';
   name: string;
   start: string; // "HH:MM" in 24h format
   end: string; // "HH:MM" in 24h format

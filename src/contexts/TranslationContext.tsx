@@ -1,6 +1,6 @@
 import { toast } from '@/components/ui/use-toast';
-import enTemplate from '@/i18n/template-en.json';
 import bnTemplate from '@/i18n/template-bn.json';
+import enTemplate from '@/i18n/template-en.json';
 import {
   StoredTranslation,
   TranslationFile,
@@ -303,7 +303,9 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
 
       // Apply to root element
       document.documentElement.style.fontFamily = `'${fontFamily}', system-ui, -apple-system, sans-serif`;
-    } catch (error) {}
+    } catch (error) {
+      console.error(error);
+    }
   }, []);
 
   // Reset to system fonts
@@ -321,7 +323,9 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
 
       // Reset document font family to default
       document.documentElement.style.fontFamily = '';
-    } catch (error) {}
+    } catch (error) {
+      console.error(error);
+    }
   }, []);
 
   // Apply font based on priority: custom > built-in by language > system

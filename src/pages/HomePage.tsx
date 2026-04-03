@@ -1,14 +1,11 @@
 import { Outlet } from 'react-router-dom';
-import { AppHeader } from '@/components/AppHeader';
+import { BottomNav } from '@/components/BottomNav';
 
 const HomePage = () => {
   return (
-    <div className="min-h-screen">
-      {/* App Header - Always visible */}
-      <AppHeader />
-
-      {/* Main Content - Outlet renders child routes */}
+    <div className="min-h-screen pb-24">
       <Outlet />
+      <BottomNav />
     </div>
   );
 };

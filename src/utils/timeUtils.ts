@@ -228,16 +228,19 @@ export function getProhibitedTimes(
 ): ProhibitedTime[] {
   const prohibitedTimes: ProhibitedTime[] = [
     {
+      id: 'shuruq',
       name: t('prohibited.shuruq'),
       start: prayerTimes.Shuruq, // When Fajr ends
       end: adjustTime(prayerTimes.Shuruq, 14), // 15 minutes after Shuruq
     },
     {
+      id: 'zawal',
       name: t('prohibited.zawal'),
       start: adjustTime(prayerTimes.Dhuhr, -5), // 5 minutes before Dhuhr
       end: adjustTime(prayerTimes.Dhuhr, -1), // Until Dhuhr starts
     },
     {
+      id: 'ghurub',
       name: t('prohibited.ghurub'),
       start: adjustTime(prayerTimes.Maghrib, -15), // 15 minutes before Maghrib
       end: adjustTime(prayerTimes.Maghrib, -1), // Until Maghrib starts

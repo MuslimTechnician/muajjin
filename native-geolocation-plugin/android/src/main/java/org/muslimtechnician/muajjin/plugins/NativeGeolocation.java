@@ -5,9 +5,15 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.hardware.GeomagneticField;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
+import android.view.Surface;
 
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
@@ -31,11 +37,13 @@ public class NativeGeolocation extends Plugin {
 
     private static final String TAG = "NativeGeolocation";
     private LocationManager locationManager;
+    private SensorManager sensorManager;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     @Override
     public void load() {
         locationManager = (LocationManager) getContext().getSystemService(getContext().LOCATION_SERVICE);
+        sensorManager = (SensorManager) getContext().getSystemService(getContext().SENSOR_SERVICE);
     }
 
     @PluginMethod
@@ -49,7 +57,7 @@ public class NativeGeolocation extends Plugin {
         long timeout = call.getLong("timeout", 15000L);
         long maximumAge = call.getLong("maximumAge", 0L);
 
-        getCurrentPositionInternal(call, enableHighAccuracy, timeout);
+        getCurrentPositionInternal(call, enableHighAccuracy, timeout, maximumAge);
     }
 
     @PermissionCallback
@@ -60,10 +68,11 @@ public class NativeGeolocation extends Plugin {
         }
         boolean enableHighAccuracy = call.getBoolean("enableHighAccuracy", true);
         long timeout = call.getLong("timeout", 15000L);
-        getCurrentPositionInternal(call, enableHighAccuracy, timeout);
+        long maximumAge = call.getLong("maximumAge", 0L);
+        getCurrentPositionInternal(call, enableHighAccuracy, timeout, maximumAge);
     }
 
-    private void getCurrentPositionInternal(PluginCall call, boolean enableHighAccuracy, long timeout) {
+    private void getCurrentPositionInternal(PluginCall call, boolean enableHighAccuracy, long timeout, long maximumAge) {
         try {
             // Check if location is enabled
             if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) &&
@@ -74,17 +83,21 @@ public class NativeGeolocation extends Plugin {
 
             // Get best available location from cache
             Location bestLocation = null;
-            long minTimeThreshold = System.currentTimeMillis() - 60000; // 1 minute ago
+            long minTimeThreshold = maximumAge <= 0
+                ? Long.MAX_VALUE
+                : System.currentTimeMillis() - maximumAge;
 
             try {
                 Location gpsLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                 Location networkLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 
-                if (gpsLocation != null && gpsLocation.getTime() > minTimeThreshold) {
+                if (gpsLocation != null && gpsLocation.getTime() >= minTimeThreshold) {
                     bestLocation = gpsLocation;
                 }
                 if (networkLocation != null) {
-                    if (bestLocation == null || networkLocation.getTime() > bestLocation.getTime()) {
+                    boolean networkLocationIsFresh = networkLocation.getTime() >= minTimeThreshold;
+                    if (networkLocationIsFresh &&
+                        (bestLocation == null || networkLocation.getTime() > bestLocation.getTime())) {
                         bestLocation = networkLocation;
                     }
                 }
@@ -102,16 +115,42 @@ public class NativeGeolocation extends Plugin {
             // No recent cached location, request a fresh one
             final PluginCall pendingCall = call;
             bridge.saveCall(call);
+            final Handler handler = new Handler(Looper.getMainLooper());
+            final boolean[] resolved = { false };
+            final Location[] bestFreshLocation = { null };
+            final float desiredAccuracyMeters = enableHighAccuracy ? 25f : 100f;
 
             LocationListener locationListener = new LocationListener() {
                 @Override
                 public void onLocationChanged(Location location) {
                     try {
-                        locationManager.removeUpdates(this);
-                        PluginCall savedCall = bridge.getSavedCall(pendingCall.getCallbackId());
-                        if (savedCall != null) {
-                            savedCall.resolve(createPositionResult(location));
-                            bridge.releaseCall(savedCall);
+                        if (resolved[0]) {
+                            return;
+                        }
+
+                        if (
+                            bestFreshLocation[0] == null ||
+                            location.getAccuracy() < bestFreshLocation[0].getAccuracy() ||
+                            (
+                                location.getAccuracy() == bestFreshLocation[0].getAccuracy() &&
+                                location.getTime() > bestFreshLocation[0].getTime()
+                            )
+                        ) {
+                            bestFreshLocation[0] = location;
+                        }
+
+                        boolean isGoodEnough = location.hasAccuracy() && location.getAccuracy() <= desiredAccuracyMeters;
+                        boolean isGpsFix = LocationManager.GPS_PROVIDER.equals(location.getProvider());
+
+                        if (isGoodEnough || (enableHighAccuracy && isGpsFix && location.hasAccuracy() && location.getAccuracy() <= 50f)) {
+                            resolved[0] = true;
+                            handler.removeCallbacksAndMessages(null);
+                            locationManager.removeUpdates(this);
+                            PluginCall savedCall = bridge.getSavedCall(pendingCall.getCallbackId());
+                            if (savedCall != null) {
+                                savedCall.resolve(createPositionResult(bestFreshLocation[0]));
+                                bridge.releaseCall(savedCall);
+                            }
                         }
                     } catch (Exception e) {
                         // Already resolved or rejected
@@ -130,20 +169,45 @@ public class NativeGeolocation extends Plugin {
 
             // Request location updates
             try {
-                String provider = enableHighAccuracy ? LocationManager.GPS_PROVIDER : LocationManager.NETWORK_PROVIDER;
                 long minTime = 0;
                 float minDistance = 0;
 
-                locationManager.requestLocationUpdates(provider, minTime, minDistance, locationListener, Looper.getMainLooper());
+                if (enableHighAccuracy && locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                    locationManager.requestLocationUpdates(
+                        LocationManager.GPS_PROVIDER,
+                        minTime,
+                        minDistance,
+                        locationListener,
+                        Looper.getMainLooper()
+                    );
+                }
+
+                if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+                    locationManager.requestLocationUpdates(
+                        LocationManager.NETWORK_PROVIDER,
+                        minTime,
+                        minDistance,
+                        locationListener,
+                        Looper.getMainLooper()
+                    );
+                }
 
                 // Set timeout
-                Handler handler = new Handler(Looper.getMainLooper());
                 handler.postDelayed(() -> {
                     try {
+                        if (resolved[0]) {
+                            return;
+                        }
+
+                        resolved[0] = true;
                         locationManager.removeUpdates(locationListener);
                         PluginCall savedCall = bridge.getSavedCall(pendingCall.getCallbackId());
                         if (savedCall != null) {
-                            savedCall.reject("Location request timed out");
+                            if (bestFreshLocation[0] != null) {
+                                savedCall.resolve(createPositionResult(bestFreshLocation[0]));
+                            } else {
+                                savedCall.reject("Location request timed out");
+                            }
                             bridge.releaseCall(savedCall);
                         }
                     } catch (Exception e) {
@@ -182,9 +246,188 @@ public class NativeGeolocation extends Plugin {
         return result;
     }
 
+    private Location getBestLastKnownLocation() {
+        Location bestLocation = null;
+
+        try {
+            Location gpsLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            Location networkLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+
+            if (gpsLocation != null) {
+                bestLocation = gpsLocation;
+            }
+
+            if (networkLocation != null &&
+                (bestLocation == null || networkLocation.getTime() > bestLocation.getTime())) {
+                bestLocation = networkLocation;
+            }
+        } catch (SecurityException ignored) {
+            return null;
+        }
+
+        return bestLocation;
+    }
+
     @PluginMethod
     public void requestPermissions(PluginCall call) {
         // Let Capacitor handle the permission request automatically
         requestAllPermissions(call, "locationPermsCallback");
+    }
+
+    @PluginMethod
+    public void getCurrentHeading(PluginCall call) {
+        if (sensorManager == null) {
+            call.reject("Sensor manager unavailable");
+            return;
+        }
+
+        Sensor geomagneticRotationVectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR);
+        Sensor rotationVectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
+        Sensor accelerometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        Sensor magnetometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+
+        if (
+            geomagneticRotationVectorSensor == null &&
+            rotationVectorSensor == null &&
+            (accelerometerSensor == null || magnetometerSensor == null)
+        ) {
+            call.reject("Compass sensors are not available");
+            return;
+        }
+
+        final float[] rotationMatrix = new float[9];
+        final float[] remappedMatrix = new float[9];
+        final float[] orientation = new float[3];
+        final float[] gravityReading = new float[3];
+        final float[] magneticReading = new float[3];
+        final boolean[] hasGravity = { false };
+        final boolean[] hasMagnetic = { false };
+        final boolean[] resolved = { false };
+
+        final PluginCall pendingCall = call;
+        bridge.saveCall(call);
+
+        final SensorEventListener listener = new SensorEventListener() {
+            @Override
+            public void onSensorChanged(SensorEvent event) {
+                boolean canResolve = false;
+
+                if (
+                    event.sensor.getType() == Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR ||
+                    event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR
+                ) {
+                    SensorManager.getRotationMatrixFromVector(rotationMatrix, event.values);
+                    canResolve = true;
+                } else if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+                    System.arraycopy(event.values, 0, gravityReading, 0, gravityReading.length);
+                    hasGravity[0] = true;
+                } else if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
+                    System.arraycopy(event.values, 0, magneticReading, 0, magneticReading.length);
+                    hasMagnetic[0] = true;
+                }
+
+                if (!canResolve && hasGravity[0] && hasMagnetic[0]) {
+                    canResolve = SensorManager.getRotationMatrix(
+                        rotationMatrix,
+                        null,
+                        gravityReading,
+                        magneticReading
+                    );
+                }
+
+                if (!canResolve || resolved[0]) {
+                    return;
+                }
+
+                int worldAxisForX = SensorManager.AXIS_X;
+                int worldAxisForY = SensorManager.AXIS_Y;
+
+                if (getActivity() != null && getActivity().getDisplay() != null) {
+                    int rotation = getActivity().getDisplay().getRotation();
+                    switch (rotation) {
+                        case Surface.ROTATION_90:
+                            worldAxisForX = SensorManager.AXIS_Y;
+                            worldAxisForY = SensorManager.AXIS_MINUS_X;
+                            break;
+                        case Surface.ROTATION_180:
+                            worldAxisForX = SensorManager.AXIS_MINUS_X;
+                            worldAxisForY = SensorManager.AXIS_MINUS_Y;
+                            break;
+                        case Surface.ROTATION_270:
+                            worldAxisForX = SensorManager.AXIS_MINUS_Y;
+                            worldAxisForY = SensorManager.AXIS_X;
+                            break;
+                        case Surface.ROTATION_0:
+                        default:
+                            break;
+                    }
+                }
+
+                SensorManager.remapCoordinateSystem(
+                    rotationMatrix,
+                    worldAxisForX,
+                    worldAxisForY,
+                    remappedMatrix
+                );
+                SensorManager.getOrientation(remappedMatrix, orientation);
+
+                double azimuth = Math.toDegrees(orientation[0]);
+                double heading = (azimuth + 360.0) % 360.0;
+
+                Location referenceLocation = getBestLastKnownLocation();
+                if (referenceLocation != null) {
+                    GeomagneticField geomagneticField = new GeomagneticField(
+                        (float) referenceLocation.getLatitude(),
+                        (float) referenceLocation.getLongitude(),
+                        referenceLocation.hasAltitude() ? (float) referenceLocation.getAltitude() : 0f,
+                        referenceLocation.getTime() > 0 ? referenceLocation.getTime() : System.currentTimeMillis()
+                    );
+                    heading = (heading + geomagneticField.getDeclination() + 360.0) % 360.0;
+                }
+
+                resolved[0] = true;
+                sensorManager.unregisterListener(this);
+
+                PluginCall savedCall = bridge.getSavedCall(pendingCall.getCallbackId());
+                if (savedCall != null) {
+                    JSObject result = new JSObject();
+                    result.put("heading", heading);
+                    savedCall.resolve(result);
+                    bridge.releaseCall(savedCall);
+                }
+            }
+
+            @Override
+            public void onAccuracyChanged(Sensor sensor, int accuracy) {
+            }
+        };
+
+        if (geomagneticRotationVectorSensor != null) {
+            sensorManager.registerListener(
+                listener,
+                geomagneticRotationVectorSensor,
+                SensorManager.SENSOR_DELAY_GAME
+            );
+        } else if (accelerometerSensor != null && magnetometerSensor != null) {
+            sensorManager.registerListener(listener, accelerometerSensor, SensorManager.SENSOR_DELAY_GAME);
+            sensorManager.registerListener(listener, magnetometerSensor, SensorManager.SENSOR_DELAY_GAME);
+        } else if (rotationVectorSensor != null) {
+            // Last resort only. Rotation vector can be gyro-dominant and may drift,
+            // but it is better than hard-failing when no geomagnetic path is available.
+            sensorManager.registerListener(listener, rotationVectorSensor, SensorManager.SENSOR_DELAY_GAME);
+        }
+
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            if (resolved[0]) {
+                return;
+            }
+
+            sensorManager.unregisterListener(listener);
+            PluginCall savedCall = bridge.getSavedCall(pendingCall.getCallbackId());
+            if (savedCall != null) {
+                savedCall.reject("Compass heading is unavailable");
+                bridge.releaseCall(savedCall);
+            }
+        }, 4000);
     }
 }

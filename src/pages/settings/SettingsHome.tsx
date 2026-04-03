@@ -1,22 +1,32 @@
 import { SettingsPageLayout } from '@/components/settings/SettingsPageLayout';
-import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { SelectionButtonGroup } from '@/components/ui/SelectionButtonGroup';
 import { useTranslation } from '@/contexts/TranslationContext';
 import {
   CalendarDays,
-  Sunrise,
-  Moon,
-  Clock,
-  Palette,
-  Languages,
-  Info,
   ChevronRight,
+  Clock,
+  Info,
+  Languages,
+  Monitor,
+  Moon,
+  Palette,
+  Sun,
+  Sunrise,
 } from 'lucide-react';
+import { useTheme } from 'next-themes';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export default function SettingsHome() {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const settingsCategories = [
     {
@@ -80,7 +90,44 @@ export default function SettingsHome() {
   return (
     <SettingsPageLayout
       title={t('settings.title')}
+      showBackButton={false}
       contentClassName="max-w-md mx-auto px-5 py-6 space-y-3">
+      <Card className="p-4">
+        <div className="space-y-4">
+          <div className="space-y-1">
+            <p className="font-semibold">{t('settings.theme')}</p>
+            <p className="text-sm text-muted-foreground">
+              {t('settings.themeDesc')}
+            </p>
+          </div>
+
+          <SelectionButtonGroup
+            value={theme as 'light' | 'dark' | 'system'}
+            onChange={(value) => setTheme(value)}
+            options={[
+              {
+                value: 'light',
+                icon: <Sun className="mr-2 h-4 w-4" />,
+                label: t('settings.light'),
+                disabled: !mounted,
+              },
+              {
+                value: 'dark',
+                icon: <Moon className="mr-2 h-4 w-4" />,
+                label: t('settings.dark'),
+                disabled: !mounted,
+              },
+              {
+                value: 'system',
+                icon: <Monitor className="mr-2 h-4 w-4" />,
+                label: t('settings.system'),
+                disabled: !mounted,
+              },
+            ]}
+          />
+        </div>
+      </Card>
+
       {settingsCategories.map((category) => {
         const Icon = category.icon;
         return (
@@ -93,6 +140,7 @@ export default function SettingsHome() {
                 className={`h-10 w-10 rounded-xl ${category.bgColor} flex items-center justify-center`}>
                 <Icon className={`h-5 w-5 ${category.color}`} />
               </div>
+
               <span className="flex-1 font-semibold">{category.label}</span>
               <ChevronRight className="h-5 w-5 text-muted-foreground" />
             </div>

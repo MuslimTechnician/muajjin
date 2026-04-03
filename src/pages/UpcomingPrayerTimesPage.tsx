@@ -1,4 +1,4 @@
-import { AppHeader } from '@/components/AppHeader';
+import { BottomNav } from '@/components/BottomNav';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -163,10 +163,12 @@ const UpcomingPrayerTimesPage = () => {
   }, [getSalatName, monthOffset, settings, singleDayOnly, startDateValue]);
 
   return (
-    <div className="min-h-screen bg-background">
-      <AppHeader showBackButton={true} title={t('salatTimes.upcomingTitle')} />
-
+    <div className="min-h-screen bg-background pb-24">
       <div className="mx-auto max-w-md space-y-4 px-5 py-6">
+        <h1 className="text-2xl font-bold tracking-tight">
+          {t('salatTimes.upcomingTitle')}
+        </h1>
+
         <Card className="p-4">
           <div className="flex items-end gap-3">
             <div className="flex-1">
@@ -269,6 +271,7 @@ const UpcomingPrayerTimesPage = () => {
           ))}
         </div>
       </div>
+      <BottomNav />
     </div>
   );
 };

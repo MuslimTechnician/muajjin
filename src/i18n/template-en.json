@@ -21,6 +21,12 @@
       "searchCity": "Search city...",
       "noCityFound": "No city found."
     },
+    "navigation": {
+      "home": "Home",
+      "calendar": "Calendar",
+      "compass": "Compass",
+      "settings": "Settings"
+    },
     "salatTimes": {
       "title": "Salat Times",
       "current": "Current Salat",
@@ -214,6 +220,31 @@
         "jamaahTimesList1": "Enter the exact time for each salat's Jama'ah",
         "jamaahTimesList2": "These times will be displayed alongside the calculated salat times"
       }
+    },
+    "qibla": {
+      "badge": "Qibla Compass",
+      "title": "Qibla Compass",
+      "description": "Find the direction of the Kaaba from your current location.",
+      "enableCompass": "Enable compass access",
+      "permissionDenied": "Compass permission was denied. You can still use the bearing shown below.",
+      "sensorUnsupported": "Compass sensors are not available on this device. Use the Qibla bearing with a physical compass if needed.",
+      "sensorWaiting": "Waiting for heading data. Move the device gently and keep it level.",
+      "calibrationTitle": "Calibration help",
+      "calibrationHint": "For better accuracy, keep your phone flat and move it in a figure-eight motion.",
+      "qiblaBearing": "Qibla bearing",
+      "distance": "Distance to Makkah",
+      "yourLocation": "Your location",
+      "locationUnavailable": "Location not set",
+      "locationHelp": "Set your location first for an accurate Qibla direction.",
+      "refreshLocation": "Refresh location",
+      "openLocationSettings": "Open location settings",
+      "aligned": "Aligned with Qibla",
+      "turnAround": "Turn around",
+      "turnRight": "Turn right {{degrees}}°",
+      "turnLeft": "Turn left {{degrees}}°",
+      "bearingOnly": "Qibla at {{degrees}}° from north",
+      "staticBearingLabel": "Static guidance",
+      "liveGuidanceLabel": "Live guidance"
     },
     "salats": {
       "fajr": "Fajr",

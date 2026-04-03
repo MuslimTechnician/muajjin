@@ -2,7 +2,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useTranslation } from '@/contexts/TranslationContext';
 import { ProhibitedTime } from '@/types';
 import { formatTime } from '@/utils/timeUtils';
-import { AlertTriangle, Sun } from 'lucide-react';
+import { AlertTriangle, Sun, Sunrise, Sunset } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 interface ProhibitedTimesContainerProps {
@@ -38,6 +38,18 @@ export function ProhibitedTimesContainer({
     return () => clearInterval(timer);
   }, []);
 
+  const getTimeIcon = (id: ProhibitedTime['id']) => {
+    switch (id) {
+      case 'shuruq':
+        return Sunrise;
+      case 'ghurub':
+        return Sunset;
+      case 'zawal':
+      default:
+        return Sun;
+    }
+  };
+
   return (
     <Card>
       <CardContent className="space-y-3 p-4">
@@ -48,9 +60,10 @@ export function ProhibitedTimesContainer({
         <div className="space-y-2">
           {prohibitedTimes.map((time) => {
             const isCurrent = isTimeInRange(now, time.start, time.end);
+            const TimeIcon = getTimeIcon(time.id);
             return (
               <div
-                key={time.name}
+                key={time.id}
                 className={[
                   'flex items-center justify-between rounded-lg border p-3 transition-colors',
                   isCurrent
@@ -58,7 +71,7 @@ export function ProhibitedTimesContainer({
                     : 'border-border bg-muted/20',
                 ].join(' ')}>
                 <div className="flex items-center gap-2">
-                  <Sun
+                  <TimeIcon
                     className={[
                       'h-4 w-4',
                       isCurrent ? 'text-red-500' : 'text-orange-500',
