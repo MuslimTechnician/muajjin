@@ -9,6 +9,11 @@ export interface NativeGeolocationPlugin {
   getCurrentPosition(options?: PositionOptions): Promise<Position>;
 
   /**
+   * Get the current compass heading in degrees
+   */
+  getCurrentHeading(): Promise<HeadingResult>;
+
+  /**
    * Request location permissions
    */
   requestPermissions(): Promise<PermissionStatus>;
@@ -88,6 +93,13 @@ export interface PermissionStatus {
    * Fine location permission state
    */
   location: PermissionState;
+}
+
+export interface HeadingResult {
+  /**
+   * Heading in degrees, normalized to 0-360
+   */
+  heading: number;
 }
 
 export type PermissionState =

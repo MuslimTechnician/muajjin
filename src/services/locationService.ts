@@ -98,6 +98,19 @@ async function getLocationByGPS(): Promise<Omit<LocationResult, 'method'>> {
 }
 
 /**
+ * Force a fresh GPS location read without IP fallback.
+ * Use this when the user explicitly refreshes their current location.
+ */
+export async function refreshLocationByGPS(): Promise<LocationResult> {
+  const gpsLocation = await getLocationByGPS();
+
+  return {
+    ...gpsLocation,
+    method: 'gps',
+  };
+}
+
+/**
  * Fallback to browser geolocation for web or when Capacitor fails
  */
 async function getLocationByBrowser(): Promise<Omit<LocationResult, 'method'>> {

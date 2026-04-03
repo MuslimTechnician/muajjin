@@ -6,10 +6,12 @@ export type {
   Coordinates,
   PermissionStatus,
   PermissionState,
+  HeadingResult,
 } from './definitions';
 
 export interface NativeGeolocationPlugin {
   getCurrentPosition(options?: PositionOptions): Promise<Position>;
+  getCurrentHeading(): Promise<HeadingResult>;
   requestPermissions(): Promise<PermissionStatus>;
 }
 
@@ -30,6 +32,10 @@ interface Coordinates {
 interface PermissionStatus {
   coarseLocation: PermissionState;
   location: PermissionState;
+}
+
+interface HeadingResult {
+  heading: number;
 }
 
 type PermissionState =

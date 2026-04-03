@@ -1,4 +1,5 @@
 import {
+  HeadingResult,
   NativeGeolocationPlugin,
   Position,
   PositionOptions,
@@ -47,5 +48,48 @@ export class NativeGeolocationWeb implements NativeGeolocationPlugin {
       location: 'prompt',
       coarseLocation: 'prompt',
     };
+  }
+
+  async getCurrentHeading(): Promise<HeadingResult> {
+    return new Promise((resolve, reject) => {
+      if (typeof window === 'undefined' || !('DeviceOrientationEvent' in window)) {
+        reject(new Error('Compass heading is not supported on this device'));
+        return;
+      }
+
+      const handleOrientation = (event: Event) => {
+        const orientationEvent = event as DeviceOrientationEvent & {
+          webkitCompassHeading?: number;
+        };
+
+        if (typeof orientationEvent.webkitCompassHeading === 'number') {
+          cleanup();
+          resolve({ heading: orientationEvent.webkitCompassHeading });
+          return;
+        }
+
+        if (
+          typeof orientationEvent.alpha === 'number' &&
+          orientationEvent.absolute
+        ) {
+          cleanup();
+          resolve({ heading: (360 - orientationEvent.alpha + 360) % 360 });
+        }
+      };
+
+      const timeoutId = window.setTimeout(() => {
+        cleanup();
+        reject(new Error('Compass heading is unavailable'));
+      }, 3000);
+
+      const cleanup = () => {
+        window.clearTimeout(timeoutId);
+        window.removeEventListener('deviceorientationabsolute', handleOrientation, true);
+        window.removeEventListener('deviceorientation', handleOrientation, true);
+      };
+
+      window.addEventListener('deviceorientationabsolute', handleOrientation, true);
+      window.addEventListener('deviceorientation', handleOrientation, true);
+    });
   }
 }

@@ -14,6 +14,7 @@ import NotFound from './pages/NotFound';
 import FinalSettingsPage from './pages/onboarding/FinalSettingsPage';
 import LocationSetupPage from './pages/onboarding/LocationSetupPage';
 import WelcomePage from './pages/onboarding/WelcomePage';
+import QiblaCompassPage from './pages/QiblaCompassPage';
 import AboutSettings from './pages/settings/AboutSettings';
 import DisplaySettings from './pages/settings/DisplaySettings';
 import FastingSettings from './pages/settings/FastingSettings';
@@ -91,6 +92,16 @@ const App = () => (
               <Route
                 path="/upcoming-prayer-times"
                 element={<UpcomingPrayerTimesPage />}
+              />
+              <Route
+                path="/qibla"
+                element={
+                  <RouteGuard
+                    requireOnboardingComplete={true}
+                    redirectTo="/onboarding/welcome">
+                    <QiblaCompassPage />
+                  </RouteGuard>
+                }
               />
 
               {/* Settings routes - require onboarding completion */}

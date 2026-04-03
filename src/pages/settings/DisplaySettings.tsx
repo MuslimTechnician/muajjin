@@ -2,7 +2,6 @@ import { SettingsPageLayout } from '@/components/settings/SettingsPageLayout';
 import { SettingsSaveButton } from '@/components/settings/SettingsSaveButton';
 import { SettingsSection } from '@/components/settings/SettingsSection';
 import { Button } from '@/components/ui/button';
-import { SelectionButtonGroup } from '@/components/ui/SelectionButtonGroup';
 import { Switch } from '@/components/ui/switch';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import {
@@ -23,14 +22,12 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Check, GripVertical, Trash2, Upload } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { DEFAULT_CONTAINER_ORDER } from '@/constants/defaultSettings';
 import { useTranslation } from '@/contexts/TranslationContext';
 import { EContainerType } from '@/types/enums';
-import { Monitor, Moon, Sun } from 'lucide-react';
-import { useTheme } from 'next-themes';
 
 const CONTAINER_LABELS: Record<string, string> = {
   [EContainerType.DateTime]: 'Date & Time',
@@ -101,16 +98,13 @@ function SortableContainer({
 
 export default function DisplaySettings() {
   const navigate = useNavigate();
-  const { theme, setTheme, resolvedTheme } = useTheme();
-  const { t, uploadFont, removeFont, customFont, activeTranslation } =
-    useTranslation();
+  const { t, uploadFont, removeFont, customFont, activeTranslation } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
   // const [userSettings] = useLocalStorage<UserSettings>('muajjin-settings', DEFAULT_SETTINGS);
   const [containerOrder, setContainerOrder] = useLocalStorage<string[]>(
     'muajjin-container-order',
     DEFAULT_CONTAINER_ORDER,
   );
-  const [mounted, setMounted] = useState(false);
   const hasCustomFont = !!customFont;
 
   const getCurrentFontInfo = () => {
@@ -146,16 +140,6 @@ export default function DisplaySettings() {
   const [visibleContainers, setVisibleContainers] = useLocalStorage<
     Record<string, boolean>
   >('muajjin-visible-containers', defaultVisibleContainers);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  // Get the actual current theme (resolves "system" to "light" or "dark")
-  const getCurrentTheme = () => {
-    if (!mounted) return 'light';
-    return theme === 'system' ? resolvedTheme || 'light' : theme;
-  };
 
   const sensors = useSensors(
     useSensor(MouseSensor, {
@@ -219,36 +203,6 @@ export default function DisplaySettings() {
     <SettingsPageLayout
       title={t('settings.displaySettings')}
       contentClassName="max-w-md mx-auto px-5 py-6 space-y-6">
-      {/* Theme */}
-      <SettingsSection
-        title={t('settings.theme')}
-        description={t('settings.themeDesc')}>
-        <SelectionButtonGroup
-          value={theme as 'light' | 'dark' | 'system'}
-          onChange={(value) => setTheme(value)}
-          options={[
-            {
-              value: 'light',
-              icon: <Sun className="mr-2 h-4 w-4" />,
-              label: t('settings.light'),
-              disabled: !mounted,
-            },
-            {
-              value: 'dark',
-              icon: <Moon className="mr-2 h-4 w-4" />,
-              label: t('settings.dark'),
-              disabled: !mounted,
-            },
-            {
-              value: 'system',
-              icon: <Monitor className="mr-2 h-4 w-4" />,
-              label: t('settings.system'),
-              disabled: !mounted,
-            },
-          ]}
-        />
-      </SettingsSection>
-
       {/* Custom Font */}
       <SettingsSection
         title={t('settings.customFont')}

@@ -100,22 +100,25 @@ export function CurrentPrayerContainer({
 
     return [
       {
-        name: 'shuruq',
+        id: 'shuruq',
+        name: t('prohibited.shuruq'),
         start: fajr.end,
         end: adjustTime(fajr.end, 15),
       },
       {
-        name: 'zawal',
+        id: 'zawal',
+        name: t('prohibited.zawal'),
         start: adjustTime(dhuhr.start, -15),
         end: dhuhr.start,
       },
       {
-        name: 'ghurub',
+        id: 'ghurub',
+        name: t('prohibited.ghurub'),
         start: adjustTime(maghrib.start, -5),
         end: maghrib.start,
       },
     ];
-  }, [allPrayers]);
+  }, [allPrayers, t]);
 
   const effectiveProhibitedTimes =
     prohibitedTimes.length > 0 ? prohibitedTimes : derivedProhibitedTimes;
