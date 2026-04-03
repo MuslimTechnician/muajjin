@@ -5,18 +5,18 @@ import { useApp } from '@/contexts/AppContext';
 import { useTranslation } from '@/contexts/TranslationContext';
 import { NativeGeolocation } from '@/plugins/native-geolocation';
 import { Capacitor } from '@capacitor/core';
+import { Coordinates, Qibla } from 'adhan';
 import {
   Compass,
   LocateFixed,
   MapPin,
   Navigation,
-  RotateCw,
 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-const KAABA_LATITUDE = 21.422487;
-const KAABA_LONGITUDE = 39.826206;
+const KAABA_LATITUDE = 21.4225241;
+const KAABA_LONGITUDE = 39.8261818;
 
 type OrientationPermissionState =
   | 'idle'
@@ -61,18 +61,6 @@ function hasValidCoordinates(latitude?: number, longitude?: number) {
 
 function toRadians(degrees: number) {
   return (degrees * Math.PI) / 180;
-}
-
-function calculateQiblaBearing(latitude: number, longitude: number) {
-  const lat1 = toRadians(latitude);
-  const lat2 = toRadians(KAABA_LATITUDE);
-  const deltaLon = toRadians(KAABA_LONGITUDE - longitude);
-
-  const y = Math.sin(deltaLon);
-  const x =
-    Math.cos(lat1) * Math.tan(lat2) - Math.sin(lat1) * Math.cos(deltaLon);
-
-  return normalizeDegrees((Math.atan2(y, x) * 180) / Math.PI);
 }
 
 function calculateDistanceToKaaba(latitude: number, longitude: number) {
@@ -142,7 +130,7 @@ export default function QiblaCompassPage() {
       return null;
     }
 
-    return calculateQiblaBearing(coordinates.latitude, coordinates.longitude);
+    return Qibla(new Coordinates(coordinates.latitude, coordinates.longitude));
   }, [coordinates]);
 
   const distanceToKaaba = useMemo(() => {
@@ -175,7 +163,7 @@ export default function QiblaCompassPage() {
   }, [heading]);
 
   const dialRotation = displayDialRotation;
-  const qiblaMarkerRotation = qiblaBearing ?? 0;
+  const qiblaMarkerRotation = (qiblaBearing ?? 0) + dialRotation;
 
   const subscribeToOrientation = useCallback(() => {
     if (typeof window === 'undefined') {
@@ -361,16 +349,16 @@ export default function QiblaCompassPage() {
                   <div className="absolute inset-3 rounded-full border border-dashed border-primary/20" />
                   <div className="absolute inset-7 rounded-full border border-border/70" />
                   <div className="absolute left-1/2 top-3 -translate-x-1/2 text-xs font-semibold tracking-[0.3em] text-red-500">
-                    N
+                    {t('qibla.north')}
                   </div>
                   <div className="absolute bottom-3 left-1/2 -translate-x-1/2 text-xs font-semibold tracking-[0.3em] text-muted-foreground">
-                    S
+                    {t('qibla.south')}
                   </div>
                   <div className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold tracking-[0.3em] text-muted-foreground">
-                    W
+                    {t('qibla.west')}
                   </div>
                   <div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold tracking-[0.3em] text-muted-foreground">
-                    E
+                    {t('qibla.east')}
                   </div>
                 </div>
 
@@ -429,8 +417,8 @@ export default function QiblaCompassPage() {
           </CardContent>
         </Card>
 
-        <div className="grid grid-cols-2 gap-4">
-          <Card>
+        <div className="flex gap-4">
+          <Card className="flex-1">
             <CardContent className="space-y-2 p-5">
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Navigation className="h-4 w-4" />
@@ -442,7 +430,7 @@ export default function QiblaCompassPage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="flex-1">
             <CardContent className="space-y-2 p-5">
               <div className="flex items-center gap-2 text-muted-foreground">
                 <LocateFixed className="h-4 w-4" />
@@ -481,18 +469,6 @@ export default function QiblaCompassPage() {
                 </Link>
               </Button>
             ) : null}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="space-y-3 p-5">
-            <div className="flex items-center gap-2">
-              <RotateCw className="h-4 w-4 text-primary" />
-              <p className="font-medium">{t('qibla.calibrationTitle')}</p>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              {t('qibla.calibrationHint')}
-            </p>
           </CardContent>
         </Card>
       </div>

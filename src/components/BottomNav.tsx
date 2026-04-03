@@ -14,7 +14,8 @@ const NAV_ITEMS = [
     labelKey: 'navigation.calendar',
     to: '/upcoming-prayer-times',
     icon: CalendarDays,
-    matches: (pathname: string) => pathname.startsWith('/upcoming-prayer-times'),
+    matches: (pathname: string) =>
+      pathname.startsWith('/upcoming-prayer-times'),
   },
   {
     labelKey: 'navigation.compass',
