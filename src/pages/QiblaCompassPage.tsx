@@ -41,6 +41,14 @@ function getContinuousAngle(nextAngle: number, previousAngle: number) {
   return previousAngle + normalizeSignedDegrees(nextAngle - previousAngle);
 }
 
+function smoothHeading(nextHeading: number, previousHeading: number) {
+  const continuousTarget = getContinuousAngle(nextHeading, previousHeading);
+  const smoothingFactor = 0.24;
+  return normalizeDegrees(
+    previousHeading + (continuousTarget - previousHeading) * smoothingFactor,
+  );
+}
+
 function hasValidCoordinates(latitude?: number, longitude?: number) {
   return (
     typeof latitude === 'number' &&
@@ -105,6 +113,7 @@ export default function QiblaCompassPage() {
   const { t } = useTranslation();
   const { settings } = useApp();
   const [heading, setHeading] = useState<number | null>(null);
+  const [smoothedHeading, setSmoothedHeading] = useState<number | null>(null);
   const [displayDialRotation, setDisplayDialRotation] = useState(0);
   const [permissionState, setPermissionState] =
     useState<OrientationPermissionState>('idle');
@@ -139,23 +148,40 @@ export default function QiblaCompassPage() {
     );
   }, [coordinates]);
 
+  const effectiveHeading = smoothedHeading ?? heading;
+
   const directionDelta = useMemo(() => {
-    if (heading === null || qiblaBearing === null) {
+    if (effectiveHeading === null || qiblaBearing === null) {
       return null;
     }
 
-    return normalizeSignedDegrees(qiblaBearing - heading);
-  }, [heading, qiblaBearing]);
+    return normalizeSignedDegrees(qiblaBearing - effectiveHeading);
+  }, [effectiveHeading, qiblaBearing]);
 
   useEffect(() => {
     if (heading === null) {
+      setSmoothedHeading(null);
+      return;
+    }
+
+    setSmoothedHeading((previous) => {
+      if (previous === null) {
+        return heading;
+      }
+
+      return smoothHeading(heading, previous);
+    });
+  }, [heading]);
+
+  useEffect(() => {
+    if (effectiveHeading === null) {
       return;
     }
 
     setDisplayDialRotation((previousRotation) =>
-      getContinuousAngle(-heading, previousRotation),
+      getContinuousAngle(-effectiveHeading, previousRotation),
     );
-  }, [heading]);
+  }, [effectiveHeading]);
 
   const dialRotation = displayDialRotation;
   const qiblaMarkerRotation = (qiblaBearing ?? 0) + dialRotation;
@@ -166,20 +192,40 @@ export default function QiblaCompassPage() {
       return () => undefined;
     }
 
+    let frameId: number | null = null;
+    let latestHeading: number | null = null;
+
     const updateHeading = (event: Event) => {
       const orientationEvent = event as DeviceOrientationEventWithCompass;
+      let nextHeading: number | null = null;
 
       if (typeof orientationEvent.webkitCompassHeading === 'number') {
-        setHeading(normalizeDegrees(orientationEvent.webkitCompassHeading));
-        return;
+        nextHeading = normalizeDegrees(orientationEvent.webkitCompassHeading);
       }
 
       if (
         typeof orientationEvent.alpha === 'number' &&
         orientationEvent.absolute
       ) {
-        setHeading(normalizeDegrees(360 - orientationEvent.alpha));
+        nextHeading = normalizeDegrees(360 - orientationEvent.alpha);
       }
+
+      if (nextHeading === null) {
+        return;
+      }
+
+      latestHeading = nextHeading;
+      if (frameId !== null) {
+        return;
+      }
+
+      frameId = window.requestAnimationFrame(() => {
+        frameId = null;
+        if (latestHeading === null) {
+          return;
+        }
+        setHeading(latestHeading);
+      });
     };
 
     window.addEventListener('deviceorientationabsolute', updateHeading, true);
@@ -193,6 +239,9 @@ export default function QiblaCompassPage() {
         true,
       );
       window.removeEventListener('deviceorientation', updateHeading, true);
+      if (frameId !== null) {
+        window.cancelAnimationFrame(frameId);
+      }
     };
   }, []);
 
@@ -255,7 +304,7 @@ export default function QiblaCompassPage() {
     };
 
     pollHeading();
-    intervalId = window.setInterval(pollHeading, 700);
+    intervalId = window.setInterval(pollHeading, 120);
 
     return () => {
       cancelled = true;
@@ -337,7 +386,7 @@ export default function QiblaCompassPage() {
             <div className="flex justify-center">
               <div className="relative h-72 w-72 rounded-full border border-border bg-card shadow-sm">
                 <div
-                  className="absolute inset-0 transition-transform duration-300 ease-out"
+                  className="absolute inset-0 transition-transform duration-150 ease-linear will-change-transform"
                   style={{
                     transform: `rotate(${dialRotation}deg)`,
                   }}>
@@ -358,7 +407,7 @@ export default function QiblaCompassPage() {
                 </div>
 
                 <div
-                  className="absolute inset-0 transition-transform duration-300 ease-out"
+                  className="absolute inset-0 transition-transform duration-150 ease-linear will-change-transform"
                   style={{
                     transform: `rotate(${qiblaMarkerRotation}deg)`,
                   }}>

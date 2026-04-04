@@ -281,6 +281,8 @@
     "errors": {
       "locationFailed": "Failed to get your location",
       "locationDenied": "Location permission denied. Please enable location access.",
+      "locationTimeout": "Location detection timed out. Please try again or enter your location manually.",
+      "locationAutoDetectFailed": "Could not detect location automatically. Please enable GPS or check your internet connection, then try again. You can also enter your location manually.",
       "invalidFile": "Invalid translation file. Please check the format.",
       "fileRequired": "Please select a translation file",
       "fontUploadFailed": "Failed to upload font"
