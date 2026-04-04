@@ -1,6 +1,6 @@
-import { cn } from '@/lib/utils';
-import { useTranslation } from '@/contexts/TranslationContext';
 import { Card } from '@/components/ui/card';
+import { useTranslation } from '@/contexts/TranslationContext';
+import { cn } from '@/lib/utils';
 import {
   CalendarDays,
   Compass,
@@ -9,8 +9,8 @@ import {
   Settings,
   X,
 } from 'lucide-react';
-import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const NAV_ITEMS = [
   {
@@ -136,7 +136,16 @@ export function BottomNav() {
           </button>
 
           <button
-            onClick={() => navigate('/settings')}
+            onClick={() => {
+              // experimental condition
+              if (pathname === '/settings') {
+                return;
+              } else if (pathname.startsWith('/settings/')) {
+                navigate(-1);
+              } else {
+                navigate('/settings');
+              }
+            }}
             className="flex size-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
             aria-label={t('navigation.settings')}>
             <Settings className="h-5 w-5" />

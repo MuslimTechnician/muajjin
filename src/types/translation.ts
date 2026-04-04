@@ -133,6 +133,8 @@ export interface TranslationStrings {
   errors: {
     locationFailed: string;
     locationDenied: string;
+    locationTimeout: string;
+    locationAutoDetectFailed: string;
     invalidFile: string;
   };
   update: {

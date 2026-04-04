@@ -20,6 +20,30 @@ export interface LocationError {
   type: 'gps' | 'ip' | 'geocoding' | 'unknown';
 }
 
+const LOCATION_DETECTION_TIMEOUT_MS = 25000;
+
+function withTimeout<T>(
+  promise: Promise<T>,
+  timeoutMs: number,
+  errorMessage: string,
+): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const timeoutId = setTimeout(() => {
+      reject(new Error(errorMessage));
+    }, timeoutMs);
+
+    promise
+      .then((value) => {
+        clearTimeout(timeoutId);
+        resolve(value);
+      })
+      .catch((error) => {
+        clearTimeout(timeoutId);
+        reject(error);
+      });
+  });
+}
+
 /**
  * Get location using GPS (Capacitor Geolocation or browser navigator.geolocation)
  * @returns Promise<LocationResult>
@@ -301,32 +325,34 @@ async function reverseGeocode(
  * @returns Promise<LocationResult>
  */
 export async function detectLocation(): Promise<LocationResult> {
-  try {
-    // Try GPS first (high accuracy, 15 second timeout)
-    const gpsLocation = await getLocationByGPS();
+  return withTimeout(
+    (async () => {
+      try {
+        // Try GPS first (high accuracy, 15 second timeout)
+        const gpsLocation = await getLocationByGPS();
 
-    return {
-      ...gpsLocation,
-      method: 'gps',
-    };
-  } catch (gpsError) {
-    const error = gpsError as LocationError;
+        return {
+          ...gpsLocation,
+          method: 'gps' as const,
+        };
+      } catch (gpsError) {
+        try {
+          // Fallback to IP-based location
+          const ipLocation = await getLocationByIP();
 
-    try {
-      // Fallback to IP-based location
-      const ipLocation = await getLocationByIP();
-
-      return {
-        ...ipLocation,
-        method: 'ip',
-      };
-    } catch (ipError) {
-      // Both methods failed
-      throw new Error(
-        'Could not detect location automatically. Please enable GPS or check your internet connection, then try again. You can also enter your location manually.',
-      );
-    }
-  }
+          return {
+            ...ipLocation,
+            method: 'ip' as const,
+          };
+        } catch (ipError) {
+          // Both methods failed
+          throw new Error('errors.locationAutoDetectFailed');
+        }
+      }
+    })(),
+    LOCATION_DETECTION_TIMEOUT_MS,
+    'errors.locationTimeout',
+  );
 }
 
 /**

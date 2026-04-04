@@ -7,9 +7,8 @@ import {
 import { SettingsPageLayout } from '@/components/settings/SettingsPageLayout';
 import { SettingsSaveButton } from '@/components/settings/SettingsSaveButton';
 import { SettingsSection } from '@/components/settings/SettingsSection';
-import { Button } from '@/components/ui/button';
-import { SelectionButtonGroup } from '@/components/ui/SelectionButtonGroup';
 import { Label } from '@/components/ui/label';
+import { SelectionButtonGroup } from '@/components/ui/SelectionButtonGroup';
 import { useApp } from '@/contexts/AppContext';
 import { useTranslation } from '@/contexts/TranslationContext';
 import { detectLocation, LocationResult } from '@/services/locationService';
@@ -80,7 +79,11 @@ export default function TimeLocationSettings() {
       });
     } catch (error) {
       const errorMessage =
-        error instanceof Error ? error.message : t('errors.locationFailed');
+        error instanceof Error && error.message.startsWith('errors.')
+          ? t(error.message)
+          : error instanceof Error
+            ? error.message
+            : t('errors.locationFailed');
       setLocationStatus({
         type: 'error',
         message: errorMessage,

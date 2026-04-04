@@ -59,7 +59,11 @@ export default function LocationSetupPage() {
       });
     } catch (error) {
       const errorMessage =
-        error instanceof Error ? error.message : t('errors.locationFailed');
+        error instanceof Error && error.message.startsWith('errors.')
+          ? t(error.message)
+          : error instanceof Error
+            ? error.message
+            : t('errors.locationFailed');
       setLocationStatus({
         type: 'error',
         message: errorMessage,
