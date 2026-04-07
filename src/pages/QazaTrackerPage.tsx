@@ -1,10 +1,10 @@
 import { BottomNav } from '@/components/BottomNav';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useTranslation } from '@/contexts/TranslationContext';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { Minus, Pencil, Plus } from 'lucide-react';
-import { useState, useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 type QazaCounterKey =
   | 'fajr'
@@ -46,6 +46,7 @@ const INITIAL_COUNTS: QazaCounts = {
 };
 
 const MAX_COUNT = 99999;
+const DRAWER_ANIMATION_MS = 300;
 
 interface PrayerRowProps {
   label: string;
@@ -87,14 +88,16 @@ export default function QazaTrackerPage() {
     INITIAL_COUNTS,
   );
   const [activeKey, setActiveKey] = useState<QazaCounterKey | null>(null);
+  const [isClosing, setIsClosing] = useState(false);
   const [editing, setEditing] = useState(false);
   const [editValue, setEditValue] = useState('');
 
   const activeCount = activeKey ? counts[activeKey] : 0;
-  const isOpen = activeKey !== null;
+  const isOpen = activeKey !== null && !isClosing;
+  const isDrawerVisible = activeKey !== null;
 
   useEffect(() => {
-    if (isOpen) {
+    if (isDrawerVisible) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
@@ -102,19 +105,33 @@ export default function QazaTrackerPage() {
     return () => {
       document.body.style.overflow = '';
     };
-  }, [isOpen]);
+  }, [isDrawerVisible]);
 
   const handleOpen = useCallback((key: QazaCounterKey) => {
+    setIsClosing(false);
     setActiveKey(key);
     setEditing(false);
     setEditValue('');
   }, []);
 
   const handleClose = useCallback(() => {
-    setActiveKey(null);
+    if (!activeKey || isClosing) return;
+    setIsClosing(true);
     setEditing(false);
     setEditValue('');
-  }, []);
+  }, [activeKey, isClosing]);
+
+  useEffect(() => {
+    if (!isClosing) return;
+    const timeoutId = window.setTimeout(() => {
+      setActiveKey(null);
+      setIsClosing(false);
+    }, DRAWER_ANIMATION_MS);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [isClosing]);
 
   const handleIncrement = useCallback(() => {
     if (!activeKey) return;
@@ -185,14 +202,23 @@ export default function QazaTrackerPage() {
         </div>
       </div>
 
-      {isOpen && (
+      {isDrawerVisible && (
         <>
           <div
-            className="fixed inset-x-0 bottom-14 top-0 z-[45] bg-black/35 duration-200 animate-in fade-in"
+            className={`fixed inset-x-0 bottom-14 top-0 z-[45] bg-black/35 duration-200 ${
+              isOpen
+                ? 'animate-in fade-in'
+                : 'animate-out fade-out [animation-fill-mode:forwards]'
+            }`}
             onClick={handleClose}
           />
 
-          <div className="fixed inset-x-0 bottom-14 z-[50] rounded-t-3xl border-t border-border bg-card shadow-[0_-4px_24px_rgba(0,0,0,0.12)] duration-300 animate-in slide-in-from-bottom">
+          <div
+            className={`fixed inset-x-0 bottom-14 z-[50] rounded-t-3xl border-t border-border bg-card shadow-[0_-4px_24px_rgba(0,0,0,0.12)] duration-300 ${
+              isOpen
+                ? 'animate-in slide-in-from-bottom'
+                : 'animate-out slide-out-to-bottom [animation-fill-mode:forwards]'
+            }`}>
             <div className="flex justify-center pb-1 pt-3">
               <div className="h-1 w-9 rounded-full bg-border" />
             </div>
