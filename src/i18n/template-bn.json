@@ -25,7 +25,8 @@
       "home": "হোম",
       "calendar": "ক্যালেন্ডার",
       "compass": "কম্পাস",
-      "settings": "সেটিংস"
+      "settings": "সেটিংস",
+      "qazaTracker": "কাযা ট্র্যাকার"
     },
     "salatTimes": {
       "title": "সালাতের সময়সূচি",
@@ -298,6 +299,17 @@
       "offlineDescription": "ইন্টারনেটে সংযুক্ত হয়ে আবার চেষ্টা করুন।",
       "checkFailedTitle": "আপডেট যাচাই করা যায়নি",
       "checkFailedDescription": "কিছুক্ষণ পর আবার চেষ্টা করুন।"
+    },
+    "qaza": {
+      "title": "কাযা ট্র্যাকার",
+      "fajr": "ফজর",
+      "dhuhr": "যোহর",
+      "asr": "আসর",
+      "maghrib": "মাগরিব",
+      "isha": "ইশা",
+      "other": "অন্যান্য",
+      "saum": "সাওম",
+      "tapToSetManually": "সরাসরি সেট করতে সংখ্যায় ট্যাপ করুন"
     },
     "notFound": {
       "title": "৪০৪",

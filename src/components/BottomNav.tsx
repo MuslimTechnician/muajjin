@@ -8,11 +8,19 @@ import {
   LayoutGrid,
   Settings,
   X,
+  BookCheck,
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-const NAV_ITEMS = [
+interface NavItemData {
+  labelKey: string;
+  to: string;
+  icon: React.ComponentType<{ className?: string }>;
+  matches: (pathname: string) => boolean;
+}
+
+const NAV_ITEMS: NavItemData[] = [
   {
     labelKey: 'navigation.home',
     to: '/',
@@ -32,7 +40,47 @@ const NAV_ITEMS = [
     icon: Compass,
     matches: (pathname: string) => pathname.startsWith('/qibla'),
   },
+  {
+    labelKey: 'navigation.qazaTracker',
+    to: '/qaza',
+    icon: BookCheck,
+    matches: (pathname: string) => pathname.startsWith('/qaza'),
+  },
 ];
+
+interface NavItemCardProps {
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  isActive: boolean;
+  to: string;
+  onNavigate: (to: string) => void;
+}
+
+function NavItemCard({
+  label,
+  icon: Icon,
+  isActive,
+  to,
+  onNavigate,
+}: NavItemCardProps) {
+  const handleClick = useCallback(() => {
+    onNavigate(to);
+  }, [onNavigate, to]);
+
+  return (
+    <Card
+      className={cn(
+        'cursor-pointer p-3 transition-colors hover:bg-accent/50',
+        isActive && 'border-primary/30 bg-primary/5',
+      )}
+      onClick={handleClick}>
+      <div className="flex items-center gap-3">
+        <Icon className="h-5 w-5" />
+        <span className="flex-1 font-semibold">{label}</span>
+      </div>
+    </Card>
+  );
+}
 
 export function BottomNav() {
   const { pathname } = useLocation();
@@ -51,6 +99,33 @@ export function BottomNav() {
     };
   }, [sheetOpen]);
 
+  const closeSheet = useCallback(() => {
+    setSheetOpen(false);
+  }, []);
+
+  const handleNavSelect = useCallback(
+    (to: string) => {
+      setSheetOpen(false);
+      navigate(to);
+    },
+    [navigate],
+  );
+
+  const openSheet = useCallback(() => {
+    setSheetOpen(true);
+  }, []);
+
+  const handleSettingsClick = useCallback(() => {
+    if (pathname === '/settings') {
+      return;
+    }
+    if (pathname.startsWith('/settings/')) {
+      navigate(-1);
+    } else {
+      navigate('/settings');
+    }
+  }, [pathname, navigate]);
+
   return (
     <>
       {/* Overlay */}
@@ -61,7 +136,7 @@ export function BottomNav() {
             ? 'pointer-events-auto opacity-100'
             : 'pointer-events-none opacity-0',
         )}
-        onClick={() => setSheetOpen(false)}
+        onClick={closeSheet}
       />
 
       {/* Nav Sheet */}
@@ -82,7 +157,7 @@ export function BottomNav() {
               {t('common.appName')}
             </span>
             <button
-              onClick={() => setSheetOpen(false)}
+              onClick={closeSheet}
               className="flex size-8 items-center justify-center rounded-sm opacity-70 transition-opacity hover:opacity-100">
               <X className="h-4 w-4" />
               <span className="sr-only">Close</span>
@@ -92,30 +167,16 @@ export function BottomNav() {
 
         {/* Nav Items */}
         <nav className="flex flex-col gap-2 px-3 py-4">
-          {NAV_ITEMS.map((item) => {
-            const Icon = item.icon;
-            const isActive = item.matches(pathname);
-
-            return (
-              <Card
-                key={item.to}
-                className={cn(
-                  'cursor-pointer p-3 transition-colors hover:bg-accent/50',
-                  isActive && 'border-primary/30 bg-primary/5',
-                )}
-                onClick={() => {
-                  setSheetOpen(false);
-                  navigate(item.to);
-                }}>
-                <div className="flex items-center gap-3">
-                  <Icon className="h-5 w-5" />
-                  <span className="flex-1 font-semibold">
-                    {t(item.labelKey)}
-                  </span>
-                </div>
-              </Card>
-            );
-          })}
+          {NAV_ITEMS.map((item) => (
+            <NavItemCard
+              key={item.to}
+              label={t(item.labelKey)}
+              icon={item.icon}
+              isActive={item.matches(pathname)}
+              to={item.to}
+              onNavigate={handleNavSelect}
+            />
+          ))}
         </nav>
       </div>
 
@@ -123,7 +184,7 @@ export function BottomNav() {
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
         <div className="flex items-center justify-between px-5 pb-[calc(env(safe-area-inset-bottom,0px)+0.5rem)] pt-2">
           <button
-            onClick={() => setSheetOpen(true)}
+            onClick={openSheet}
             className="flex size-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
             aria-label="Menu">
             <LayoutGrid className="h-5 w-5" />
@@ -136,16 +197,7 @@ export function BottomNav() {
           </button>
 
           <button
-            onClick={() => {
-              // experimental condition
-              if (pathname === '/settings') {
-                return;
-              } else if (pathname.startsWith('/settings/')) {
-                navigate(-1);
-              } else {
-                navigate('/settings');
-              }
-            }}
+            onClick={handleSettingsClick}
             className="flex size-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
             aria-label={t('navigation.settings')}>
             <Settings className="h-5 w-5" />

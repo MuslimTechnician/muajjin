@@ -24,20 +24,19 @@ import SettingsHome from './pages/settings/SettingsHome';
 import TimeLocationSettings from './pages/settings/TimeLocationSettings';
 import TranslationSettings from './pages/settings/TranslationSettings';
 import UpcomingPrayerTimesPage from './pages/UpcomingPrayerTimesPage';
+import QazaTrackerPage from './pages/QazaTrackerPage';
 
 const queryClient = new QueryClient();
 
-const ScrollToTopOnNavigate = () => {
+function ScrollToTopOnNavigate() {
   const { pathname } = useLocation();
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
   }, [pathname]);
 
   return null;
-};
+}
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -175,6 +174,17 @@ const App = () => (
                   </RouteGuard>
                 }
               />
+              <Route
+                path="/qaza"
+                element={
+                  <RouteGuard
+                    requireOnboardingComplete={true}
+                    redirectTo="/onboarding/welcome">
+                    <QazaTrackerPage />
+                  </RouteGuard>
+                }
+              />
+
               <Route
                 path="/settings/about"
                 element={

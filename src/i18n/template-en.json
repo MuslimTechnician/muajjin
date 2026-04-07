@@ -25,7 +25,8 @@
       "home": "Home",
       "calendar": "Calendar",
       "compass": "Compass",
-      "settings": "Settings"
+      "settings": "Settings",
+      "qazaTracker": "Qaza Tracker"
     },
     "salatTimes": {
       "title": "Salat Times",
@@ -298,6 +299,17 @@
       "offlineDescription": "Connect to the internet and try again.",
       "checkFailedTitle": "Couldn’t check for updates",
       "checkFailedDescription": "Please try again in a moment."
+    },
+    "qaza": {
+      "title": "Qaza Tracker",
+      "fajr": "Fajr",
+      "dhuhr": "Dhuhr",
+      "asr": "Asr",
+      "maghrib": "Maghrib",
+      "isha": "Isha",
+      "other": "Other",
+      "saum": "Saum",
+      "tapToSetManually": "Tap the number to set manually"
     },
     "notFound": {
       "title": "404",
