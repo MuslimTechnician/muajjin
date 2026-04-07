@@ -1,0 +1,4 @@
+• Moved top navigation to bottom navigation with left drawer.
+• Implemented the "Qibla Compass" feature.
+• Implemented the "Qaza Tracker" feature.
+• Enhanced location detection with timeout.

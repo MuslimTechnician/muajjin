@@ -44,6 +44,9 @@ Any additional features beyond these core functions will **not** be implemented.
 - 📅 Hijri date display
 - 🎨 Automatic light and dark theme support
 - 📱 Native Android app via Capacitor
+- ☁️ Automatic updates via GitHub Releases
+- 🧭 Qibla Compass integration
+- 📈 Qaza Tracker integration
 
 ---
 
