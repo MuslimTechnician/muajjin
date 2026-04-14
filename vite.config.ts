@@ -1,6 +1,6 @@
-import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react-swc';
 import path from 'path';
+import { defineConfig } from 'vite';
 
 const sanitizeName = (value: string | undefined, fallback: string) => {
   if (!value) return fallback;
@@ -23,8 +23,8 @@ const SOURCE_DATE_EPOCH = process.env.SOURCE_DATE_EPOCH?.trim() || '0';
 export default defineConfig(({ mode }) => {
   const updateAlias =
     mode === 'github'
-      ? path.resolve(__dirname, './src/features/update/index.github.ts')
-      : path.resolve(__dirname, './src/features/update/index.ts');
+      ? path.resolve(__dirname, './src/features/update-checker/index.github.ts')
+      : path.resolve(__dirname, './src/features/update-checker/index.ts');
 
   if (process.env.CI && !process.env.SOURCE_DATE_EPOCH) {
     console.warn(
@@ -40,7 +40,9 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: [
         {
-          find: '@/features/update',
+          // Only replace bare "@/features/update-checker" imports.
+          // Keep "@/features/update-checker/..." subpath imports untouched.
+          find: /^@\/features\/update-checker$/,
           replacement: updateAlias,
         },
         {
