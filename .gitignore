@@ -55,3 +55,24 @@ tmp/
 
 reproducible-checksums.txt
 reproducible-checksums-*.txt
+
+# Auto-generated agent rules (personalized per developer)
+.brainsync/agent-rules.md
+.brainsync
+AGENT.md
+CLAUDE.md
+.cache_idx
+context.dat
+brainsyncory.md
+active-context.md
+.codex
+
+# Auto-generated AI agent exclusions
+.cursorrules
+.clineRules
+.agent/
+.windsurfrules
+.gemini/
+.cline/
+
+.agent-mem/

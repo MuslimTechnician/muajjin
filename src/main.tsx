@@ -1,8 +1,8 @@
 import { createRoot } from 'react-dom/client';
-import App from './App.tsx';
+import App from './app.tsx';
 import './index.css';
-import { ThemeProvider } from './components/ThemeProvider';
-import { TranslationProvider } from './contexts/TranslationContext';
+import { ThemeProvider } from './components/theme-provider';
+import { TranslationProvider } from './contexts/translation-context';
 import { Capacitor } from '@capacitor/core';
 import { useState, useEffect } from 'react';
 
