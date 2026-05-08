@@ -47,10 +47,14 @@ export const CurrentPrayerContainer: FC<CurrentPrayerContainerProps> = ({
   const [isUiReady, setIsUiReady] = useState(false);
   const isUiReadyRef = useRef(false);
 
-  const parseTimeToDate = (time: string, baseDate: Date = new Date()): Date => {
+  const parseTimeToDate = (
+    time: string,
+    baseDate: Date = new Date(),
+    endOfMinute = false,
+  ): Date => {
     const [h, m] = time.split(':').map(Number);
     const d = new Date(baseDate);
-    d.setHours(h || 0, m || 0, 0, 0);
+    d.setHours(h || 0, m || 0, endOfMinute ? 59 : 0, endOfMinute ? 999 : 0);
     return d;
   };
 
@@ -153,13 +157,13 @@ export const CurrentPrayerContainer: FC<CurrentPrayerContainerProps> = ({
         const tomorrow = new Date(now);
         tomorrow.setDate(tomorrow.getDate() + 1);
         tomorrow.setHours(0, 0, 0, 0); // Reset to midnight
-        endTime = parseTimeToDate(currentPrayer.end, tomorrow);
+        endTime = parseTimeToDate(currentPrayer.end, tomorrow, true);
       } else {
         // Other prayers use today's date
-        endTime = parseTimeToDate(currentPrayer.end);
+        endTime = parseTimeToDate(currentPrayer.end, now, true);
       }
     } else {
-      endTime = nextPrayer ? parseTimeToDate(nextPrayer.start) : startTime;
+      endTime = nextPrayer ? parseTimeToDate(nextPrayer.start, now, true) : startTime;
     }
 
     // Handle day wraparound for Isha (Jama'ah times may cross midnight)
@@ -183,7 +187,7 @@ export const CurrentPrayerContainer: FC<CurrentPrayerContainerProps> = ({
         // End time (tomorrow's Fajr) needs to be adjusted to today's Fajr
         const today = new Date(now);
         today.setHours(0, 0, 0, 0);
-        endTime = parseTimeToDate(currentPrayer.end!, today);
+        endTime = parseTimeToDate(currentPrayer.end!, today, true);
 
         // Check if Jama'ah has already passed
         const jamaahHour = jamaahDateTime.getHours();
