@@ -1,0 +1,3 @@
+- Improved heading extraction logic and handling of orientation events
+- Removed unnecessary live instruction section on qibla-compass page
+- Updated current salat time comparison to include end time

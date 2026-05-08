@@ -163,7 +163,9 @@ export const CurrentPrayerContainer: FC<CurrentPrayerContainerProps> = ({
         endTime = parseTimeToDate(currentPrayer.end, now, true);
       }
     } else {
-      endTime = nextPrayer ? parseTimeToDate(nextPrayer.start, now, true) : startTime;
+      endTime = nextPrayer
+        ? parseTimeToDate(nextPrayer.start, now, true)
+        : startTime;
     }
 
     // Handle day wraparound for Isha (Jama'ah times may cross midnight)
