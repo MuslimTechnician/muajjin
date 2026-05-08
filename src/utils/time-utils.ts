@@ -177,14 +177,14 @@ export function getCurrentSalat(salatTimes: PrayerTime[]): PrayerTime | null {
     if (currentSalat.id === 'isha' && endTotalMinutes < startTotalMinutes) {
       if (
         currentTotalMinutes >= startTotalMinutes ||
-        currentTotalMinutes < endTotalMinutes
+        currentTotalMinutes <= endTotalMinutes
       ) {
         return currentSalat;
       }
     } else {
       if (
         currentTotalMinutes >= startTotalMinutes &&
-        currentTotalMinutes < endTotalMinutes
+        currentTotalMinutes <= endTotalMinutes
       ) {
         return currentSalat;
       }
