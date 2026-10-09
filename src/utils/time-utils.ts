@@ -3,13 +3,25 @@ import { PrayerTime, ProhibitedTime } from '@/types';
 
 // Cache for translation function to avoid circular imports
 let translationFunction: ((key: string) => string) | null = null;
+let activeLanguage: string = 'en';
+
+const BENGALI_DIGITS = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
 
 export function setTranslationFunction(fn: (key: string) => string) {
   translationFunction = fn;
 }
 
+export function setActiveLanguage(lang: string) {
+  activeLanguage = lang;
+}
+
 function t(key: string): string {
   return translationFunction ? translationFunction(key) : key;
+}
+
+export function toLocalDigits(str: string): string {
+  if (activeLanguage !== 'bn') return str;
+  return str.replace(/[0-9]/g, (d) => BENGALI_DIGITS[Number(d)]);
 }
 
 /**
@@ -113,13 +125,13 @@ export function formatTime(
   const actualFormat = resolveTimeFormat(format);
 
   if (actualFormat === '24h') {
-    return `${String(hoursNum).padStart(2, '0')}:${minutes}`;
+    return toLocalDigits(`${String(hoursNum).padStart(2, '0')}:${minutes}`);
   }
 
   // 12h format with AM/PM
   const ampm = hoursNum >= 12 ? t('common.pm') : t('common.am');
   const hours12 = hoursNum % 12 || 12;
-  return `${hours12}:${minutes} ${ampm}`;
+  return toLocalDigits(`${hours12}:${minutes}`) + ` ${ampm}`;
 }
 
 // Adjust time by adding or subtracting minutes
@@ -269,19 +281,20 @@ export function getCurrentTimeFormatted(
     hours = hours ? hours : 12; // the hour '0' should be '12'
     const hoursStr = String(hours).padStart(2, '0');
 
-    return `${hoursStr}:${minutes}:${seconds} ${ampm}`;
+    return `${toLocalDigits(hoursStr)}:${toLocalDigits(minutes)}:${toLocalDigits(seconds)} ${ampm}`;
   } else {
     const hours = String(now.getHours()).padStart(2, '0');
     const minutes = String(now.getMinutes()).padStart(2, '0');
     const seconds = String(now.getSeconds()).padStart(2, '0');
 
-    return `${hours}:${minutes}:${seconds}`;
+    return toLocalDigits(`${hours}:${minutes}:${seconds}`);
   }
 }
 
 // Format Gregorian date
 export function formatGregorianDate(date: Date): string {
-  return new Intl.DateTimeFormat('en-US', {
+  const locale = activeLanguage === 'bn' ? 'bn-BD' : 'en-US';
+  return new Intl.DateTimeFormat(locale, {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
@@ -291,7 +304,8 @@ export function formatGregorianDate(date: Date): string {
 
 // Get day name only (e.g., "Mon")
 export function getDayName(date: Date, short: boolean = true): string {
-  const weekday = new Intl.DateTimeFormat('en-US', {
+  const locale = activeLanguage === 'bn' ? 'bn-BD' : 'en-US';
+  const weekday = new Intl.DateTimeFormat(locale, {
     weekday: short ? 'short' : 'long',
   }).format(date);
   return weekday;
@@ -299,7 +313,8 @@ export function getDayName(date: Date, short: boolean = true): string {
 
 // Format Gregorian date without day name (e.g., "12 Aug 2026")
 export function formatGregorianDateShort(date: Date): string {
-  return new Intl.DateTimeFormat('en-US', {
+  const locale = activeLanguage === 'bn' ? 'bn-BD' : 'en-US';
+  return new Intl.DateTimeFormat(locale, {
     year: 'numeric',
     month: 'short',
     day: 'numeric',

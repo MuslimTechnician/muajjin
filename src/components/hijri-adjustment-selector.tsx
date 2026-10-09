@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { useTranslation } from '@/contexts/translation-context';
+import { toLocalDigits } from '@/utils/time-utils';
 import { Moon } from 'lucide-react';
 
 interface HijriAdjustmentSelectorProps {
@@ -37,7 +38,9 @@ export function HijriAdjustmentSelector({
             variant={value === option ? 'default' : 'outline'}
             onClick={() => onChange(option)}
             className="min-w-[60px] flex-1">
-            {option > 0 ? `+${option}` : option}
+            {option > 0
+              ? `+${toLocalDigits(String(option))}`
+              : toLocalDigits(String(option))}
           </Button>
         ))}
       </div>

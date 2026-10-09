@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { toLocalDigits } from '@/utils/time-utils';
 import { Pencil } from 'lucide-react';
 import { type FC, useCallback } from 'react';
 
@@ -30,7 +31,7 @@ export const PrayerRow: FC<PrayerRowProps> = ({
         className={`min-w-[28px] text-right text-lg font-bold tabular-nums tracking-tight ${
           count > 0 ? 'text-primary' : 'text-muted-foreground'
         }`}>
-        {count}
+        {toLocalDigits(String(count))}
       </span>
       <Button
         size="icon"

@@ -1,6 +1,6 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { useTranslation } from '@/contexts/translation-context';
-import { formatTime } from '@/utils/time-utils';
+import { formatTime, toLocalDigits } from '@/utils/time-utils';
 import { MoonStar } from 'lucide-react';
 import { type FC, useEffect, useState } from 'react';
 
@@ -86,7 +86,9 @@ export const FastingTimesContainer: FC<FastingTimesContainerProps> = ({
       if (difference) {
         const { hours, minutes, seconds } = difference;
         setCountdown(
-          `${hours < 1 ? '' : `${hours}:`}${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`,
+          toLocalDigits(
+            `${hours < 1 ? '' : `${hours}:`}${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`,
+          ),
         );
         setNextEventName(eventName);
       } else {

@@ -1,3 +1,4 @@
+import { toLocalDigits } from '@/utils/time-utils';
 import umalqura from '@umalqura/core';
 
 export interface HijriDateResult {
@@ -87,7 +88,7 @@ export function formatHijriDateLocal(
     return 'Loading Hijri date...';
   }
 
-  return `${hijriData.day} ${hijriData.month.en} ${hijriData.year}`;
+  return `${toLocalDigits(hijriData.day)} ${hijriData.month.en} ${toLocalDigits(hijriData.year)}`;
 }
 
 /**

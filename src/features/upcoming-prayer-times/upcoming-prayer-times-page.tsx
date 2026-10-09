@@ -38,17 +38,18 @@ const parseInputDate = (value: string): Date => {
   return new Date(year, month - 1, day);
 };
 
-const formatDisplayDate = (value: string): string => {
+const formatDisplayDate = (value: string, locale?: string): string => {
   const date = parseInputDate(value);
-  const day = date.toLocaleDateString(undefined, { day: 'numeric' });
-  const month = date.toLocaleDateString(undefined, { month: 'long' });
-  const year = date.toLocaleDateString(undefined, { year: 'numeric' });
+  const loc = locale || 'en-US';
+  const day = date.toLocaleDateString(loc, { day: 'numeric' });
+  const month = date.toLocaleDateString(loc, { month: 'long' });
+  const year = date.toLocaleDateString(loc, { year: 'numeric' });
   return `${day} ${month}, ${year}`;
 };
 
 const UpcomingPrayerTimesPage: FC = () => {
   const { settings } = useApp();
-  const { t, getSalatName } = useTranslation();
+  const { t, getSalatName, activeTranslation } = useTranslation();
 
   const [startDateValue, setStartDateValue] = useState(() =>
     formatDateForInput(new Date()),
@@ -56,6 +57,7 @@ const UpcomingPrayerTimesPage: FC = () => {
   const [singleDayOnly, setSingleDayOnly] = useState(false);
   const [monthOffset, setMonthOffset] = useState(0);
   const dateInputRef = useRef<HTMLInputElement>(null);
+  const locale = activeTranslation?.id === 'bn' ? 'bn-BD' : 'en-US';
 
   const openDatePicker = () => {
     const input = dateInputRef.current;
@@ -82,11 +84,11 @@ const UpcomingPrayerTimesPage: FC = () => {
       1,
     );
 
-    return viewedMonthDate.toLocaleDateString(undefined, {
+    return viewedMonthDate.toLocaleDateString(locale, {
       month: 'long',
       year: 'numeric',
     });
-  }, [monthOffset, startDateValue]);
+  }, [monthOffset, startDateValue, locale]);
 
   const upcomingDays = useMemo<UpcomingDay[]>(() => {
     const selectedDate = parseInputDate(startDateValue);
@@ -151,7 +153,7 @@ const UpcomingPrayerTimesPage: FC = () => {
 
       return {
         dateKey: formatDateForInput(date),
-        dateLabel: date.toLocaleDateString(undefined, {
+        dateLabel: date.toLocaleDateString(locale, {
           weekday: 'short',
           day: 'numeric',
           month: 'short',
@@ -160,7 +162,14 @@ const UpcomingPrayerTimesPage: FC = () => {
         prayers,
       };
     });
-  }, [getSalatName, monthOffset, settings, singleDayOnly, startDateValue]);
+  }, [
+    getSalatName,
+    monthOffset,
+    settings,
+    singleDayOnly,
+    startDateValue,
+    locale,
+  ]);
 
   return (
     <div className="min-h-screen bg-background pb-16">
@@ -178,7 +187,7 @@ const UpcomingPrayerTimesPage: FC = () => {
               <div className="relative">
                 <Input
                   type="text"
-                  value={formatDisplayDate(startDateValue)}
+                  value={formatDisplayDate(startDateValue, locale)}
                   readOnly
                   tabIndex={-1}
                   className="cursor-pointer select-none pr-10"

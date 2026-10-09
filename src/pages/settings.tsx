@@ -21,6 +21,7 @@ import { useTranslation } from '@/contexts/translation-context';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { CALCULATION_METHODS, MADHABS } from '@/services/prayer-times-service';
 import { UserSettings } from '@/types';
+import { toLocalDigits } from '@/utils/time-utils';
 import { useEffect, useState } from 'react';
 
 const DEFAULT_SETTINGS: UserSettings = {
@@ -143,8 +144,8 @@ const SettingsPage = () => {
 
             <div className="space-y-2">
               <Label>
-                {t('settings.hijriAdjustment')} ({localSettings.hijriAdjustment}{' '}
-                days)
+                {t('settings.hijriAdjustment')} (
+                {toLocalDigits(String(localSettings.hijriAdjustment))} days)
               </Label>
               <Slider
                 min={-3}

@@ -14,15 +14,16 @@ import { EContainerType } from '@/types/enums';
 import {
   adjustTime,
   getProhibitedTimes,
+  setActiveLanguage,
   setTranslationFunction,
 } from '@/utils/time-utils';
 import {
   Fragment,
-  type FC,
   useCallback,
   useEffect,
   useRef,
   useState,
+  type FC,
 } from 'react';
 
 /**
@@ -60,7 +61,7 @@ const defaultVisibleContainers: Record<string, boolean> = {
 };
 
 const HomeDashboardPage: FC = () => {
-  const { t, getSalatName, mounted } = useTranslation();
+  const { t, getSalatName, mounted, activeTranslation } = useTranslation();
   const { settings, updateSettings } = useApp();
   const [containerOrder, setContainerOrder] = useLocalStorage<string[]>(
     'muajjin-container-order',
@@ -154,6 +155,7 @@ const HomeDashboardPage: FC = () => {
 
     // Initialize the translation function for timeUtils (use general 't', not 'getSalatName')
     setTranslationFunction(t);
+    setActiveLanguage(activeTranslation?.id || 'en');
 
     // If already loaded with this translation, don't reload
     if (loadedWithTranslation) return;

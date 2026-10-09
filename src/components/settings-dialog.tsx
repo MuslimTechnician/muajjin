@@ -23,6 +23,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useTranslation } from '@/contexts/translation-context';
 import { CALCULATION_METHODS, MADHABS } from '@/services/prayer-times-service';
 import { UserSettings } from '@/types';
+import { toLocalDigits } from '@/utils/time-utils';
 import { Settings } from 'lucide-react';
 import { useState } from 'react';
 
@@ -135,7 +136,8 @@ export function SettingsDialog({
 
               <div className="space-y-2">
                 <Label>
-                  Hijri Date Adjustment ({localSettings.hijriAdjustment} days)
+                  Hijri Date Adjustment (
+                  {toLocalDigits(String(localSettings.hijriAdjustment))} days)
                 </Label>
                 <Slider
                   min={-3}
@@ -151,7 +153,8 @@ export function SettingsDialog({
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>
-                    Suhoor Adjustment ({localSettings.suhoorAdjustment} min)
+                    Suhoor Adjustment (
+                    {toLocalDigits(String(localSettings.suhoorAdjustment))} min)
                   </Label>
                   <Slider
                     min={-3}
@@ -166,7 +169,8 @@ export function SettingsDialog({
 
                 <div className="space-y-2">
                   <Label>
-                    Iftar Adjustment ({localSettings.iftarAdjustment} min)
+                    Iftar Adjustment (
+                    {toLocalDigits(String(localSettings.iftarAdjustment))} min)
                   </Label>
                   <Slider
                     min={-3}
