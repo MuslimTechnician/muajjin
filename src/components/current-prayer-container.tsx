@@ -7,6 +7,7 @@ import {
   formatTime,
   getCurrentSalat,
   getNextSalat,
+  toLocalDigits,
 } from '@/utils/time-utils';
 import { Clock } from 'lucide-react';
 import {
@@ -250,14 +251,18 @@ export const CurrentPrayerContainer: FC<CurrentPrayerContainerProps> = ({
       const hours = Math.floor(passedSeconds / 3600);
       const minutes = Math.floor((passedSeconds % 3600) / 60);
       const seconds = passedSeconds % 60;
-      remainingTime = `-${hours < 1 ? '' : `${hours}:`}${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+      remainingTime = toLocalDigits(
+        `-${hours < 1 ? '' : `${hours}:`}${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`,
+      );
     } else {
       // Time remaining
       const remainingSeconds = Math.floor(remaining / 1000);
       const hours = Math.floor(remainingSeconds / 3600);
       const minutes = Math.floor((remainingSeconds % 3600) / 60);
       const seconds = remainingSeconds % 60;
-      remainingTime = `${hours < 1 ? '' : `${hours}:`}${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+      remainingTime = toLocalDigits(
+        `${hours < 1 ? '' : `${hours}:`}${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`,
+      );
     }
 
     const isProhibited = effectiveProhibitedTimes.some((time) =>

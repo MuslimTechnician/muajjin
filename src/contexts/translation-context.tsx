@@ -6,7 +6,7 @@ import {
   TranslationFile,
   TranslationState,
 } from '@/types/translation';
-import { setTranslationFunction } from '@/utils/time-utils';
+import { setActiveLanguage, setTranslationFunction } from '@/utils/time-utils';
 import {
   createContext,
   ReactNode,
@@ -193,7 +193,8 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
   // Initialize translation function for timeUtils
   useEffect(() => {
     setTranslationFunction(t);
-  }, [t]);
+    setActiveLanguage(state.activeTranslationId || 'en');
+  }, [t, state.activeTranslationId]);
 
   const setActiveTranslation = (id: string | null) => {
     setState((prev) => ({ ...prev, activeTranslationId: id }));
