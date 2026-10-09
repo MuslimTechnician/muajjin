@@ -1,0 +1,2 @@
+• Updated Bangla digit localization across the app.
+• Updated package dependencies to latest versions.
