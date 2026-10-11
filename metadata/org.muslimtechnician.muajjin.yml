@@ -20,9 +20,9 @@ RepoType: git
 Repo: https://github.com/MuslimTechnician/muajjin
 
 Builds:
-  - versionName: 2.7.2
-    versionCode: 272
-    commit: 3823b50cbffd5dbeecf11e6b2c7c518701d21629
+  - versionName: 2.7.3
+    versionCode: 273
+    commit: 6e3e586db97fd68fb8c6344ee733b33905a25511
     subdir: android
     sudo:
       - apt-get update
@@ -44,5 +44,5 @@ MaintainerNotes: |-
 
 AutoUpdateMode: Version
 UpdateCheckMode: Tags
-CurrentVersion: 2.7.2
-CurrentVersionCode: 272
+CurrentVersion: 2.7.3
+CurrentVersionCode: 273
