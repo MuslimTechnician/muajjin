@@ -56,7 +56,11 @@ android {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
+            // Only sign when a keystore is configured; otherwise produce an
+            // unsigned APK (e.g. for F-Droid, which signs with its own key).
+            if (keystoreProperties['keystore.file']) {
+                signingConfig signingConfigs.release
+            }
         }
     }
 
