@@ -1,0 +1,2 @@
+• Added npm-compatible build path for F-Droid publishing.
+• Release builds now stay unsigned when no keystore is configured, so F-Droid can sign with its own key.
