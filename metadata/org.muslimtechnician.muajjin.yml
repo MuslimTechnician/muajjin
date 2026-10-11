@@ -1,0 +1,48 @@
+AntiFeatures:
+  NonFreeNet:
+    en-US: Location fallback uses ip-api.com/ipwhois.app, whose server code is 
+      not published.
+  TetheredNet:
+    en-US: Location fallback and reverse geocoding rely on fixed services 
+      (ip-api.com, ipwhois.app, Nominatim).
+Categories:
+  - Religion
+License: MIT
+AuthorName: MuslimTechnician
+AuthorEmail: Muslimtechnician@proton.me
+SourceCode: https://github.com/MuslimTechnician/muajjin
+IssueTracker: https://github.com/MuslimTechnician/muajjin/issues
+Changelog: https://github.com/MuslimTechnician/muajjin/releases
+
+AutoName: Muajjin
+
+RepoType: git
+Repo: https://github.com/MuslimTechnician/muajjin
+
+Builds:
+  - versionName: 2.7.2
+    versionCode: 272
+    commit: 3823b50cbffd5dbeecf11e6b2c7c518701d21629
+    subdir: android
+    sudo:
+      - apt-get update
+      - apt-get install -y npm
+    gradle:
+      - yes
+    output: app/build/outputs/apk/release/*.apk
+    prebuild:
+      - cd ..
+      - npm ci
+      - npm run build
+      - npx cap sync android
+
+MaintainerNotes: |-
+  The web bundle is built from source with npm (Vite) and synced into the
+  Android project via Capacitor before the Gradle build. The default Vite
+  build mode excludes the GitHub self-update checker, which is only compiled
+  into APKs distributed via GitHub Releases.
+
+AutoUpdateMode: Version
+UpdateCheckMode: Tags
+CurrentVersion: 2.7.2
+CurrentVersionCode: 272
