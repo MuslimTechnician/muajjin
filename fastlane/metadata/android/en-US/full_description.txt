@@ -1,81 +1,80 @@
 Muajjin is a comprehensive Islamic Salat times application designed for Muslims worldwide. It provides accurate Salat times based on your location, along with Hijri dates and Suhoor and Iftar times.
 
-## Key Features
+<b>Key Features</b>
 
-Accurate Salat Times
-• Location-based Salat time calculation
-• Support for 12+ calculation methods, including:
-  - Umm al-Qura University, Makkah
-  - University of Islamic Sciences, Karachi
-  - Muslim World League
-  - Egyptian General Authority of Survey
-  - and more
-• Shafi'i and Hanafi options for Asr Salat
+<b>Accurate Salat Times</b>
+<ul><li>Location-based Salat time calculation</li>
+<li>Support for 12+ calculation methods, including:</li>
+<ul><li>Umm al-Qura University, Makkah</li>
+<li>University of Islamic Sciences, Karachi</li>
+<li>Muslim World League</li>
+<li>Egyptian General Authority of Survey</li>
+<li>and more</li></ul>
+<li>Shafi'i and Hanafi options for Asr Salat</li></ul>
 
-Hijri Calendar
-• Accurate Islamic (Hijri) dates
-• Automatic date change at Maghrib
-• Manual adjustment for local moon sighting
+<b>Hijri Calendar</b>
+<ul><li>Accurate Islamic (Hijri) dates</li>
+<li>Automatic date change at Maghrib</li>
+<li>Manual adjustment for local moon sighting</li></ul>
 
-Saum Times
-• Suhoor end countdown
-• Iftar start countdown
-• Adjustable Suhoor and Iftar times
+<b>Saum Times</b>
+<ul><li>Suhoor end countdown</li>
+<li>Iftar start countdown</li>
+<li>Adjustable Suhoor and Iftar times</li></ul>
 
-Prohibited Salat Times
-• Shuruq (sunrise) display
-• Ghurub (sunset) display
-• Zawal indicator
+<b>Prohibited Salat Times</b>
+<ul><li>Shuruq (sunrise) display</li>
+<li>Ghurub (sunset) display</li>
+<li>Zawal indicator</li></ul>
 
-Jama'ah Times
-• Custom congregation times for each Salat
-• Countdown to Jama'ah
-• Clear distinction between Salat start and Jama'ah time
+<b>Jama'ah Times</b>
+<ul><li>Custom congregation times for each Salat</li>
+<li>Countdown to Jama'ah</li>
+<li>Clear distinction between Salat start and Jama'ah time</li></ul>
 
-Location Support
-• Automatic GPS detection
-• IP-based fallback
-• Manual latitude/longitude entry
-• City and country display
+<b>Location Support</b>
+<ul><li>Automatic GPS detection</li>
+<li>IP-based fallback</li>
+<li>Manual latitude/longitude entry</li>
+<li>City and country display</li></ul>
 
-Appearance
-• Light and dark mode
-• System theme support
+<b>Appearance</b>
+<ul><li>Light and dark mode</li>
+<li>System theme support</li></ul>
 
-Language Support
-• English and Bangla (বাংলা)
-• RTL language support
-• Custom translation file import
-• Custom font upload
+<b>Language Support</b>
+<ul><li>English and Bangla (বাংলা)</li>
+<li>RTL language support</li>
+<li>Custom translation file import</li>
+<li>Custom font upload</li></ul>
 
-Privacy Focused
-• No accounts required
-• No tracking or analytics
-• No ads
-• All data stored locally
-• Open source and transparent
+<b>Privacy Focused</b>
+<ul><li>No accounts required</li>
+<li>No tracking or analytics</li>
+<li>No ads</li>
+<li>All data stored locally</li>
+<li>Open source and transparent</li></ul>
 
-## Why Muajjin
+<b>Why Muajjin</b>
+<ul><li>Works offline after location setup</li>
+<li>Minimal permissions (location only)</li>
+<li>Lightweight and efficient</li>
+<li>Clean, modern interface</li>
+<li>Regular updates</li></ul>
 
-• Works offline after location setup
-• Minimal permissions (location only)
-• Lightweight and efficient
-• Clean, modern interface
-• Regular updates
-
-## Salat Time Calculation
+<b>Salat Time Calculation</b>
 
 Muajjin uses the Adhan library for Salat time calculations. Times are determined based on your location, selected calculation method, chosen Madhab, elevation, timezone, and astronomical data.
 
-## Hijri Calendar
+<b>Hijri Calendar</b>
 
 Hijri dates follow the Umm al-Qura calendar system used in Saudi Arabia. The Islamic date changes at Maghrib in accordance with Islamic tradition.
 
-## Permissions
+<b>Permissions</b>
 
 Location Permission: Used only to calculate accurate Salat times. Location data is never shared with third parties.
 
-## Source Code
+<b>Source Code</b>
 
 Source code is available at: https://github.com/muslimtechnician/muajjin
 
