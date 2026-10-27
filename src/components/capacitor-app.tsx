@@ -48,7 +48,8 @@ export function CapacitorApp({ children }: { children: React.ReactNode }) {
     // Handle Android back button
     const setupBackButton = async () => {
       // Check if running in native app (Capacitor)
-      const isNative = (window as any).Capacitor?.isNative;
+      const isNative =
+        Capacitor.isNativePlatform() || (window as any).Capacitor?.isNative;
 
       if (!isNative) {
         return; // Only set up in native app
@@ -58,13 +59,28 @@ export function CapacitorApp({ children }: { children: React.ReactNode }) {
       const handler = await App.addListener('backButton', async () => {
         // Check if we can go back in navigation history
         const canGoBack = window.history.length > 1;
+        const currentPath = window.location.pathname;
+
+        // On home page (root), exit the app
+        if (currentPath === '/' || !canGoBack) {
+          try {
+            await App.exitApp();
+            return;
+          } catch (error) {
+            console.error('Failed to exit app:', error);
+          }
+        }
 
         if (canGoBack) {
           // Navigate back in React Router
           window.history.back();
         } else {
-          // At the root, exit the app
-          App.exitApp();
+          try {
+            await App.exitApp();
+          } catch (error) {
+            console.error('Failed to exit app:', error);
+            window.location.href = 'mailto:?subject=App%20Exit%20Failed';
+          }
         }
       });
 
