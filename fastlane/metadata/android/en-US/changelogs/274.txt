@@ -1,0 +1,2 @@
+• Updated back button logic to exit from the app
+• Updated the app description formatting for the F-Droid listing.
