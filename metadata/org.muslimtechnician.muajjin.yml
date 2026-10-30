@@ -1,9 +1,9 @@
 AntiFeatures:
   NonFreeNet:
-    en-US: Location fallback uses ip-api.com/ipwhois.app, whose server code is 
+    en-US: Location fallback uses ip-api.com/ipwhois.app, whose server code is
       not published.
   TetheredNet:
-    en-US: Location fallback and reverse geocoding rely on fixed services 
+    en-US: Location fallback and reverse geocoding rely on fixed services
       (ip-api.com, ipwhois.app, Nominatim).
 Categories:
   - Religion
@@ -20,8 +20,8 @@ RepoType: git
 Repo: https://github.com/MuslimTechnician/muajjin
 
 Builds:
-  - versionName: 2.7.3
-    versionCode: 273
+  - versionName: 2.7.4
+    versionCode: 274
     commit: 6e3e586db97fd68fb8c6344ee733b33905a25511
     subdir: android
     sudo:
@@ -44,5 +44,5 @@ MaintainerNotes: |-
 
 AutoUpdateMode: Version
 UpdateCheckMode: Tags
-CurrentVersion: 2.7.3
-CurrentVersionCode: 273
+CurrentVersion: 2.7.4
+CurrentVersionCode: 274
