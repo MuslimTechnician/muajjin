@@ -18,6 +18,8 @@ AutoName: Muajjin
 
 RepoType: git
 Repo: https://github.com/MuslimTechnician/muajjin
+Binaries:
+  https://github.com/MuslimTechnician/muajjin/releases/download/v%v/muajjin-v%v-fdroid.apk
 
 Builds:
   - versionName: 2.7.4
@@ -38,6 +40,8 @@ Builds:
       - npx cap sync android
     scandelete:
       - node_modules
+
+AllowedAPKSigningKeys: 972e978397dc4dbb4b5432d9d016702cde09d129e1d819130360942ab1f169af
 
 MaintainerNotes: |-
   The web bundle is built from source with npm (Vite) and synced into the
