@@ -1,0 +1,185 @@
+name: Build F-Droid APK
+
+# Builds the fdroid-variant APK (default Vite mode - no GitHub self-updater)
+# and attaches muajjin-vX-fdroid.apk to the release. Runs on release publish,
+# or via manual dispatch to backfill a missing APK for any tag. Append-only:
+# never creates a release; skips if the asset already exists.
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (default: latest release)'
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Resolve tag and check existing assets
+        id: tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INPUT_TAG: ${{ inputs.tag }}
+          EVENT: ${{ github.event_name }}
+        run: |
+          set -euo pipefail
+          if [ "$EVENT" = "release" ]; then
+            TAG="${GITHUB_REF#refs/tags/}"
+          else
+            TAG="$INPUT_TAG"
+            if [ -n "$TAG" ] && ! [[ "$TAG" =~ ^v[0-9.]+$ ]]; then
+              echo "::error::tag must match v<semver>"
+              exit 1
+            fi
+            if [ -z "$TAG" ]; then
+              TAG=$(gh release view --json tagName -q .tagName)
+            fi
+          fi
+          VERSION="${TAG#v}"
+          ASSET="muajjin-${TAG}-fdroid.apk"
+          EXISTS=false
+          if gh release view "$TAG" --json assets -q '.assets[].name' | grep -qx "$ASSET"; then
+            EXISTS=true
+          fi
+          {
+            echo "TAG=$TAG"
+            echo "VERSION=$VERSION"
+            echo "ASSET=$ASSET"
+            echo "EXISTS=$EXISTS"
+          } >> "$GITHUB_OUTPUT"
+          echo "Tag: $TAG · asset: $ASSET · exists: $EXISTS"
+
+      - name: Checkout
+        if: steps.tag.outputs.EXISTS == 'false'
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.tag.outputs.TAG }}
+          fetch-depth: 0
+
+      - name: Setup Node.js LTS
+        if: steps.tag.outputs.EXISTS == 'false'
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      - name: Setup Bun
+        if: steps.tag.outputs.EXISTS == 'false'
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: .bun-version
+
+      - name: Cache Bun dependencies
+        if: steps.tag.outputs.EXISTS == 'false'
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.bun/install/cache
+            node_modules
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock', 'package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
+      - name: Install dependencies
+        if: steps.tag.outputs.EXISTS == 'false'
+        run: bun install --frozen-lockfile
+
+      - name: Set SOURCE_DATE_EPOCH from tag commit
+        if: steps.tag.outputs.EXISTS == 'false'
+        run: |
+          COMMIT="$(git rev-list -n 1 "${{ steps.tag.outputs.TAG }}")"
+          EPOCH="$(git show -s --format=%ct "$COMMIT")"
+          echo "SOURCE_DATE_EPOCH=$EPOCH" >> "$GITHUB_ENV"
+
+      - name: Build web assets (default mode - no self-updater)
+        if: steps.tag.outputs.EXISTS == 'false'
+        run: bun run build
+
+      - name: Sync to Android (Capacitor)
+        if: steps.tag.outputs.EXISTS == 'false'
+        run: bunx cap sync android
+
+      - name: Set up JDK 21
+        if: steps.tag.outputs.EXISTS == 'false'
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Setup Android SDK
+        if: steps.tag.outputs.EXISTS == 'false'
+        uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools platforms;android-36 build-tools;34.0.0 cmake;3.22.1 ndk;27.0.12077973
+
+      - name: Cache Gradle packages
+        if: steps.tag.outputs.EXISTS == 'false'
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Decode keystore
+        if: steps.tag.outputs.EXISTS == 'false'
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > /tmp/keystore.jks
+
+      - name: Create local.properties
+        if: steps.tag.outputs.EXISTS == 'false'
+        run: |
+          echo "keystore.file=/tmp/keystore.jks" > android/local.properties
+          echo "keystore.password=${{ secrets.KEYSTORE_PASSWORD }}" >> android/local.properties
+          echo "keystore.key.alias=${{ secrets.KEY_ALIAS }}" >> android/local.properties
+          echo "keystore.key.password=${{ secrets.KEY_PASSWORD }}" >> android/local.properties
+
+      - name: Grant execute permission for gradlew
+        if: steps.tag.outputs.EXISTS == 'false'
+        run: chmod +x android/gradlew
+
+      - name: Build Release APK
+        if: steps.tag.outputs.EXISTS == 'false'
+        run: |
+          cd android
+          ./gradlew clean assembleRelease -PsourceDateEpoch="$SOURCE_DATE_EPOCH" --stacktrace
+
+      - name: Rename APK
+        if: steps.tag.outputs.EXISTS == 'false'
+        run: |
+          cd android/app/build/outputs/apk/release
+          mv app-release.apk "${{ steps.tag.outputs.ASSET }}"
+
+      - name: Record fdroid APK checksums
+        if: steps.tag.outputs.EXISTS == 'false'
+        env:
+          TAG_NAME: ${{ steps.tag.outputs.TAG }}
+          ASSET_NAME: ${{ steps.tag.outputs.ASSET }}
+        run: |
+          set -euo pipefail
+          cd android/app/build/outputs/apk/release
+          {
+            echo "F-Droid APK (nongithub build of $TAG_NAME)"
+            sha256sum "$ASSET_NAME"
+            sha512sum "$ASSET_NAME"
+          } > reproducible-checksums-fdroid.txt
+
+      - name: Upload assets to release
+        if: steps.tag.outputs.EXISTS == 'false'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME: ${{ steps.tag.outputs.TAG }}
+          ASSET_NAME: ${{ steps.tag.outputs.ASSET }}
+        run: |
+          cd android/app/build/outputs/apk/release
+          gh release upload "$TAG_NAME" \
+            "$ASSET_NAME" \
+            reproducible-checksums-fdroid.txt

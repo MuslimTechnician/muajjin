@@ -1,0 +1,97 @@
+name: Release
+
+# Creates the GitHub release post when a v* tag is pushed (or via manual dispatch).
+# Builds nothing - the two APK workflows listen for the "release published" event
+# this creates and attach their assets. Idempotent: if the release already exists,
+# nothing happens.
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing tag to create the release for (default: latest release tag)'
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Resolve tag
+        id: resolve
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INPUT_TAG: ${{ inputs.tag }}
+          EVENT: ${{ github.event_name }}
+        run: |
+          set -euo pipefail
+          TAG=""
+          if [ "$EVENT" = "push" ] && [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            TAG="${GITHUB_REF#refs/tags/}"
+          else
+            TAG="$INPUT_TAG"
+            if [ -n "$TAG" ] && ! [[ "$TAG" =~ ^v[0-9.]+$ ]]; then
+              echo "::error::tag must match v<semver>"
+              exit 1
+            fi
+            if [ -z "$TAG" ]; then
+              TAG=$(git ls-remote --tags origin 'v[0-9]*' --refs --sort=-v:refname | head -1 | cut -d/ -f3)
+            fi
+          fi
+          if [ -z "$TAG" ]; then
+            echo "::error::could not resolve a tag"
+            exit 1
+          fi
+          EXISTS=false
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            EXISTS=true
+          fi
+          echo "EXISTS=$EXISTS" >> "$GITHUB_OUTPUT"
+          echo "Resolved tag: $TAG (release exists: $EXISTS)"
+
+      - name: Checkout
+        if: steps.resolve.outputs.EXISTS == 'false'
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.resolve.outputs.TAG }}
+          fetch-depth: 0
+
+      - name: Build release notes
+        if: steps.resolve.outputs.EXISTS == 'false'
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          TAG_NAME: ${{ steps.resolve.outputs.TAG }}
+        run: |
+          set -euo pipefail
+          VERSION="${TAG_NAME#v}"
+
+          CODE=$(grep -E '^[[:space:]]*versionCode[[:space:]]+[0-9]+' android/app/build.gradle | grep -oE '[0-9]+' | tail -1)
+          CHANGELOG_FILE="fastlane/metadata/android/en-US/changelogs/${CODE}.txt"
+
+          {
+            echo "## Muajjin $VERSION"
+            echo
+            if [ -f "$CHANGELOG_FILE" ]; then
+              cat "$CHANGELOG_FILE"
+              echo
+            fi
+            PREV_TAG=$(git tag --sort=v:refname | awk -v t="$TAG_NAME" '$0==t{print prev} {prev=$0}')
+            if [ -n "$PREV_TAG" ]; then
+              echo "**Full changelog:** https://github.com/${GITHUB_REPOSITORY}/compare/${PREV_TAG}...${TAG_NAME}"
+            fi
+          } > notes.md
+          cat notes.md
+
+      - name: Create release
+        if: steps.resolve.outputs.EXISTS == 'false'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME: ${{ steps.resolve.outputs.TAG }}
+        run: |
+          gh release create "$TAG_NAME" --title "$TAG_NAME" --notes-file notes.md
