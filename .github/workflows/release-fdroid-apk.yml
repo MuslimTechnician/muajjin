@@ -86,7 +86,7 @@ jobs:
 
       - name: Build web assets (default mode - no self-updater)
         if: steps.tag.outputs.EXISTS == 'false'
-        run: bun run build
+        run: npm run build
 
       - name: Sync to Android (Capacitor)
         if: steps.tag.outputs.EXISTS == 'false'
