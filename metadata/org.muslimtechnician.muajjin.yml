@@ -22,11 +22,12 @@ Repo: https://github.com/MuslimTechnician/muajjin
 Builds:
   - versionName: 2.7.4
     versionCode: 274
-    commit: 6e3e586db97fd68fb8c6344ee733b33905a25511
+    commit: 32f9a0b79ca4204ee138ef19b9da2f0981e931d1
     subdir: android
     sudo:
+      - echo "deb https://deb.debian.org/debian forky main" > /etc/apt/sources.list.d/forky.list
       - apt-get update
-      - apt-get install -y npm
+      - apt-get install -y -t forky nodejs npm
     gradle:
       - yes
     output: app/build/outputs/apk/release/*.apk
