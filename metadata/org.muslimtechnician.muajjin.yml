@@ -1,10 +1,10 @@
 AntiFeatures:
   NonFreeNet:
-    en-US: Location fallback uses ip-api.com/ipwhois.app, whose server code is
-      not published.
+    en-US: Location fallback uses ip-api.com/ipwhois.app, whose server code is not
+      published.
   TetheredNet:
-    en-US: Location fallback and reverse geocoding rely on fixed services
-      (ip-api.com, ipwhois.app, Nominatim).
+    en-US: Location fallback and reverse geocoding rely on fixed services (ip-api.com,
+      ipwhois.app, Nominatim).
 Categories:
   - Religion
 License: MIT
@@ -36,6 +36,8 @@ Builds:
       - npm ci
       - npm run build
       - npx cap sync android
+    scandelete:
+      - node_modules
 
 MaintainerNotes: |-
   The web bundle is built from source with npm (Vite) and synced into the
