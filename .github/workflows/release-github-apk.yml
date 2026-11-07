@@ -26,6 +26,7 @@ jobs:
         id: tag
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
           INPUT_TAG: ${{ inputs.tag }}
           EVENT: ${{ github.event_name }}
         run: |
