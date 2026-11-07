@@ -1,9 +1,11 @@
 name: Build F-Droid APK
 
 # Builds the fdroid-variant APK (default Vite mode - no GitHub self-updater)
-# and attaches muajjin-vX-fdroid.apk to the release. Runs on release publish,
-# or via manual dispatch to backfill a missing APK for any tag. Append-only:
-# never creates a release; skips if the asset already exists.
+# and attaches muajjin-vX-fdroid.apk to the release. Uses npm + node 24 on
+# purpose: identical toolchain to the F-Droid buildserver (Debian forky), so
+# the APK stays byte-identical for Binaries verification. Runs on release
+# publish, or via manual dispatch to backfill a missing APK for any tag.
+# Append-only: never creates a release; skips if the asset already exists.
 
 on:
   release:
@@ -64,32 +66,16 @@ jobs:
           ref: ${{ steps.tag.outputs.TAG }}
           fetch-depth: 0
 
-      - name: Setup Node.js LTS
+      - name: Setup Node.js 24 (matches Debian forky on the F-Droid buildserver)
         if: steps.tag.outputs.EXISTS == 'false'
         uses: actions/setup-node@v4
         with:
-          node-version: lts/*
+          node-version: 24
+          cache: npm
 
-      - name: Setup Bun
+      - name: Install dependencies (npm - same as the F-Droid build recipe)
         if: steps.tag.outputs.EXISTS == 'false'
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version-file: .bun-version
-
-      - name: Cache Bun dependencies
-        if: steps.tag.outputs.EXISTS == 'false'
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.bun/install/cache
-            node_modules
-          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock', 'package.json') }}
-          restore-keys: |
-            ${{ runner.os }}-bun-
-
-      - name: Install dependencies
-        if: steps.tag.outputs.EXISTS == 'false'
-        run: bun install --frozen-lockfile
+        run: npm ci
 
       - name: Set SOURCE_DATE_EPOCH from tag commit
         if: steps.tag.outputs.EXISTS == 'false'
@@ -104,7 +90,7 @@ jobs:
 
       - name: Sync to Android (Capacitor)
         if: steps.tag.outputs.EXISTS == 'false'
-        run: bunx cap sync android
+        run: npx cap sync android
 
       - name: Set up JDK 21
         if: steps.tag.outputs.EXISTS == 'false'
