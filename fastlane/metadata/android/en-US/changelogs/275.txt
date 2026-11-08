@@ -1,0 +1,1 @@
+• F-Droid release packaging improvements: APKs no longer embed the Google Play dependency-info signing block.
