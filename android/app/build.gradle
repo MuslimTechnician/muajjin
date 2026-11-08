@@ -6,6 +6,14 @@ android {
     namespace = "org.muslimtechnician.muajjin"
     compileSdk = rootProject.ext.compileSdkVersion
 
+    // Strip the AGP "Dependency metadata" signing block: F-Droid's scanner
+    // rejects unknown extra signing blocks in upstream binaries
+    // (fdroiddata CI failure on the v2.7.4 fdroid APK).
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
+    }
+
     buildFeatures {
         buildConfig = true
     }
