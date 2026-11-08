@@ -54,6 +54,7 @@ jobs:
           if gh release view "$TAG" > /dev/null 2>&1; then
             EXISTS=true
           fi
+          echo "TAG=$TAG" >> "$GITHUB_OUTPUT"
           echo "EXISTS=$EXISTS" >> "$GITHUB_OUTPUT"
           echo "Resolved tag: $TAG (release exists: $EXISTS)"
 
